@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/fragmentTitle">
+
+    <fragment
+        android:id="@+id/fragmentTitle"
+        android:name="com.fourthfinger.pinkyplayer.FragmentTitle"
+        android:label="fragment_title"
+        tools:layout="@layout/fragment_title" >
+        <action
+            android:id="@+id/action_fragmentTitle_to_fragmentSettings"
+            app:destination="@id/fragmentSettings" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragmentSettings"
+        android:name="com.fourthfinger.pinkyplayer.settings.FragmentSettings"
+        android:label="FragmentSettings"
+        tools:layout="@layout/fragment_settings" />
+</navigation>

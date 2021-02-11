@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Pinky Player</string>
+
+    <!-- FragmentTitle -->
+    <string name="playlists">Playlists</string>
+    <string name="songs">Songs</string>
+    <string name="settings">Settings</string>
+    <string name="folder_search">Folder Search</string>
+
+    <!-- FragmentSettings -->
+    <string name="n_songs">Min number of songs</string>
+    <string name="n_songs_desc">
+        The min number of songs determines the amount of songs you will hear
+        when the algorithm finds the songs you like.
+        The lower this number, the less songs you will hear
+        when the algorithm finds the songs you like.
+        At 1, your favorite song will play a lot after a while until
+        you use the menu in the app bar to reset or lower the probabilities.
+    </string>
+    <string name="max_percent_error">Enter a positive number for Min Number of Songs</string>
+    <string name="percent_change_desc">
+        The mods (1-100) determine how much weight the algorithm uses
+        when the thumb up, thumb down, or skip button are tapped or held down.
+        1 makes the smallest change and 100 makes the largest change.
+        When Min number of songs is 1 and mod up is 100, a song will take the least number of taps to play a lot.
+        When mod down is 1, songs will take a lot of taps until you do not hear them as often.
+    </string>
+    <string name="percent_change_up"><b>Mod Up:</b></string>
+    <string name="percent_change_down"><b>Mod Down:</b></string>
+    <string name="percent_change_error">Mod must be between 1 and 100</string>
+    <string name="save">Save</string>
+
+</resources>
