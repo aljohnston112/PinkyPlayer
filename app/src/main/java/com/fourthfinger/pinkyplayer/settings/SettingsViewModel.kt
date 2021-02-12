@@ -12,20 +12,21 @@ private const val FILE_SAVE3 = "settings3"
 private val SAVE_FILES = listOf(FILE_SAVE, FILE_SAVE2, FILE_SAVE3)
 private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
 
-@HiltViewModel
 class SettingsViewModel @Inject constructor(
         private val app: Application,
         savedStateHandle: SavedStateHandle,
         private val settingsRepo: SettingsRepo)
-    : AndroidViewModel(app) {
+    : ViewModel() {
 
-    val settings: MutableLiveData<Settings> by lazy {
+    private val _settings: MutableLiveData<Settings> by lazy {
         MutableLiveData<Settings>()
     }
 
+    val settings = _settings as LiveData<Settings>
+
     init {
         viewModelScope.launch {
-            settings.postValue(
+            _settings.postValue(
                     settingsRepo.load(
                             app.applicationContext,
                             SAVE_FILES,
@@ -34,7 +35,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun save(settings: Settings) {
-        this.settings.postValue(settings)
+        this._settings.postValue(settings)
         viewModelScope.launch {
             settingsRepo.save(
                     settings,

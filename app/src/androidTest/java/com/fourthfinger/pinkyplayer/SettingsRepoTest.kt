@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.fourthfinger.pinkyplayer.settings.Settings
+import com.fourthfinger.pinkyplayer.settings.SettingsFileManager
 import com.fourthfinger.pinkyplayer.settings.SettingsRepo
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -20,7 +21,7 @@ class SettingsRepoTest {
 
     companion object {
         private val context = InstrumentationRegistry.getInstrumentation().targetContext
-        private val settingsRepo = SettingsRepo()
+        private val settingsRepo = SettingsRepo(SettingsFileManager())
         private val fileNames = listOf<String>("0", "1", "2")
         private const val fileVerificationNumber = 1234567898765432123
     }

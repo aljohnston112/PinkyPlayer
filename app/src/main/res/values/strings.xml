@@ -29,5 +29,6 @@
     <string name="percent_change_down"><b>Mod Down:</b></string>
     <string name="percent_change_error">Mod must be between 1 and 100</string>
     <string name="save">Save</string>
+    <string name="song_menu">Song menu</string>
 
 </resources>
