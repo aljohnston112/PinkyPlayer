@@ -5,10 +5,8 @@ import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
-import com.fourthfinger.pinkyplayer.songs.Song
-import com.fourthfinger.pinkyplayer.songs.SongDao
 import java.io.*
-import java.util.*
+import kotlin.random.Random
 
 @Transient
 const val TAG = "AudioURI"
@@ -66,6 +64,11 @@ class AudioUri(
     }
 
     companion object {
+
+        fun doesAudioUriExist(context: Context, songID: Long): Boolean {
+            val file = File(context.filesDir, songID.toString())
+            return file.exists()
+        }
 
         fun saveAudioUri(context: Context, audioURI: AudioUri) : Boolean {
             val file = File(context.filesDir, audioURI.id.toString())

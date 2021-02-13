@@ -1,6 +1,7 @@
 package com.fourthfinger.pinkyplayer
 
 import java.util.*
+import kotlin.random.Random
 
 class NestedProbMap {
 

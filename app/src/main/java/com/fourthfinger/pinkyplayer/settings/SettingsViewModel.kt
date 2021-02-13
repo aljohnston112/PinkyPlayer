@@ -14,10 +14,10 @@ private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-        private val app: Application,
+        app: Application,
         savedStateHandle: SavedStateHandle,
         private val settingsRepo: SettingsRepo)
-    : ViewModel() {
+    : AndroidViewModel(app) {
 
     private val _settings: MutableLiveData<Settings> by lazy {
         MutableLiveData<Settings>()
@@ -40,7 +40,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             settingsRepo.save(
                     settings,
-                    app.applicationContext,
+                    getApplication<Application>().applicationContext,
                     SAVE_FILES,
                     SAVE_FILE_VERIFICATION_NUMBER,
                     )

@@ -1,6 +1,6 @@
 package com.fourthfinger.pinkyplayer
 
-import java.util.*
+import kotlin.random.Random
 
 class ProbMap<T> {
 
@@ -12,7 +12,7 @@ class ProbMap<T> {
     }
 
     fun outcome(t: T, random: Random): Boolean {
-        val prob = probMap[t]?.let {
+        probMap[t]?.let {
             val randomChoice = random.nextDouble()
             return randomChoice <= it
         }

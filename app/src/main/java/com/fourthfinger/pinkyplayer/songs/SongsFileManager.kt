@@ -2,22 +2,22 @@ package com.fourthfinger.pinkyplayer.songs
 
 import android.content.Context
 import android.provider.MediaStore
-import androidx.lifecycle.MutableLiveData
 import com.fourthfinger.pinkyplayer.AudioUri
 import com.fourthfinger.pinkyplayer.R
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
-class SongsFileManager {
+class SongsFileManager @Inject constructor() {
 
-    private fun getNewSongsFromMediaStore(
+    fun scanSongs(
             context: Context,
-            loadingText: MutableLiveData<String>,
-            loadingProgress: MutableLiveData<Double>,
-    ): List<Song> {
+            callback: LoadingCallback,
+            songDao: SongDao,
+    ): List<Long> {
+        val songsThatExist = ArrayList<Long>()
         val newSongs = ArrayList<Song>()
-        val filesThatExist = ArrayList<Long>()
         GlobalScope.launch {
             val projection = arrayOf(
                     MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME,
@@ -38,24 +38,35 @@ class SongsFileManager {
                     val artistCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST_ID)
                     val nSongs = cursor.count
                     var currentSongPosition = 0
-                    loadingText.postValue(context.resources.getString(R.string.loading1))
+                    callback.setLoadingText(context.resources.getString(R.string.loading1))
                     while (cursor.moveToNext()) {
                         val id = cursor.getLong(idCol)
                         val displayName = cursor.getString(nameCol)
                         val title = cursor.getString(titleCol)
                         val artist = cursor.getString(artistCol)
-                        val audioURI = AudioUri(displayName, artist, title, id)
-                        if (AudioUri.saveAudioUri(context, audioURI)) {
-                            newSongs.add(Song(id, title))
+                        if(!AudioUri.doesAudioUriExist(context, id)) {
+                            val audioURI = AudioUri(displayName, artist, title, id)
+                            if (AudioUri.saveAudioUri(context, audioURI)) {
+                                songsThatExist.add(id)
+                                newSongs.add(Song(id, title))
+                            }
+                        } else {
+                            songsThatExist.add(id)
                         }
-                        filesThatExist.add(id)
-                        loadingProgress.postValue(
+                        callback.setLoadingProgress(
                                 currentSongPosition.toDouble() / nSongs.toDouble())
                         currentSongPosition++
+                    }
+                    callback.setLoadingText(context.resources.getString(R.string.loading2))
+                    val nNewSongs = newSongs.size
+                    for ((newSongIndex, song) in newSongs.withIndex()) {
+                        songDao.insertAll(song)
+                        callback.setLoadingProgress(newSongIndex.toDouble() / nNewSongs.toDouble())
                     }
                 }
             }
         }
+        return songsThatExist
     }
 
 }
