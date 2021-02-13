@@ -12,6 +12,7 @@ private const val FILE_SAVE3 = "settings3"
 private val SAVE_FILES = listOf(FILE_SAVE, FILE_SAVE2, FILE_SAVE3)
 private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
 
+@HiltViewModel
 class SettingsViewModel @Inject constructor(
         private val app: Application,
         savedStateHandle: SavedStateHandle,
