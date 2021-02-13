@@ -9,4 +9,6 @@ import androidx.room.PrimaryKey
 data class Song(
         @PrimaryKey val id : Long,
         @ColumnInfo(name = "title") val title :String,
-        @Ignore var selected: Boolean = false)
+){
+    @Ignore var selected: Boolean = false
+}

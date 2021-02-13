@@ -13,8 +13,8 @@ interface SongDao {
     @Insert
     suspend fun insertAll(vararg songs: Song)
 
-    @Delete
-    suspend fun delete(user: Song)
+    @Query("DELETE FROM songs WHERE id = :song_id")
+    suspend fun deleteSong(song_id: Long)
 
     @Query("SELECT * FROM songs WHERE id = :song_id")
     suspend fun getSong(song_id: Long): Song

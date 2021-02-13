@@ -22,9 +22,7 @@ class FragmentSongs : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-   //  private val viewModel: SongsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
-
-    val registrationViewModel: SongsViewModel by viewModels<SongsViewModel>()
+    val registrationViewModel: SongsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {

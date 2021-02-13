@@ -12,13 +12,13 @@ import javax.inject.Inject
 @HiltViewModel
 class SongsViewModel @Inject constructor(
         private val app: Application,
-        // savedStateHandle: SavedStateHandle,
-       // private val songsRepo: SongsRepo,
+        savedStateHandle: SavedStateHandle,
+        private val songsRepo: SongsRepo,
         ) : ViewModel() {
 
-    // val songs = songsRepo.songs.asLiveData()
+     val songs = songsRepo.songs.asLiveData()
 
-   // fun insert(vararg songs : Song) = viewModelScope.launch { songsRepo.insertAll(*songs) }
+    fun insert(vararg songs : Song) = viewModelScope.launch { songsRepo.insertAll(*songs) }
 
 }
 

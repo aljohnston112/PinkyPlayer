@@ -6,7 +6,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import dagger.hilt.migration.DisableInstallInCheck
 import javax.inject.Singleton
 
 @Module
@@ -15,14 +14,14 @@ class SongModule {
 
     @Provides
     @Singleton
-    fun provideSongDB(@ApplicationContext context: Context): SongDatabase {
-        return SongDatabase.getDatabase(context)
+    fun provideSongDB(@ApplicationContext context: Context): SongDB {
+        return SongDB.getDatabase(context)
     }
 
     @Provides
     @Singleton
-    fun provideSongDao(songDatabase: SongDatabase): SongDao {
-        return songDatabase.songDAO()
+    fun provideSongDao(songDB: SongDB): SongDao {
+        return songDB.songDao()
     }
 
 }

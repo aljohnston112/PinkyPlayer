@@ -1,5 +1,7 @@
 package com.fourthfinger.pinkyplayer
 
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -16,11 +18,10 @@ import java.io.IOException
 import java.io.ObjectInputStream
 
 @RunWith(AndroidJUnit4::class)
-@LargeTest
 class SettingsRepoTest {
 
     companion object {
-        private val context = InstrumentationRegistry.getInstrumentation().targetContext
+        private val context = ApplicationProvider.getApplicationContext<Context>()
         private val settingsRepo = SettingsRepo(SettingsFileManager())
         private val fileNames = listOf<String>("0", "1", "2")
         private const val fileVerificationNumber = 1234567898765432123
