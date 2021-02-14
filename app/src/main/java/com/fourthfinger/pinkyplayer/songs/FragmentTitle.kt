@@ -1,16 +1,22 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.songs
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
+import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.databinding.FragmentTitleBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FragmentTitle : Fragment() {
 
     private var _binding: FragmentTitleBinding? = null
+
+    private val viewModelSongs: SongsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -21,6 +27,15 @@ class FragmentTitle : Fragment() {
                               savedInstanceState: Bundle?): View {
         _binding = FragmentTitleBinding.inflate(layoutInflater)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModelSongs.isLoaded.observe(viewLifecycleOwner,  {loaded ->
+            if(loaded != true){
+                findNavController().navigate(R.id.fragmentLoading)
+            }
+        })
     }
 
     override fun onStart() {

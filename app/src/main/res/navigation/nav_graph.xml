@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/fragmentTitle"
-        android:name="com.fourthfinger.pinkyplayer.FragmentTitle"
+        android:name="com.fourthfinger.pinkyplayer.songs.FragmentTitle"
         android:label="fragment_title"
         tools:layout="@layout/fragment_title" >
         <action
@@ -21,4 +21,9 @@
         android:name="com.fourthfinger.pinkyplayer.settings.FragmentSettings"
         android:label="FragmentSettings"
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/fragmentLoading"
+        android:name="com.fourthfinger.pinkyplayer.songs.FragmentLoading"
+        android:label="FragmentLoading"
+        tools:layout="@layout/fragment_loading"/>
 </navigation>

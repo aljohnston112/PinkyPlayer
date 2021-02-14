@@ -3,14 +3,17 @@ package com.fourthfinger.pinkyplayer.settings
 import android.app.Application
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
 private const val FILE_SAVE = "settings"
 private const val FILE_SAVE2 = "settings2"
 private const val FILE_SAVE3 = "settings3"
 private val SAVE_FILES = listOf(FILE_SAVE, FILE_SAVE2, FILE_SAVE3)
 private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
+
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -26,7 +29,7 @@ class SettingsViewModel @Inject constructor(
     val settings = _settings as LiveData<Settings>
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _settings.postValue(
                     settingsRepo.load(
                             app.applicationContext,
@@ -37,7 +40,7 @@ class SettingsViewModel @Inject constructor(
 
     fun save(settings: Settings) {
         this._settings.postValue(settings)
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             settingsRepo.save(
                     settings,
                     getApplication<Application>().applicationContext,

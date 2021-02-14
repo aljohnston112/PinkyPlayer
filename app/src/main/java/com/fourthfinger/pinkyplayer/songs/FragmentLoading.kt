@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.navigation.fragment.findNavController
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.databinding.FragmentLoadingBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,12 +20,31 @@ class FragmentLoading : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    val registrationViewModel: SongsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
+    private val viewModelSongs: SongsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
         _binding = FragmentLoadingBinding.inflate(layoutInflater)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        observeLoadingProgress()
+    }
+
+    private fun observeLoadingProgress() {
+        viewModelSongs.loadingProgress.observe(viewLifecycleOwner, { progress ->
+            binding.progressBarLoading.progress = progress
+        })
+        viewModelSongs.loadingText.observe(viewLifecycleOwner, { text ->
+            binding.textViewLoading.text = text
+        })
+        viewModelSongs.isLoaded.observe(viewLifecycleOwner, { loaded ->
+            if(loaded){
+                findNavController().popBackStack()
+            }
+        })
     }
 
     override fun onDestroyView() {
