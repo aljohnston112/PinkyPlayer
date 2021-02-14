@@ -2,7 +2,6 @@ package com.fourthfinger.pinkyplayer.songs
 
 import android.content.Context
 import android.provider.MediaStore
-import com.fourthfinger.pinkyplayer.AudioUri
 import com.fourthfinger.pinkyplayer.R
 import java.util.*
 import javax.inject.Inject

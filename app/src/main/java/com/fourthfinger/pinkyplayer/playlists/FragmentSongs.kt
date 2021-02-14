@@ -1,17 +1,15 @@
-package com.fourthfinger.pinkyplayer.songs
+package com.fourthfinger.pinkyplayer.playlists
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
-import androidx.lifecycle.ViewModel
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.databinding.RecyclerViewSongListBinding
+import com.fourthfinger.pinkyplayer.songs.SongsViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class FragmentSongs : Fragment() {
@@ -22,7 +20,7 @@ class FragmentSongs : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    val registrationViewModel: SongsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
+    val viewModelSongs: SongsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {

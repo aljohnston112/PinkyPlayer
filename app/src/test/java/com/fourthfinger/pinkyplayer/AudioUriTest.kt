@@ -1,5 +1,6 @@
 package com.fourthfinger.pinkyplayer
 
+import com.fourthfinger.pinkyplayer.songs.AudioUri
 import org.junit.Test
 
 class AudioUriTest {

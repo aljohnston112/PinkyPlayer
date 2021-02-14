@@ -1,5 +1,6 @@
 package com.fourthfinger.pinkyplayer
 
+import com.fourthfinger.pinkyplayer.songs.ProbMap
 import junit.framework.TestCase
 import org.junit.Test
 import kotlin.math.roundToInt

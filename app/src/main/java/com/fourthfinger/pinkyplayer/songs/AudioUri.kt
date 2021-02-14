@@ -1,4 +1,4 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.songs
 
 import android.content.ContentUris
 import android.content.Context
@@ -114,7 +114,8 @@ class AudioUri(
                     context.openFileInput(songID.toString()).use {
                         fileInputStream -> ObjectInputStream(fileInputStream).use {
                         objectInputStream ->
-                        return objectInputStream.readObject() as AudioUri } }
+                        return objectInputStream.readObject() as AudioUri
+                    } }
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace()
                 } catch (e: IOException) {
