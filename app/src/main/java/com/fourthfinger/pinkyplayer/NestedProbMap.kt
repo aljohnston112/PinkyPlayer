@@ -1,9 +1,10 @@
 package com.fourthfinger.pinkyplayer
 
+import java.io.Serializable
 import java.util.*
 import kotlin.random.Random
 
-class NestedProbMap {
+class NestedProbMap : Serializable {
 
     // The ProbFun used to determine if a song should play during a specific hour
     private val probabilityFunctionHours: ProbMap<Int> = ProbMap()

@@ -34,8 +34,9 @@ class SongsFileManager @Inject constructor() {
                     val titleCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
                     val artistCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST_ID)
                     val nSongs = cursor.count
-                    var currentSongPosition = 0
+                    callback.setLoadingProgress(0.0)
                     callback.setLoadingText(context.resources.getString(R.string.loading1))
+                    var currentSongPosition = 0
                     while (cursor.moveToNext()) {
                         val id = cursor.getLong(idCol)
                         val displayName = cursor.getString(nameCol)
@@ -43,10 +44,9 @@ class SongsFileManager @Inject constructor() {
                         val artist = cursor.getString(artistCol)
                         if(!AudioUri.doesAudioUriExist(context, id)) {
                             val audioURI = AudioUri(displayName, artist, title, id)
-                            if (AudioUri.saveAudioUri(context, audioURI)) {
-                                songsThatExist.add(id)
-                                newSongs.add(Song(id, title))
-                            }
+                            newSongs.add(Song(id, title))
+                            AudioUri.saveAudioUri(context, audioURI)
+                            songsThatExist.add(id)
                         } else {
                             songsThatExist.add(id)
                         }
@@ -55,10 +55,11 @@ class SongsFileManager @Inject constructor() {
                         currentSongPosition++
                     }
                     callback.setLoadingText(context.resources.getString(R.string.loading2))
+                    callback.setLoadingProgress(0.0)
                     val nNewSongs = newSongs.size
-                    for ((newSongIndex, song) in newSongs.withIndex()) {
+                    for ((index, song) in newSongs.withIndex()) {
                         songDao.insertAll(song)
-                        callback.setLoadingProgress(newSongIndex.toDouble() / nNewSongs.toDouble())
+                        callback.setLoadingProgress(index.toDouble() / nNewSongs.toDouble())
                     }
                 }
             }

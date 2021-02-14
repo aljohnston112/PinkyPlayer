@@ -1,8 +1,9 @@
 package com.fourthfinger.pinkyplayer
 
+import java.io.Serializable
 import kotlin.random.Random
 
-class ProbMap<T> {
+class ProbMap<T> : Serializable {
 
     // A map of T to the probability of it being returned if selected
     private val probMap = mutableMapOf<T, Double>()

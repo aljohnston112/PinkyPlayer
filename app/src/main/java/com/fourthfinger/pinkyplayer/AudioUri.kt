@@ -21,9 +21,15 @@ class AudioUri(
 
     private val nestProbMap: NestedProbMap = NestedProbMap()
 
-    val uri: Uri by lazy {
-        ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-    }
+    @Transient
+    var uri: Uri? = null
+        get() : Uri? {
+            if(field == null){
+                field = getUri(id)
+            }
+            return field
+        }
+        private set
 
     private var duration: Int = -1
 
@@ -34,7 +40,7 @@ class AudioUri(
             var time = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
             mediaMetadataRetriever.release()
             if (time == null) {
-                time = "00:00:00"
+                time = "-1"
             }
             duration = time.toInt()
         }
@@ -83,14 +89,22 @@ class AudioUri(
                     context.openFileOutput(audioURI.id.toString(), Context.MODE_PRIVATE).use {
                         fos -> ObjectOutputStream(fos).use {
                         objectOutputStream -> objectOutputStream.writeObject(audioURI) } }
+                    return true
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace()
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
-                return false
             }
-            return true;
+            return false
+        }
+
+        fun deleteAudioUri(context: Context, songID : Long) : Boolean {
+            val file = File(context.filesDir, songID.toString())
+            if (file.exists()) {
+                return file.delete()
+            }
+            return false
         }
 
         fun getAudioUri(context: Context, songID: Long): AudioUri? {

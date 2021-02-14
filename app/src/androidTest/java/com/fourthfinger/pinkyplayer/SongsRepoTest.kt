@@ -29,16 +29,14 @@ class SongsRepoTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         songDB = Room.inMemoryDatabaseBuilder(context, SongDB::class.java).build()
         songDao = songDB.songDao()
-        var loadingText: String
-        var loadingProgress = 0.0
         val songsRepo = SongsRepo(songDao, songFileManager)
         runBlocking {
+            loadingCallback = LoadingCallbackImp()
             val songs = songsRepo.scanSongs(Companion.context, loadingCallback)
-            var file: File
             for (song in songs) {
-                file = File(context.filesDir, song.toString())
-                file.delete()
+                AudioUri.deleteAudioUri(context, song)
             }
+            songDao.deleteAll()
         }
     }
 
@@ -53,6 +51,7 @@ class SongsRepoTest {
         val songsRepo = SongsRepo(songDao, songFileManager)
         var songs : List<Long>
         runBlocking {
+            loadingCallback = LoadingCallbackImp()
             songs = songsRepo.scanSongs(context, loadingCallback)
             var file: File
             for (song in songs) {
@@ -66,18 +65,24 @@ class SongsRepoTest {
     companion object {
         private val context = ApplicationProvider.getApplicationContext<Context>()
         private val songFileManager = SongsFileManager()
-        val loadingCallback : LoadingCallback = object : LoadingCallback {
-            lateinit var _loadingText: String
-            var _loadingProgress = 0.0
+        private lateinit var loadingCallback : LoadingCallback
+        class LoadingCallbackImp : LoadingCallback {
+            private var loadingText =  context.resources.getString(R.string.loading1)
+            private var loadingProgress = 0.0
             override fun setLoadingText(text: String) {
-                _loadingText = text
-                if(_loadingText == context.resources.getString(R.string.loading2)){
+                if(text ==  context.resources.getString(R.string.loading1)){
+                    assert(loadingText == context.resources.getString(R.string.loading1))
+                }
+                loadingText = text
+                if(loadingText == context.resources.getString(R.string.loading2)){
                     assert(text != context.resources.getString(R.string.loading1))
                 }
             }
             override fun setLoadingProgress(progress: Double) {
-                assert(_loadingProgress <= progress)
-                _loadingProgress = progress
+                if(loadingText != context.resources.getString(R.string.loading2) || progress != 0.0){
+                    assert(loadingProgress <= progress)
+                }
+                loadingProgress = progress
             }
         }
     }
