@@ -14,7 +14,7 @@ interface SongDao {
     suspend fun insertAll(vararg songs: Song)
 
     @Query("SELECT * FROM songs WHERE id = :song_id")
-    suspend fun getSong(song_id: Long): Song
+    suspend fun getSong(song_id: Long): Song?
 
     @Query("SELECT * FROM songs")
     fun getAll(): Flow<List<Song>>

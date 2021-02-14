@@ -78,6 +78,6 @@ class ProbMapTest : TestCase() {
                 map[false] = map[false]!!+1
             }
         }
-        assert(map[true]!! >= rolls)
+        assert(map[true]!! == rolls+1)
     }
 }

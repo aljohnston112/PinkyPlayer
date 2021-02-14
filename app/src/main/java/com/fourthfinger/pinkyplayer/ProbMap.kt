@@ -25,8 +25,8 @@ class ProbMap<T> {
         }
         val prob = probMap[t] ?: return false
         var globalGood = true
-        for (d in probMap.values) {
-            if (prob >= d) {
+        for (entry in probMap) {
+            if (prob >= entry.value && entry.key != t) {
                 globalGood = false
                 break
             }
@@ -42,8 +42,8 @@ class ProbMap<T> {
         }
         val prob = probMap[t] ?: return false
         var globalBad = true
-        for (d in probMap.values) {
-            if (prob <= d) {
+        for (entry in probMap) {
+            if (prob <= entry.value && entry.key != t) {
                 globalBad = false
                 break
             }

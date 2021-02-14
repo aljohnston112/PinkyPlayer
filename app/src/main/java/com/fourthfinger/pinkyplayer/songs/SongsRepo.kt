@@ -15,7 +15,7 @@ class SongsRepo  @Inject constructor(
     @WorkerThread
     suspend fun insertAll(vararg songs: Song) = songDao.insertAll(*songs)
 
-    fun scanSongs(
+    suspend fun scanSongs(
             context: Context,
             callback: LoadingCallback,
     ): List<Long> {

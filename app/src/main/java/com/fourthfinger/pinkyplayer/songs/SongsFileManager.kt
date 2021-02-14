@@ -4,21 +4,18 @@ import android.content.Context
 import android.provider.MediaStore
 import com.fourthfinger.pinkyplayer.AudioUri
 import com.fourthfinger.pinkyplayer.R
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
 class SongsFileManager @Inject constructor() {
 
-    fun scanSongs(
+    suspend fun scanSongs(
             context: Context,
             callback: LoadingCallback,
             songDao: SongDao,
     ): List<Long> {
         val songsThatExist = ArrayList<Long>()
         val newSongs = ArrayList<Song>()
-        GlobalScope.launch {
             val projection = arrayOf(
                     MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME,
                     MediaStore.Audio.Media.IS_MUSIC, MediaStore.Audio.Media.ARTIST_ID,
@@ -65,7 +62,6 @@ class SongsFileManager @Inject constructor() {
                     }
                 }
             }
-        }
         return songsThatExist
     }
 

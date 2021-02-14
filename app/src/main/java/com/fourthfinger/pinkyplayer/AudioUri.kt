@@ -6,6 +6,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import java.io.*
+import java.util.*
 import kotlin.random.Random
 
 @Transient
@@ -24,27 +25,32 @@ class AudioUri(
         ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
     }
 
-    val duration: Int by lazy {
-        val mediaMetadataRetriever = MediaMetadataRetriever()
-        mediaMetadataRetriever.setDataSource(null, uri)
-        var time = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-        mediaMetadataRetriever.release()
-        if (time == null) {
-            time = "00:00:00"
+    private var duration: Int = -1
+
+    fun getDuration(context: Context): Int {
+        if(duration == -1) {
+            val mediaMetadataRetriever = MediaMetadataRetriever()
+            mediaMetadataRetriever.setDataSource(context, uri)
+            var time = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            mediaMetadataRetriever.release()
+            if (time == null) {
+                time = "00:00:00"
+            }
+            duration = time.toInt()
         }
-        time.toInt()
+        return duration
     }
 
     fun shouldPlay(random: Random): Boolean {
-        return nestProbMap.outcome(random)
+        return nestProbMap.outcome(random, Calendar.getInstance())
     }
 
     fun good(percent: Double): Boolean {
-        return nestProbMap.good(percent)
+        return nestProbMap.good(percent, Calendar.getInstance())
     }
 
     fun bad(percent: Double): Boolean {
-        return nestProbMap.bad(percent)
+        return nestProbMap.bad(percent, Calendar.getInstance())
     }
 
     fun resetProbabilities() {
