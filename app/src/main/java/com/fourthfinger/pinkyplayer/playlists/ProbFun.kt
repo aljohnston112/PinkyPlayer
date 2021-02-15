@@ -5,6 +5,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
 import kotlin.random.Random
+import kotlin.reflect.KProperty
 
 sealed class ProbFun<T>(
         choices: Set<T>, var maxPercent: Double, comparable: Boolean
@@ -139,7 +140,7 @@ sealed class ProbFun<T>(
         probabilityMap = swappedMap
     }
 
-    fun switchOnePosition(oldPosition: Int, newPosition: Int) {
+    fun switchOnesPosition(oldPosition: Int, newPosition: Int) {
         val oldMap = probabilityMap
         val keys = ArrayList(oldMap.keys)
         val d = keys[oldPosition]
@@ -156,7 +157,7 @@ sealed class ProbFun<T>(
         return probabilityMap.containsKey(t)
     }
 
-    val getKeys = ArrayList(probabilityMap.keys)
+    fun getKeys() = ArrayList(probabilityMap.keys)
 
     fun iterator() = probabilityMap.iterator()
 
@@ -281,7 +282,7 @@ sealed class ProbFun<T>(
     /**
      * Sets the probabilities to there being an equal chance of getting any element from this ProbFunTree.
      */
-    fun clearProbabilities() {
+    fun resetProbabilities() {
         for (e in probabilityMap.entries) {
             e.setValue(1.0)
         }
@@ -342,7 +343,7 @@ sealed class ProbFun<T>(
      * @return a randomly picked element from this ProbFunTree.
      * Any changes in the element will be reflected in this ProbFunTree.
      */
-    fun next(random: Random.Default): T {
+    fun next(random: Random): T {
         val randomChoice = random.nextDouble()
         val entries = probabilityMap.entries.iterator()
         var element: T? = null
@@ -382,6 +383,13 @@ sealed class ProbFun<T>(
             return hashCode() == other.hashCode()
         }
         return false
+    }
+
+    operator fun getValue(randomPlaylist: RandomPlaylist, property: KProperty<*>): Double {
+        if(property.name == "maxPercent"){
+            return maxPercent
+        }
+        return -1.0
     }
 
     companion object {

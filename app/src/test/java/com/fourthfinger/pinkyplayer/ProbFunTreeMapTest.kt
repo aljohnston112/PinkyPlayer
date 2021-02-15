@@ -10,6 +10,7 @@ private const val roundingError = 0.001
 private const val TOLERANCE = 0.95
 private const val rolls = 100000
 
+// TODO scale up to 10000 goods or bads
 class ProbFunTreeMapMapTest {
 
     @Test
@@ -18,8 +19,8 @@ class ProbFunTreeMapMapTest {
         val maxPercent = 0.5
         val pf: ProbFunTreeMap<Int> = ProbFunTreeMap(choices, maxPercent)
         pf.add(2, 0.5)
-        pf.clearProbabilities()
-        for (key in pf.getKeys) {
+        pf.resetProbabilities()
+        for (key in pf.getKeys()) {
             assert((pf.getProbability(key) < ((1.0 / 3.0) + roundingError)) ||
                     (pf.getProbability(key) > ((1.0 / 3.0) - roundingError)))
         }
@@ -45,8 +46,8 @@ class ProbFunTreeMapMapTest {
         } catch (e: IllegalArgumentException) {
         }
         val pf = ProbFunTreeMap(choices1, maxPercent)
-        pf.getKeys.contains(0)
-        pf.getKeys.contains(1)
+        pf.getKeys().contains(0)
+        pf.getKeys().contains(1)
         pf.maxPercent = maxPercent
     }
 
@@ -117,13 +118,13 @@ class ProbFunTreeMapMapTest {
         val maxPercent = 0.5
         val pf = ProbFunTreeMap(choices, maxPercent)
         val pf0 = pf.clone()
-        pf0.getKeys.contains(0)
-        pf0.getKeys.contains(1)
+        pf0.getKeys().contains(0)
+        pf0.getKeys().contains(1)
         pf0.maxPercent = maxPercent
         pf.bad(1, 0.5)
         val pf1 = pf.clone()
-        pf1.getKeys.contains(0)
-        pf1.getKeys.contains(1)
+        pf1.getKeys().contains(0)
+        pf1.getKeys().contains(1)
         pf1.maxPercent = maxPercent
         assert((pf.getProbability(0) < ((3.0 / 4.0) + roundingError)) ||
                 (pf.getProbability(0) > ((3.0 / 4.0) - roundingError)))
@@ -209,25 +210,25 @@ class ProbFunTreeMapMapTest {
         val choices = setOf(0, 1, 2)
         val maxPercent = 0.5
         val pf = ProbFunLinkedMap(choices, maxPercent)
-        var keys = pf.iterator()
-        assert(keys.next().key == 0)
-        assert(keys.next().key == 1)
-        assert(keys.next().key == 2)
-        pf.switchOnePosition(2, 1)
-        keys = pf.iterator()
-        assert(keys.next().key == 0)
-        assert(keys.next().key == 2)
-        assert(keys.next().key == 1)
-        pf.switchOnePosition(0, 2)
-        keys = pf.iterator()
-        assert(keys.next().key == 2)
-        assert(keys.next().key == 1)
-        assert(keys.next().key == 0)
-        pf.switchOnePosition(2, 0)
-        keys = pf.iterator()
-        assert(keys.next().key == 0)
-        assert(keys.next().key == 2)
-        assert(keys.next().key == 1)
+        var keys = pf.getKeys()
+        assert(keys[0] == 0)
+        assert(keys[1] == 1)
+        assert(keys[2] == 2)
+        pf.switchOnesPosition(2, 1)
+        keys = pf.getKeys()
+        assert(keys[0] == 0)
+        assert(keys[1] == 2)
+        assert(keys[2] == 1)
+        pf.switchOnesPosition(0, 2)
+        keys = pf.getKeys()
+        assert(keys[0] == 2)
+        assert(keys[1] == 1)
+        assert(keys[2] == 0)
+        pf.switchOnesPosition(2, 0)
+        keys = pf.getKeys()
+        assert(keys[0] == 0)
+        assert(keys[1] == 2)
+        assert(keys[2] == 1)
     }
 
     @Test
