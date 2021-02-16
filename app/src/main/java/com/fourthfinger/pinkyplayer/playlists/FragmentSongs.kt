@@ -16,6 +16,7 @@ class FragmentSongs : Fragment() {
 
     private var _binding: RecyclerViewSongListBinding? = null
 
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
