@@ -14,8 +14,12 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
 
     fun songs() = probabilityFunction.getKeys()
 
-    fun maxPercent(): Double {
+    fun getMaxPercent(): Double {
         return probabilityFunction.maxPercent
+    }
+
+    fun setMaxPercent(maxPercent : Double){
+        probabilityFunction.maxPercent = maxPercent
     }
 
     fun size(): Int {
@@ -144,6 +148,19 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
                 next(context, random)
             } else {
                 null
+            }
+        }
+    }
+
+    fun updateSongs(newSongs: List<Song>){
+        for(s in newSongs){
+            if(!contains(s)){
+                add(s)
+            }
+        }
+        for(s in songs()){
+            if(!newSongs.contains(s)){
+                remove(s)
             }
         }
     }

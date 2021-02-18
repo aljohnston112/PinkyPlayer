@@ -41,8 +41,6 @@ class SongsViewModel @Inject constructor(
 
     val isLoaded get() = _isLoaded as LiveData<Boolean>
 
-    val songs = songsRepo.songs.asLiveData()
-
     init {
         if(!loadingStarted) {
             viewModelScope.launch(Dispatchers.IO) {

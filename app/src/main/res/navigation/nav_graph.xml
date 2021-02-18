@@ -14,6 +14,9 @@
         <action
             android:id="@+id/action_fragmentTitle_to_fragmentSettings"
             app:destination="@id/fragmentSettings" />
+        <action
+            android:id="@+id/action_fragmentTitle_to_fragmentSongs"
+            app:destination="@id/fragmentSongs" />
     </fragment>
 
     <fragment
@@ -26,4 +29,9 @@
         android:name="com.fourthfinger.pinkyplayer.songs.FragmentLoading"
         android:label="FragmentLoading"
         tools:layout="@layout/fragment_loading"/>
+    <fragment
+        android:id="@+id/fragmentSongs"
+        android:name="com.fourthfinger.pinkyplayer.playlists.FragmentSongs"
+        android:label="recycler_view_song_list"
+        tools:layout="@layout/recycler_view_song_list" />
 </navigation>

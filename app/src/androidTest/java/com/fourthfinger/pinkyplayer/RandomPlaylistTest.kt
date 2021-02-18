@@ -62,7 +62,7 @@ class RandomPlaylistTest {
         for (s in music) {
             assert(songs.contains(s))
         }
-        assert(rp.maxPercent() == maxPercent)
+        assert(rp.getMaxPercent() == maxPercent)
         assert(songs[0] == song1)
         assert(songs[1] == song)
         assert(songs[2] == song2)
@@ -217,6 +217,5 @@ class RandomPlaylistTest {
         assert(AudioUri.deleteAudioUri(context, song.id))
         assert(!AudioUri.doesAudioUriExist(context, song.id))
     }
-
 
 }

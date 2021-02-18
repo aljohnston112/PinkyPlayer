@@ -56,10 +56,13 @@ class SongsFileManager @Inject constructor() {
                     callback.setLoadingText(context.resources.getString(R.string.loading2))
                     callback.setLoadingProgress(0.0)
                     val nNewSongs = newSongs.size
-                    for ((index, song) in newSongs.withIndex()) {
+                    var i = 0;
+                    for (song in newSongs) {
                         songDao.insertAll(song)
-                        callback.setLoadingProgress(index.toDouble() / nNewSongs.toDouble())
+                        callback.setLoadingProgress(i.toDouble() / nNewSongs.toDouble())
+                        i++
                     }
+                    callback.setLoadingProgress(1.0)
                 }
             }
         return songsThatExist

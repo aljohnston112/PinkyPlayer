@@ -9,6 +9,7 @@ import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.databinding.FragmentLoadingBinding
+import com.fourthfinger.pinkyplayer.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -21,6 +22,8 @@ class FragmentLoading : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModelSongs: SongsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
+
+    private val viewModelSettings: SettingsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -40,8 +43,9 @@ class FragmentLoading : Fragment() {
         viewModelSongs.loadingText.observe(viewLifecycleOwner, { text ->
             binding.textViewLoading.text = text
         })
-        viewModelSongs.isLoaded.observe(viewLifecycleOwner, { loaded ->
-            if(loaded){
+        val loaded = MediatorLiveDataLoading().isLoaded(viewModelSongs.isLoaded, viewModelSettings.isLoaded)
+        loaded.observe(viewLifecycleOwner, { isLoaded ->
+            if (isLoaded) {
                 findNavController().popBackStack()
             }
         })

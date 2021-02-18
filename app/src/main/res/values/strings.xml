@@ -14,6 +14,11 @@
     <string name="settings">Settings</string>
     <string name="folder_search">Folder Search</string>
 
+    <!-- FragmentSongs-->
+    <string name="add_to_playlist">Add to playlist</string>
+    <string name="add_to_queue">Add to queue</string>
+
+
     <!-- FragmentSettings -->
     <string name="n_songs">Min number of songs</string>
     <string name="n_songs_desc">

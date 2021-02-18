@@ -18,7 +18,7 @@ open class ActivityMainBaseTest : HiltExt() {
     var activityRule: ActivityScenarioRule<ActivityMain>
             = ActivityScenarioRule(ActivityMain::class.java)
 
-    @AfterClass
+    @After
     open fun tearDown(){
         activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
     }

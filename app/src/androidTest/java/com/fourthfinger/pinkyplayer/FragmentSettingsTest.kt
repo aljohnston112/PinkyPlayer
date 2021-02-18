@@ -35,7 +35,7 @@ class FragmentSettingsTest : HiltExt() {
         hiltRule.inject()
     }
 
-    @BeforeClass fun setUp(){
+    @Before fun setUp(){
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         val scenario = launchFragmentInHiltContainer<FragmentSettings>(
                 navController, R.id.nav_host_fragment, R.navigation.nav_graph, R.id.fragmentSettings)
