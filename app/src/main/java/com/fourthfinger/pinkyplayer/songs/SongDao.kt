@@ -17,7 +17,7 @@ interface SongDao {
     suspend fun getSong(song_id: Long): Song?
 
     @Query("SELECT * FROM songs")
-    fun getAll(): Flow<List<Song>>
+    fun getAll(): LiveData<List<Song>>
 
     @Query("DELETE FROM songs WHERE id = :song_id")
     suspend fun deleteSong(song_id: Long)

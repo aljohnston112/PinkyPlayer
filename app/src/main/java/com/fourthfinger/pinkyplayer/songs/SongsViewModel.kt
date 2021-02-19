@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.math.roundToInt
 
 
@@ -41,7 +42,13 @@ class SongsViewModel @Inject constructor(
 
     val isLoaded get() = _isLoaded as LiveData<Boolean>
 
+    val songs = songsRepo.songs
+
     init {
+        _isLoaded.postValue(false)
+    }
+
+    fun loadSongs() {
         if(!loadingStarted) {
             viewModelScope.launch(Dispatchers.IO) {
                 _isLoaded.postValue(false)

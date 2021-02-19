@@ -7,6 +7,7 @@ import androidx.test.filters.LargeTest
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.After
 import org.junit.AfterClass
+import org.junit.ClassRule
 import org.junit.Rule
 import org.junit.runner.RunWith
 
@@ -14,13 +15,20 @@ import org.junit.runner.RunWith
 @HiltAndroidTest
 open class ActivityMainBaseTest : HiltExt() {
 
-    @get:Rule
-    var activityRule: ActivityScenarioRule<ActivityMain>
-            = ActivityScenarioRule(ActivityMain::class.java)
 
-    @After
-    open fun tearDown(){
-        activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
+    companion object {
+
+        @JvmStatic
+        @get:ClassRule
+        var activityRule: ActivityScenarioRule<ActivityMain>
+                = ActivityScenarioRule(ActivityMain::class.java)
+
+        @JvmStatic
+        @AfterClass
+        fun tearDown() {
+            activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
+        }
+
     }
 
 }

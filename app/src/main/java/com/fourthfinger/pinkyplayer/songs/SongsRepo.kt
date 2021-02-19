@@ -2,15 +2,17 @@ package com.fourthfinger.pinkyplayer.songs
 
 import android.content.Context
 import androidx.annotation.WorkerThread
-import kotlinx.coroutines.flow.Flow
+import androidx.lifecycle.LiveData
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class SongsRepo  @Inject constructor(
         private val songDao: SongDao,
         private val songsFileManager: SongsFileManager,
         ) {
 
-    val songs : Flow<List<Song>> = songDao.getAll()
+    val songs : LiveData<List<Song>> = songDao.getAll()
 
     @WorkerThread
     suspend fun insertAll(vararg songs: Song) = songDao.insertAll(*songs)
@@ -18,7 +20,7 @@ class SongsRepo  @Inject constructor(
     suspend fun scanSongs(
             context: Context,
             callback: LoadingCallback,
-    ): List<Long> {
+    ): ArrayList<Long>? {
         return songsFileManager.scanSongs(context, callback, songDao)
     }
 

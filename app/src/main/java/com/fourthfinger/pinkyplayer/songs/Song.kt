@@ -13,8 +13,8 @@ data class Song constructor(
 ) : Serializable, Comparable<Song> {
     @Ignore var selected: Boolean = false
 
-    override fun compareTo(o: Song): Int {
-        return title.compareTo(o.title)
+    override fun compareTo(other: Song): Int {
+        return title.compareTo(other.title)
     }
 
     override fun equals(other: Any?): Boolean {

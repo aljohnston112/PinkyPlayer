@@ -32,7 +32,7 @@ class SongsRepoTest {
         val songsRepo = SongsRepo(songDao, songFileManager)
         runBlocking {
             loadingCallback = LoadingCallbackImp()
-            val songs = songsRepo.scanSongs(Companion.context, loadingCallback)
+            val songs = songsRepo.scanSongs(Companion.context, loadingCallback)!!
             for (song in songs) {
                 AudioUri.deleteAudioUri(context, song)
             }
@@ -52,7 +52,7 @@ class SongsRepoTest {
         var songs : List<Long>
         runBlocking {
             loadingCallback = LoadingCallbackImp()
-            songs = songsRepo.scanSongs(context, loadingCallback)
+            songs = songsRepo.scanSongs(context, loadingCallback)!!
             var file: File
             for (song in songs) {
                 file = File(context.filesDir, song.toString())

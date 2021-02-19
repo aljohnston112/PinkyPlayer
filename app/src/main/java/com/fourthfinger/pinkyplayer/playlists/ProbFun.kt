@@ -67,7 +67,6 @@ sealed class ProbFun<T>(
         for (choice in choices) {
             probabilityMap[choice] = 1.0 / choices.size
         }
-        roundingError = 1.0 - probSum()
         fixProbSum()
     }
 
@@ -300,7 +299,7 @@ sealed class ProbFun<T>(
         while (firstProb.value * 2.0 < roundingError) {
             var p: Double
             for (e in probabilityMap.entries) {
-                p = e.value + (roundingError / probabilityMap.size)
+                p = e.value + (roundingError / probabilityMap.size.toDouble())
                 e.setValue(p)
             }
             firstProb = probabilityMap.entries.iterator().next()

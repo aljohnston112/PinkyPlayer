@@ -12,37 +12,41 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.fourthfinger.pinkyplayer.HiltExt.Companion.launchFragmentInHiltContainer
 import com.fourthfinger.pinkyplayer.settings.FragmentSettings
 import com.fourthfinger.pinkyplayer.songs.FragmentTitleDirections
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 @HiltAndroidTest
-class FragmentSettingsTest : HiltExt() {
-
-    @get:Rule
-    var hiltRule = HiltAndroidRule(this)
+class FragmentSettingsTest {
 
     @Before
     fun init() {
         hiltRule.inject()
     }
 
-    @Before fun setUp(){
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        val scenario = launchFragmentInHiltContainer<FragmentSettings>(
-                navController, R.id.nav_host_fragment, R.navigation.nav_graph, R.id.fragmentSettings)
-        scenario.onActivity {
-            activity -> activity.findNavController(R.id.nav_host_fragment).navigate(
-                FragmentTitleDirections.actionFragmentTitleToFragmentSettings())
+    companion object {
+
+        @get:ClassRule
+        var hiltRule = HiltAndroidRule(this)
+
+        @JvmStatic
+        @BeforeClass
+        fun setUp() {
+            val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+            val scenario = launchFragmentInHiltContainer<FragmentSettings>(
+                    navController, R.id.nav_host_fragment, R.navigation.nav_graph, R.id.fragmentSettings)
+            scenario.onActivity { activity ->
+                activity.findNavController(R.id.nav_host_fragment).navigate(
+                        FragmentTitleDirections.actionFragmentTitleToFragmentSettings())
+            }
         }
+
     }
 
     @Test fun verifyLayout(){

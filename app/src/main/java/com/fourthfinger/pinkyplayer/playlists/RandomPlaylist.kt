@@ -4,6 +4,8 @@ import android.content.Context
 import com.fourthfinger.pinkyplayer.songs.AudioUri
 import com.fourthfinger.pinkyplayer.songs.Song
 import java.io.Serializable
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
@@ -176,7 +178,7 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
      */
     init {
         require(music.isNotEmpty()) { "List music must contain at least one AudioURI" }
-        val songs: Set<Song> = LinkedHashSet<Song>(music)
+        val songs: Set<Song> = TreeSet<Song>(music)
         probabilityFunction = if (comparable) {
             ProbFun.ProbFunTreeMap(songs, maxPercent)
         } else {

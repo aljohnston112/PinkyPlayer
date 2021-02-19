@@ -10,7 +10,7 @@ class Whatever {
 
     @Test fun iterativeFunctionLimit(){
         var i = Rational(1, 1)
-        val ten = Rational(10, 1)
+        val ten = Rational(1, 1)
 
         for(j in 0..100){
             i = ((ten*i)-i)/ten

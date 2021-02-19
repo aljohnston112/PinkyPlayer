@@ -51,10 +51,11 @@ class SongDBTest {
             assert(songDao.getSong(0L) == song)
             assert(songDao.getSong(1L) == song1)
             assert(songDao.getSong(2L) == song2)
-            val songs = songDao.getAll().first()
-            assert(songs.contains(song))
-            assert(songs.contains(song1))
-            assert(songs.contains(song2))
+            val songs = songDao.getAll().observeForever {songs ->
+                assert(songs.contains(song))
+                assert(songs.contains(song1))
+                assert(songs.contains(song2))
+            }
         }
     }
 
@@ -70,10 +71,11 @@ class SongDBTest {
             assert(songDao.getSong(1L) == song1)
             assert(songDao.getSong(2L) == song2)
             songDao.deleteSong(1L)
-            val songs = songDao.getAll().first()
-            assert(songs.contains(song))
-            assert(!songs.contains(song1))
-            assert(songs.contains(song2))
+            val songs = songDao.getAll().observeForever {songs ->
+                assert(songs.contains(song))
+                assert(!songs.contains(song1))
+                assert(songs.contains(song2))
+            }
         }
     }
 
@@ -90,10 +92,11 @@ class SongDBTest {
             assert(songDao.getSong(2L) == song2)
             songDao.deleteSong(1L)
             songDao.deleteAll()
-            val songs = songDao.getAll().first()
-            assert(!songs.contains(song))
-            assert(!songs.contains(song1))
-            assert(!songs.contains(song2))
+            val songs = songDao.getAll().observeForever { songs ->
+                assert(!songs.contains(song))
+                assert(!songs.contains(song1))
+                assert(!songs.contains(song2))
+            }
         }
     }
 

@@ -7,18 +7,11 @@ import javax.inject.Singleton
 @Singleton
 class SettingsRepo @Inject constructor(private val settingsFileManager: SettingsFileManager) {
 
-    @Volatile
-    private var _settingsCache: Settings? = null
-
-    fun settings() = _settingsCache
-
     suspend fun load(context: Context,
                      fileNames: List<String>,
                      saveFileVerificationNumber: Long,
-    ): Settings {
-        _settingsCache = settingsFileManager.load(context, fileNames, saveFileVerificationNumber)
-        return _settingsCache!!
-    }
+    ): Settings = settingsFileManager.load(context, fileNames, saveFileVerificationNumber)
+
 
     fun save(
             settings: Settings,

@@ -1,5 +1,8 @@
 <resources>
+
     <string name="app_name">Pinky Player</string>
+
+    <string name="permission_read_needed">Permission needed to scan for media</string>
 
     <!-- FragmentLoading -->
     <string name="loading">Loading</string>

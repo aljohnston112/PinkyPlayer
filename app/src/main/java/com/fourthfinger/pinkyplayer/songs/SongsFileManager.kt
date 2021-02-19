@@ -12,7 +12,7 @@ class SongsFileManager @Inject constructor() {
             context: Context,
             callback: LoadingCallback,
             songDao: SongDao,
-    ): List<Long> {
+    ): ArrayList<Long>? {
         val songsThatExist = ArrayList<Long>()
         val newSongs = ArrayList<Song>()
             val projection = arrayOf(
@@ -23,7 +23,7 @@ class SongsFileManager @Inject constructor() {
             val selection = MediaStore.Audio.Media.IS_MUSIC + " != ?"
             val selectionArgs = arrayOf("0")
             val sortOrder = MediaStore.Audio.Media.TITLE + " ASC"
-            context.contentResolver.query(
+            return context.contentResolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     projection, selection, selectionArgs, sortOrder
             ).use { cursor ->
@@ -56,16 +56,13 @@ class SongsFileManager @Inject constructor() {
                     callback.setLoadingText(context.resources.getString(R.string.loading2))
                     callback.setLoadingProgress(0.0)
                     val nNewSongs = newSongs.size
-                    var i = 0;
-                    for (song in newSongs) {
+                    for ((index, song) in newSongs.withIndex()) {
                         songDao.insertAll(song)
-                        callback.setLoadingProgress(i.toDouble() / nNewSongs.toDouble())
-                        i++
+                        callback.setLoadingProgress(index.toDouble() / nNewSongs.toDouble())
                     }
-                    callback.setLoadingProgress(1.0)
+                    return@use songsThatExist
                 }
             }
-        return songsThatExist
     }
 
 }
