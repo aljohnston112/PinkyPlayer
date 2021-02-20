@@ -40,9 +40,9 @@ class SettingViewModelTest : Fragment() {
 
     @Test
     fun viewModel() {
-        val countDownLatchSettingLoaded: CountDownLatch = CountDownLatch(1)
-        val countDownLatchSettingSaved: CountDownLatch = CountDownLatch(1)
-        val countDownLatchSettingSaved2: CountDownLatch = CountDownLatch(1)
+        val countDownLatchSettingLoaded = CountDownLatch(1)
+        val countDownLatchSettingSaved = CountDownLatch(1)
+        val countDownLatchSettingSaved2 = CountDownLatch(1)
         val startActivityIntent = Intent.makeMainActivity(
                 ComponentName(
                         ApplicationProvider.getApplicationContext(),
@@ -109,7 +109,7 @@ class SettingViewModelTest : Fragment() {
         countDownLatchFragmentLoaded.countDown()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentTitleBinding.inflate(layoutInflater).root
     }
 
