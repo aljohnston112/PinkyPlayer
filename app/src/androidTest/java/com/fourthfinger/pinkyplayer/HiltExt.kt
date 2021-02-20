@@ -11,6 +11,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
+import com.fourthfinger.pinkyplayer.songs.FragmentLoading
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
@@ -20,6 +21,9 @@ import org.junit.Rule
 @LargeTest
 @HiltAndroidTest
 open class HiltExt {
+
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
 
     companion object {
 
@@ -31,11 +35,10 @@ open class HiltExt {
             val startActivityIntent = Intent.makeMainActivity(
                     ComponentName(
                             ApplicationProvider.getApplicationContext(),
-                            ActivityMain::class.java))
-                    .putExtra(FragmentScenario.EmptyFragmentActivity.THEME_EXTRAS_BUNDLE_KEY,
-                            themeResId)
-
-            return ActivityScenario.launch<ActivityMain>(startActivityIntent).onActivity { activity ->
+                            ActivityMain::class.java)
+            ).putExtra(FragmentScenario.EmptyFragmentActivity.THEME_EXTRAS_BUNDLE_KEY, themeResId)
+            return ActivityScenario.launch<ActivityMain>(startActivityIntent).onActivity {
+                activity ->
                 val navHostFragment = activity.supportFragmentManager.findFragmentById(navHost) as NavHostFragment
                 Navigation.setViewNavController(navHostFragment.requireView(), navController)
                 navController.setGraph(navGraph)

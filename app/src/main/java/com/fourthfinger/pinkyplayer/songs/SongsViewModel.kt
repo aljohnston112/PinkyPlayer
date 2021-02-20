@@ -48,6 +48,8 @@ class SongsViewModel @Inject constructor(
         _isLoaded.postValue(false)
     }
 
+    private var loadingStarted = false
+
     fun loadSongs() {
         if(!loadingStarted) {
             viewModelScope.launch(Dispatchers.IO) {
@@ -70,10 +72,6 @@ class SongsViewModel @Inject constructor(
 
     override fun setLoadingProgress(progress: Double) {
         _loadingProgress.postValue((progress * 100).roundToInt())
-    }
-
-    companion object{
-        private var loadingStarted = false
     }
 
 }

@@ -1,7 +1,14 @@
 package com.fourthfinger.pinkyplayer
 
+import android.app.Instrumentation
+import android.os.Bundle
+import androidx.lifecycle.Lifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.testing.TestNavHostController
+import androidx.test.annotation.UiThreadTest
+import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.ViewInteraction
@@ -12,50 +19,49 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.fourthfinger.pinkyplayer.HiltExt.Companion.launchFragmentInHiltContainer
+import androidx.test.platform.app.InstrumentationRegistry
 import com.fourthfinger.pinkyplayer.settings.FragmentSettings
 import com.fourthfinger.pinkyplayer.songs.FragmentTitleDirections
-import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.*
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 @HiltAndroidTest
-class FragmentSettingsTest {
+class FragmentSettingsTest : HiltExt() {
+
+    private val countDownLatch: CountDownLatch = CountDownLatch(1)
 
     @Before
-    fun init() {
-        hiltRule.inject()
-    }
-
-    companion object {
-
-        @get:ClassRule
-        var hiltRule = HiltAndroidRule(this)
-
-        @JvmStatic
-        @BeforeClass
-        fun setUp() {
-            val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-            val scenario = launchFragmentInHiltContainer<FragmentSettings>(
-                    navController, R.id.nav_host_fragment, R.navigation.nav_graph, R.id.fragmentSettings)
-            scenario.onActivity { activity ->
-                activity.findNavController(R.id.nav_host_fragment).navigate(
-                        FragmentTitleDirections.actionFragmentTitleToFragmentSettings())
+    fun setUp() {
+        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+        lateinit var actualNavController : NavController
+        lateinit var scenario: ActivityScenario<ActivityMain>
+        scenario = launchFragmentInHiltContainer<FragmentSettings>(
+                    navController,
+                    R.id.nav_host_fragment, R.navigation.nav_graph, R.style.Theme_PinkyPlayer)
+            scenario.onActivity {
+                actualNavController = it.findNavController(R.id.nav_host_fragment)
+                actualNavController.addOnDestinationChangedListener { navController: NavController, navDestination: NavDestination, bundle: Bundle? ->
+                    if (navDestination.id == R.id.fragmentTitle) {
+                        countDownLatch.countDown()
+                    }
+                }
             }
+            countDownLatch.await()
+        InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            actualNavController.navigate(FragmentTitleDirections.actionFragmentTitleToFragmentSettings())
         }
-
     }
 
-    @Test fun verifyLayout(){
-        onView(withId(R.id.scroll_view_fragment_settings)).
-        check(matches(isCompletelyDisplayed()))
-        onView(withId(R.id.fab_fragment_settings)).
-        check(matches(isCompletelyDisplayed()))
-        onView(withId(R.id.constraint_layout_fragment_settings)).
-        check(matches(isDisplayed()))
+    @Test
+    fun verifyLayout() {
+        onView(withId(R.id.scroll_view_fragment_settings)).check(matches(isCompletelyDisplayed()))
+        onView(withId(R.id.fab_fragment_settings)).check(matches(isCompletelyDisplayed()))
+        onView(withId(R.id.constraint_layout_fragment_settings)).check(matches(isDisplayed()))
         onView(withId(R.id.edit_text_n_songs))
         onView(withId(R.id.text_view_n_songs))
         onView(withId(R.id.text_view_n_song_desc))
@@ -66,7 +72,8 @@ class FragmentSettingsTest {
         onView(withId(R.id.text_view_percent_changed_desc))
     }
 
-    @Test fun settingsChange(){
+    @Test
+    fun settingsChange() {
         val badNSongs1 = "0"
         val badNSongs2 = "-1"
         val goodNSongs1 = "1"

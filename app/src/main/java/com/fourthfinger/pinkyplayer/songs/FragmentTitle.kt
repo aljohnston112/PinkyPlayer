@@ -33,6 +33,8 @@ class FragmentTitle : Fragment() {
 
     private lateinit var requestPermissionLauncher : ActivityResultLauncher<String>
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestPermissionLauncher =

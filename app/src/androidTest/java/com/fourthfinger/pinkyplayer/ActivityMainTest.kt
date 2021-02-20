@@ -11,13 +11,12 @@ import com.fourthfinger.pinkyplayer.settings.SettingsRepo
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.hamcrest.core.AllOf.allOf
+import org.junit.ClassRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-@LargeTest
-@HiltAndroidTest
 class ActivityMainTest : ActivityMainBaseTest() {
 
     @Test

@@ -13,21 +13,16 @@ import org.junit.runner.RunWith
 @HiltAndroidTest
 class IntentTest : ActivityMainBaseTest() {
 
-    companion object {
-
-        @JvmStatic
-        @BeforeClass
+        @Before
         fun setUp() {
             Intents.init()
         }
 
-        @JvmStatic
-        @AfterClass
-        fun tearDown() {
+        @After
+        override fun tearDown() {
+            super.tearDown()
             Intents.release()
         }
-
-    }
 
     @Test
     fun verifyMessageSentToActivity(){

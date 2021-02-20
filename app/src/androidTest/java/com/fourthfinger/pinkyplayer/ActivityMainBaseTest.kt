@@ -11,24 +11,16 @@ import org.junit.ClassRule
 import org.junit.Rule
 import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 @LargeTest
-@HiltAndroidTest
 open class ActivityMainBaseTest : HiltExt() {
 
+    @get:Rule
+    var activityRule: ActivityScenarioRule<ActivityMain> = ActivityScenarioRule(ActivityMain::class.java)
 
-    companion object {
-
-        @JvmStatic
-        @get:ClassRule
-        var activityRule: ActivityScenarioRule<ActivityMain>
-                = ActivityScenarioRule(ActivityMain::class.java)
-
-        @JvmStatic
-        @AfterClass
-        fun tearDown() {
-            activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
-        }
-
+    @After
+    open fun tearDown() {
+        activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
     }
 
 }
