@@ -1,13 +1,8 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.settings
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
-import com.fourthfinger.pinkyplayer.settings.Settings
-import com.fourthfinger.pinkyplayer.settings.SettingsFileManager
-import com.fourthfinger.pinkyplayer.settings.SettingsRepo
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Test
@@ -45,18 +40,18 @@ class SettingsRepoTest {
         runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber) }
         assert(settings == settingsA)
         val settings1 = Settings(3.0, 2.0, 1.0, 0.0)
-        settingsRepo.save(settings1, context, fileNames, fileVerificationNumber+1)
-        runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber+1) }
+        settingsRepo.save(settings1, context, fileNames, fileVerificationNumber +1)
+        runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber +1) }
         assert(settings1 == settingsA)
         val settings2 = Settings(10.0, 11.0, 12.0, 13.0)
-        settingsRepo.save(settings2, context, fileNames, fileVerificationNumber+2)
-        runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber+2) }
+        settingsRepo.save(settings2, context, fileNames, fileVerificationNumber +2)
+        runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber +2) }
         assert(settings2 == settingsA)
         runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber) }
         assert(settings == settingsA)
-        runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber+1) }
+        runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber +1) }
         assert(settings1 == settingsA)
-        runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber+2) }
+        runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber +2) }
         assert(settings2 == settingsA)
     }
 

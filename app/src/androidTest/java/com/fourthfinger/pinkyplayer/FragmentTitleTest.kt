@@ -71,4 +71,10 @@ class FragmentTitleTest : HiltExt() {
         assertThat(actualNavController.currentDestination?.id ?: assert(false)).isEqualTo(R.id.fragmentSettings)
     }
 
+    @Test
+    fun testNavigationToSongs() {
+        onView(withId(R.id.button_songs)).perform(click())
+        assertThat(actualNavController.currentDestination?.id ?: assert(false)).isEqualTo(R.id.fragmentSongs)
+    }
+
 }

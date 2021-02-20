@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.ToastUtil.Companion.showToast
 import com.fourthfinger.pinkyplayer.databinding.FragmentTitleBinding
+import com.fourthfinger.pinkyplayer.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -27,13 +28,13 @@ class FragmentTitle : Fragment() {
 
     private val viewModelSongs: SongsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
+    private val viewModelSettings: SettingsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
 
     private lateinit var requestPermissionLauncher : ActivityResultLauncher<String>
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,8 +62,9 @@ class FragmentTitle : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModelSongs.isLoaded.observe(viewLifecycleOwner, { loaded ->
-            if (loaded != true) {
+        val loaded = MediatorLiveDataLoading().isLoaded(viewModelSongs.isLoaded, viewModelSettings.isLoaded)
+        loaded.observe(viewLifecycleOwner, { isLoaded ->
+            if (isLoaded != true) {
                 checkPermissions()
             }
         })
@@ -78,6 +80,7 @@ class FragmentTitle : Fragment() {
             }
             shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
                 showToast(requireContext(), R.string.permission_read_needed)
+                requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
             }
             else -> {
                 requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)

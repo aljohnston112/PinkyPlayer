@@ -11,8 +11,6 @@ import org.junit.ClassRule
 import org.junit.Rule
 import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
-@LargeTest
 open class ActivityMainBaseTest : HiltExt() {
 
     @get:Rule

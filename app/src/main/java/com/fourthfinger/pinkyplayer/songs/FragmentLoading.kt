@@ -33,6 +33,7 @@ class FragmentLoading : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModelSettings.loadSettings()
         viewModelSongs.loadSongs()
         observeLoadingProgress()
     }

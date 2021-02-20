@@ -20,7 +20,7 @@ class SettingsViewModel @Inject constructor(
         app: Application,
         savedStateHandle: SavedStateHandle,
         private val settingsRepo: SettingsRepo
-        ) : AndroidViewModel(app) {
+) : AndroidViewModel(app) {
 
     private val _settings: MutableLiveData<Settings> by lazy {
         MutableLiveData<Settings>()
@@ -28,20 +28,25 @@ class SettingsViewModel @Inject constructor(
 
     val settings = _settings as LiveData<Settings>
 
-    private val _isLoaded:  MutableLiveData<Boolean> by lazy {
+    private val _isLoaded: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>()
     }
 
     val isLoaded get() = _isLoaded as LiveData<Boolean>
 
     init {
+        _isLoaded.postValue(false)
+    }
+
+    fun loadSettings() {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoaded.postValue(false)
             _settings.postValue(
                     settingsRepo.load(
-                            app.applicationContext,
+                            getApplication(),
                             SAVE_FILES,
-                            SAVE_FILE_VERIFICATION_NUMBER,))
+                            SAVE_FILE_VERIFICATION_NUMBER,
+                    ))
             _isLoaded.postValue(true)
         }
     }
@@ -54,7 +59,7 @@ class SettingsViewModel @Inject constructor(
                     getApplication<Application>().applicationContext,
                     SAVE_FILES,
                     SAVE_FILE_VERIFICATION_NUMBER,
-                    )
+            )
         }
     }
 

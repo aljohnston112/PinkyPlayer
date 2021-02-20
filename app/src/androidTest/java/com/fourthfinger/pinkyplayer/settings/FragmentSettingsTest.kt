@@ -1,4 +1,4 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.settings
 
 import android.os.Bundle
 import androidx.navigation.NavController
@@ -17,7 +17,9 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.fourthfinger.pinkyplayer.settings.FragmentSettings
+import com.fourthfinger.pinkyplayer.ActivityMain
+import com.fourthfinger.pinkyplayer.HiltExt
+import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.songs.FragmentTitleDirections
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
