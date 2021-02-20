@@ -20,7 +20,7 @@ class RandomPlaylistRoundingErrorTest {
         val comparable = true
         val rp = RandomPlaylist(name, music, maxPercent, comparable)
         while(true){
-            rp.globalBad(song, 0.5)
+            rp.globalBad(song5, 0.5)
         }
     }
 

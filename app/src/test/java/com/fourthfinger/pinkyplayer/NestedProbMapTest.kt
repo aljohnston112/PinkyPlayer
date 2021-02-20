@@ -82,7 +82,7 @@ class NestedProbMapTest : TestCase() {
         val goodHourProb = percent.pow(7.0)
         val goodDayProb = percent
         val badMonthProb = percent
-        rolls = 1000000
+        rolls = 100000
         val badMonthTarget = (rolls * (goodDayProb * goodHourProb * badMonthProb * TOLERANCE)).roundToInt()
         var lowestRolls = Int.MAX_VALUE
         for (day in days) {

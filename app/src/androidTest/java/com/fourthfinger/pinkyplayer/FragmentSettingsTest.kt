@@ -1,13 +1,10 @@
 package com.fourthfinger.pinkyplayer
 
-import android.app.Instrumentation
 import android.os.Bundle
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.testing.TestNavHostController
-import androidx.test.annotation.UiThreadTest
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
@@ -23,7 +20,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.fourthfinger.pinkyplayer.settings.FragmentSettings
 import com.fourthfinger.pinkyplayer.songs.FragmentTitleDirections
 import dagger.hilt.android.testing.HiltAndroidTest
-import org.junit.*
+import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 
