@@ -9,11 +9,23 @@ class NestedProbMap : Serializable {
     // The ProbFun used to determine if a song should play during a specific hour
     private val probabilityFunctionHours: ProbMap<Int> = ProbMap()
 
+    fun getProbForHour(hour: Int): Double {
+        return probabilityFunctionHours.getProb(hour)
+    }
+
     // The ProbFun used to determine if a song should play during a specific day
     private val probabilityFunctionDays: ProbMap<Int> = ProbMap()
 
+    fun getProbForDay(day: Int): Double {
+        return probabilityFunctionDays.getProb(day-1)
+    }
+
     // The ProbFun used to determine if a song should play during a specific month
     private val probabilityFunctionMonths: ProbMap<Int> = ProbMap()
+
+    fun getProbForMonth(month: Int): Double {
+        return probabilityFunctionMonths.getProb(month)
+    }
 
     init {
         for (i in 0..23) {

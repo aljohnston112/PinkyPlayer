@@ -8,6 +8,12 @@ class ProbMap<T> : Serializable {
     // A map of T to the probability of it being returned if selected
     private val probMap = mutableMapOf<T, Double>()
 
+    fun getProb(t: T): Double {
+        val prob = probMap[t]
+        prob?.let { return@getProb prob }
+        return -1.0
+    }
+
     fun put(t: T, prob: Double) {
         probMap[t] = prob
     }
