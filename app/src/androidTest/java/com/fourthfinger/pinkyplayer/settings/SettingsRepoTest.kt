@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
@@ -20,6 +21,10 @@ class SettingsRepoTest {
         private val settingsRepo = SettingsRepo(SettingsFileManager())
         private val fileNames = listOf<String>("0", "1", "2")
         private const val fileVerificationNumber = 1234567898765432123
+    }
+
+    @Before fun before(){
+        deleteTestFiles()
     }
 
     @After fun after(){

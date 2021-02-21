@@ -7,6 +7,10 @@ import kotlin.collections.LinkedHashMap
 import kotlin.random.Random
 import kotlin.reflect.KProperty
 
+private const val MIN_VALUE = 0.0000000000000005
+
+
+// TODO fix max percent like the constructor
 sealed class ProbFun<T>(
         choices: Set<T>, var maxPercent: Double, comparable: Boolean
 ) : Serializable, Cloneable {
@@ -60,7 +64,10 @@ sealed class ProbFun<T>(
         require(choices.isNotEmpty()) {
             "Must have at least 1 element in the choices passed to the ProbFunTree constructor\n"
         }
-        require((maxPercent > 0 && maxPercent < 1.0)) {
+        require(choices.size < 2000000000000000) {
+            "ProbFun will not work with a size of 2,000,000,000,000,000"
+        }
+        require((maxPercent >= (1.0 / choices.size) && maxPercent <= (1.0 - (choices.size*MIN_VALUE)))) {
             "maxPercent passed into the ProbFunTree constructor must be above 0 and 1.0 or under"
         }
         probabilityMap = if (comparable) TreeMap() else LinkedHashMap()
@@ -98,7 +105,7 @@ sealed class ProbFun<T>(
      */
     fun add(element: T, percent: Double) {
         Objects.requireNonNull(element)
-        require((percent < 1.0 && percent > 0.0)) {
+        require((percent >= ((size()+1)*MIN_VALUE)) && percent <= (1.0 - ((size()+1)*MIN_VALUE))) {
             "percent passed to add() is not between 0.0 and 1.0 (exclusive)"
         }
         val scale = 1.0 - percent
@@ -193,9 +200,10 @@ sealed class ProbFun<T>(
         var newPercent = percent
         while (oldProb + add >= maxPercent - roundingError) {
             newPercent *= percent
-            add = probToAddForGood(oldProb, percent)
+            add = probToAddForGood(oldProb, newPercent)
         }
         val goodProbability = oldProb + add
+        if(goodProbability >= (1.0-(size()*MIN_VALUE))) return -1.0
         probabilityMap[element] = goodProbability
         val leftover = 1.0 - goodProbability
         val sumOfLeftovers = probSum() - goodProbability
@@ -236,6 +244,7 @@ sealed class ProbFun<T>(
         val sub = oldProb * percent
         if (oldProb - sub <= roundingError) return oldProb
         val badProbability = oldProb - sub
+        if(badProbability <= (size()*MIN_VALUE)) return -1.0
         probabilityMap[element] = badProbability
         val leftover = 1.0 - badProbability
         val sumOfLeftovers = probSum() - badProbability
@@ -254,6 +263,7 @@ sealed class ProbFun<T>(
      * @param low as the lowest chance of an object being returned when fun() is called.
      */
     fun lowerProbs(low: Double) {
+        require((low >= (size()*MIN_VALUE)) && low <= (1.0 - (size()*MIN_VALUE)))
         val probs: Collection<T> = probabilityMap.keys
         for (t in probs) {
             if (probabilityMap[t]!! > low) {
@@ -295,6 +305,7 @@ sealed class ProbFun<T>(
      * TODO This is a terrible solution to the rounding error
      */
     private fun fixProbSum() {
+        roundingError = 1.0 - probSum()
         var firstProb = probabilityMap.entries.iterator().next()
         while (firstProb.value * 2.0 < roundingError) {
             var p: Double

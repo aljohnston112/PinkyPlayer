@@ -85,6 +85,42 @@ class ProbFunTreeMapMapTest {
     }
 
     @Test
+    fun testBadByDebug() {
+        val choices = setOf(0, 1, 2, 3, 4, 5, 6)
+        val maxPercent = 0.5
+        val percentBad = 0.5
+        val pf = ProbFunTreeMap(choices, maxPercent)
+        var percent1 = (1.0 / choices.size)
+        for(i in 0..100000) {
+            if(pf.bad(1, percentBad) != -1.0) {
+                percent1 -= (percent1 * percentBad)
+            }
+        }
+        print("Done")
+    }
+
+    @Test
+    fun testGoodByDebug() {
+        val choices = setOf(0, 1, 2, 3, 4, 5, 6)
+        val maxPercent = 1.0-(0.0000000000000005*7.0)
+        val percentGood = 0.5
+        val pf = ProbFunTreeMap(choices, maxPercent)
+        var percent1 = (1.0 / choices.size)
+        for(i in 0..100000) {
+            if(pf.good(1, percentGood) != -1.0) {
+                if (percent1 > 0.5) {
+                    percent1 += (1.0 - percent1) * percentGood
+                } else {
+                    percent1 += percent1 * percentGood
+                }
+
+                percent1 += (percent1 * percentGood)
+            }
+        }
+        print("Done")
+    }
+
+    @Test
     fun testGood() {
         val random = Random.Default
         val choices = setOf(0, 1)
