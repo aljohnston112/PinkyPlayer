@@ -22,22 +22,30 @@ class MediatorLiveDataLoading {
         }
         mediator.addSource(songsLoaded) {
             this.songLoadedValue = it
-            val songLoadedValue = this.songLoadedValue!!
-            val settingsLoadedValue = this.settingsLoadedValue
-            if(settingsLoadedValue == null){
+            val songLoadedValue = this.songLoadedValue
+            val settingLoadedValue = this.settingsLoadedValue
+            if(settingLoadedValue == null){
                 mediator.value = false
             } else {
-                mediator.value = (songLoadedValue) && (settingsLoadedValue)
+                if(songLoadedValue == null){
+                    mediator.value = false
+                } else {
+                    mediator.value = (songLoadedValue) && (settingLoadedValue)
+                }
             }
         }
         mediator.addSource(settingsLoaded) {
             this.settingsLoadedValue = it
             val songLoadedValue = this.songLoadedValue
-            val settingsLoadedValue = this.settingsLoadedValue!!
+            val settingLoadedValue = this.settingsLoadedValue
             if(songLoadedValue == null){
                 mediator.value = false
             } else {
-                mediator.value = (songLoadedValue && settingsLoadedValue)
+                if(settingLoadedValue == null){
+                    mediator.value = false
+                } else {
+                    mediator.value = (songLoadedValue && settingLoadedValue)
+                }
             }
         }
     }
