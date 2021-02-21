@@ -7,9 +7,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SongsRepo  @Inject constructor(
+class SongRepo  @Inject constructor(
         private val songDao: SongDao,
-        private val songsFileManager: SongsFileManager,
+        private val songFileManager: SongFileManager,
         ) {
 
     val songs : LiveData<List<Song>> = songDao.getAll()
@@ -21,7 +21,7 @@ class SongsRepo  @Inject constructor(
             context: Context,
             callback: LoadingCallback,
     ): ArrayList<Long>? {
-        return songsFileManager.scanSongs(context, callback, songDao)
+        return songFileManager.scanSongs(context, callback, songDao)
     }
 
 }

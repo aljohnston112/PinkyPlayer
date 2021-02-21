@@ -1,14 +1,10 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.songs
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.fourthfinger.pinkyplayer.songs.Song
-import com.fourthfinger.pinkyplayer.songs.SongDB
-import com.fourthfinger.pinkyplayer.songs.SongDao
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before

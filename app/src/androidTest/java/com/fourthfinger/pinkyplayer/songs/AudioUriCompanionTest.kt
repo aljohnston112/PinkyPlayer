@@ -1,4 +1,4 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.songs
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider

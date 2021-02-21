@@ -1,4 +1,4 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.songs
 
 import android.os.Bundle
 import androidx.lifecycle.Lifecycle
@@ -15,6 +15,9 @@ import androidx.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.fourthfinger.pinkyplayer.ActivityMain
+import com.fourthfinger.pinkyplayer.HiltExt
+import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.settings.FragmentSettings
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before

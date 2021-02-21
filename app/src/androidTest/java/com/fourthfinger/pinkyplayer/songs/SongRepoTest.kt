@@ -1,11 +1,11 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.songs
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.fourthfinger.pinkyplayer.songs.*
+import com.fourthfinger.pinkyplayer.R
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -16,7 +16,7 @@ import java.io.File
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-class SongsRepoTest {
+class SongRepoTest {
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -29,7 +29,7 @@ class SongsRepoTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         songDB = Room.inMemoryDatabaseBuilder(context, SongDB::class.java).build()
         songDao = songDB.songDao()
-        val songsRepo = SongsRepo(songDao, songFileManager)
+        val songsRepo = SongRepo(songDao, songFileManager)
         runBlocking {
             loadingCallback = LoadingCallbackImp()
             val songs = songsRepo.scanSongs(Companion.context, loadingCallback)!!
@@ -48,7 +48,7 @@ class SongsRepoTest {
 
     @Test
     fun testFileAndDBWriting(){
-        val songsRepo = SongsRepo(songDao, songFileManager)
+        val songsRepo = SongRepo(songDao, songFileManager)
         var songs : List<Long>
         runBlocking {
             loadingCallback = LoadingCallbackImp()
@@ -64,7 +64,7 @@ class SongsRepoTest {
 
     companion object {
         private val context = ApplicationProvider.getApplicationContext<Context>()
-        private val songFileManager = SongsFileManager()
+        private val songFileManager = SongFileManager()
         private lateinit var loadingCallback : LoadingCallback
         class LoadingCallbackImp : LoadingCallback {
             private var loadingText =  context.resources.getString(R.string.loading1)

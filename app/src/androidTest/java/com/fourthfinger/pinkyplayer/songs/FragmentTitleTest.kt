@@ -1,4 +1,4 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.songs
 
 import android.os.Bundle
 import androidx.navigation.NavController
@@ -14,15 +14,13 @@ import androidx.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
+import com.fourthfinger.pinkyplayer.ActivityMain
+import com.fourthfinger.pinkyplayer.HiltExt
+import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.settings.FragmentSettings
-import com.fourthfinger.pinkyplayer.songs.FragmentTitle
-import com.fourthfinger.pinkyplayer.songs.FragmentTitleDirections
 import com.google.common.truth.Truth.assertThat
-import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch

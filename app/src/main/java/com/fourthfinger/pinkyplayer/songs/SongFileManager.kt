@@ -6,7 +6,7 @@ import com.fourthfinger.pinkyplayer.R
 import java.util.*
 import javax.inject.Inject
 
-class SongsFileManager @Inject constructor() {
+class SongFileManager @Inject constructor() {
 
     suspend fun scanSongs(
             context: Context,
