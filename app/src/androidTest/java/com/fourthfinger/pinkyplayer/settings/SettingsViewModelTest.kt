@@ -20,22 +20,12 @@ class SettingsViewModelTest : ViewModelBaseTest(DummySettingsViewModelFragment(C
     var hiltRule = HiltAndroidRule(this)
 
     private val countDownLatchSettingSaved = CountDownLatch(1)
-
-    private val liveDataCheckPass: LiveDataUtil.LiveDataCheckPass =
-            object : LiveDataUtil.LiveDataCheckPass {
-                override fun liveDataCheckPass() {
-                    countDownLatchSettingSaved.countDown()
-                }
-            }
+    private val liveDataCheckPass =
+            LiveDataUtil.LiveDataCheckPass(countDownLatchSettingSaved)
 
     private val countDownLatchSettingSaved2 = CountDownLatch(1)
-
-    private val liveDataCheckPass2: LiveDataUtil.LiveDataCheckPass =
-            object : LiveDataUtil.LiveDataCheckPass {
-                override fun liveDataCheckPass() {
-                    countDownLatchSettingSaved2.countDown()
-                }
-            }
+    private val liveDataCheckPass2 =
+            LiveDataUtil.LiveDataCheckPass(countDownLatchSettingSaved2)
 
     @Test
     fun viewModel() {

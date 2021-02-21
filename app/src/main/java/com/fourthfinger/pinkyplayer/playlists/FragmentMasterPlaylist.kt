@@ -18,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
 @AndroidEntryPoint
-class FragmentSongs : Fragment(), ListenerCallbackSongs {
+class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {
 
     private var _binding: RecyclerViewSongListBinding? = null
 

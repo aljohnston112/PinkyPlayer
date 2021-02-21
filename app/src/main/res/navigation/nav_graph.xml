@@ -31,7 +31,7 @@
         tools:layout="@layout/fragment_loading"/>
     <fragment
         android:id="@+id/fragmentSongs"
-        android:name="com.fourthfinger.pinkyplayer.playlists.FragmentSongs"
+        android:name="com.fourthfinger.pinkyplayer.playlists.FragmentMasterPlaylist"
         android:label="recycler_view_song_list"
         tools:layout="@layout/recycler_view_song_list" />
 </navigation>

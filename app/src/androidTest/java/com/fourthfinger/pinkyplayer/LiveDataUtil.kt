@@ -5,11 +5,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.CountDownLatch
 
 class LiveDataUtil {
 
-    interface LiveDataCheckPass{
-        fun liveDataCheckPass()
+    class LiveDataCheckPass(val countDownLatch: CountDownLatch){
+        fun liveDataCheckPass(){
+            countDownLatch.countDown()
+        }
     }
 
     companion object {

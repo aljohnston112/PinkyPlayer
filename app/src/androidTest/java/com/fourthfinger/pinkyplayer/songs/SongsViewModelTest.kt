@@ -21,22 +21,12 @@ class SongsViewModelTest: ViewModelBaseTest(DummySongsViewModelFragment(CountDow
     var hiltRule = HiltAndroidRule(this)
 
     private val countDownLatchSetLoadingProgress = CountDownLatch(1)
-
-    private val loadingProgressCheckPass: LiveDataUtil.LiveDataCheckPass =
-            object : LiveDataUtil.LiveDataCheckPass {
-                override fun liveDataCheckPass() {
-                    countDownLatchSetLoadingProgress.countDown()
-                }
-            }
+    private val loadingProgressCheckPass =
+            LiveDataUtil.LiveDataCheckPass(countDownLatchSetLoadingProgress)
 
     private val countDownLatchSetLoadingText = CountDownLatch(1)
-
-    private val loadingTextCheckPass: LiveDataUtil.LiveDataCheckPass =
-            object : LiveDataUtil.LiveDataCheckPass {
-                override fun liveDataCheckPass() {
-                    countDownLatchSetLoadingText.countDown()
-                }
-            }
+    private val loadingTextCheckPass =
+            LiveDataUtil.LiveDataCheckPass(countDownLatchSetLoadingText)
 
     private val countDownLatchIsLoaded = CountDownLatch(1)
 
