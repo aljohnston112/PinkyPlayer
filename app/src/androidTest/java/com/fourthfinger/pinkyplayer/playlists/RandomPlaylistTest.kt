@@ -1,4 +1,4 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.playlists
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -55,22 +55,43 @@ class RandomPlaylistTest {
 
     private fun testConstructor(rp: RandomPlaylist, music: List<Song>) {
         assert(rp.name == name)
-        val songs = rp.songs()
+        var songs = rp.songs()
         for (s in songs) {
             assert(music.contains(s))
         }
         for (s in music) {
             assert(songs.contains(s))
         }
+        rp.remove(music[0])
+        assert(!rp.contains(music[0]))
+        rp.add(music[0])
+        assert(rp.contains(music[0]))
+        songs = rp.songs()
         assert(rp.getMaxPercent() == maxPercent)
-        assert(songs[0] == song1)
-        assert(songs[1] == song)
-        assert(songs[2] == song2)
+        val testSetPercent = 0.3
+        rp.setMaxPercent(testSetPercent)
+        assert(rp.getMaxPercent() == testSetPercent)
+        rp.setMaxPercent(maxPercent)
+        if(rp.comparable) {
+            assert(songs[0] == song1)
+            assert(songs[1] == song)
+            assert(songs[2] == song2)
+        } else {
+            assert(songs[0] == song)
+            assert(songs[1] == song2)
+            assert(songs[2] == song1)
+        }
         assert(rp.size() == music.size)
         val songIDs = rp.songIds()
-        assert(songIDs[0] == song1.id)
-        assert(songIDs[1] == song.id)
-        assert(songIDs[2] == song2.id)
+        if(rp.comparable) {
+            assert(songIDs[0] == song1.id)
+            assert(songIDs[1] == song.id)
+            assert(songIDs[2] == song2.id)
+        } else {
+            assert(songIDs[0] == song.id)
+            assert(songIDs[1] == song2.id)
+            assert(songIDs[2] == song1.id)
+        }
         for (m in music) {
             assert(rp.contains(m))
         }

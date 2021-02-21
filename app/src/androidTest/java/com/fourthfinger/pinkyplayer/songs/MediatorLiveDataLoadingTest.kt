@@ -20,40 +20,7 @@ class MediatorLiveDataLoadingTest: ActivityMainBaseTest()  {
 
     private val activityStarted = CountDownLatch(1)
 
-    private val countDownLatchIsLoadedChange = CountDownLatch(1)
-    private val isLoadedCheckPass =
-            LiveDataUtil.LiveDataCheckPass(countDownLatchIsLoadedChange)
-
-    private val countDownLatchIsLoadedChange2 = CountDownLatch(1)
-    private val isLoadedCheckPass2 =
-            LiveDataUtil.LiveDataCheckPass(countDownLatchIsLoadedChange2)
-
-    private val countDownLatchIsLoadedChange3 = CountDownLatch(1)
-    private val isLoadedCheckPass3 =
-            LiveDataUtil.LiveDataCheckPass(countDownLatchIsLoadedChange3)
-
-    private val countDownLatchIsLoadedChange4 = CountDownLatch(1)
-    private val isLoadedCheckPass4 =
-            LiveDataUtil.LiveDataCheckPass(countDownLatchIsLoadedChange4)
-
-    private val countDownLatchIsLoadedChange5 = CountDownLatch(1)
-    private val isLoadedCheckPass5 =
-            LiveDataUtil.LiveDataCheckPass(countDownLatchIsLoadedChange5)
-
-    private val countDownLatchIsLoadedChange6 = CountDownLatch(1)
-    private val isLoadedCheckPass6 =
-            LiveDataUtil.LiveDataCheckPass(countDownLatchIsLoadedChange6)
-
-    private val countDownLatchIsLoadedChange7 = CountDownLatch(1)
-    private val isLoadedCheckPass7 =
-            LiveDataUtil.LiveDataCheckPass(countDownLatchIsLoadedChange7)
-
-    private val countDownLatchIsLoadedChange8 = CountDownLatch(1)
-    private val isLoadedCheckPass8 =
-            LiveDataUtil.LiveDataCheckPass(countDownLatchIsLoadedChange8)
-
     @Test fun isLoaded(){
-
         lateinit var activity: LifecycleOwner
         lateinit var lifecycleScope: CoroutineScope
         activityRule.scenario.onActivity {
@@ -71,19 +38,19 @@ class MediatorLiveDataLoadingTest: ActivityMainBaseTest()  {
             countDownLatchInit.countDown()
         }
         countDownLatchInit.await()
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, isLoadedCheckPass,)
+        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false,)
         lifecycleScope.launch {
             ldb.postValue(false)
         }
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, isLoadedCheckPass2,)
+        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false,)
         lifecycleScope.launch {
             ldb.postValue(true)
         }
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, isLoadedCheckPass3,)
+        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false,)
         lifecycleScope.launch {
             ldb2.postValue(false)
         }
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, isLoadedCheckPass4,)
+        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false,)
         val countDownLatchPost = CountDownLatch(1)
         lifecycleScope.launch {
             ldb.postValue(false)
@@ -91,19 +58,19 @@ class MediatorLiveDataLoadingTest: ActivityMainBaseTest()  {
             countDownLatchPost.countDown()
         }
         countDownLatchPost.await()
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, isLoadedCheckPass5,)
+        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false,)
         lifecycleScope.launch {
             ldb.postValue(true)
         }
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, true, isLoadedCheckPass6,)
+        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, true,)
         lifecycleScope.launch {
             ldb2.postValue(null)
         }
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, isLoadedCheckPass7,)
+        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false,)
         lifecycleScope.launch {
             ldb.postValue(false)
         }
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, isLoadedCheckPass8,)
+        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false,)
 
     }
 
@@ -111,12 +78,10 @@ class MediatorLiveDataLoadingTest: ActivityMainBaseTest()  {
             lifecycleScope: CoroutineScope, activity: LifecycleOwner,
             mediatorLiveDataLoading: LiveData<Boolean>,
             data: Boolean,
-            isLoadedCheckPass: LiveDataUtil.LiveDataCheckPass,
     ) {
         LiveDataUtil.checkLiveDataUpdate(
-                lifecycleScope, activity, mediatorLiveDataLoading, data, isLoadedCheckPass
+                lifecycleScope, activity, mediatorLiveDataLoading, data
         )
-        isLoadedCheckPass.countDownLatch.await()
     }
 
 }

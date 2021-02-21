@@ -9,7 +9,7 @@ import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
-                     comparable: Boolean) : Serializable {
+                     val comparable: Boolean) : Serializable {
 
     // The ProbFun that randomly picks the media to play
     private var probabilityFunction: ProbFun<Song>
@@ -73,7 +73,12 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
 
     private val playlistArray: MutableList<Long> = ArrayList()
 
-    fun songIds() = ArrayList(playlistArray)
+    fun songIds(): MutableList<Long> {
+        if(comparable) {
+            playlistArray.sort()
+        }
+        return playlistArray
+    }
 
     operator fun contains(song: Song): Boolean {
         return playlistArray.contains(song.id)

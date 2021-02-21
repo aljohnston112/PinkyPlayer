@@ -20,14 +20,6 @@ class SongsViewModelTest: ViewModelBaseTest(DummySongsViewModelFragment(CountDow
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
-    private val countDownLatchSetLoadingProgress = CountDownLatch(1)
-    private val loadingProgressCheckPass =
-            LiveDataUtil.LiveDataCheckPass(countDownLatchSetLoadingProgress)
-
-    private val countDownLatchSetLoadingText = CountDownLatch(1)
-    private val loadingTextCheckPass =
-            LiveDataUtil.LiveDataCheckPass(countDownLatchSetLoadingText)
-
     private val countDownLatchIsLoaded = CountDownLatch(1)
 
     @Test
@@ -49,14 +41,12 @@ class SongsViewModelTest: ViewModelBaseTest(DummySongsViewModelFragment(CountDow
         viewModelSongs.setLoadingProgress(loadingProgress)
         LiveDataUtil.checkLiveDataUpdate(
                 viewModelScope, viewLifecycleOwner,
-                viewModelSongs.loadingProgress, (loadingProgress * 100).roundToInt(), loadingProgressCheckPass)
-        countDownLatchSetLoadingProgress.await()
+                viewModelSongs.loadingProgress, (loadingProgress * 100).roundToInt())
         val loadingText = "akjgunasgui"
         viewModelSongs.setLoadingText(loadingText)
         LiveDataUtil.checkLiveDataUpdate(
                 viewModelScope, viewLifecycleOwner,
-                viewModelSongs.loadingText, loadingText, loadingTextCheckPass)
-        countDownLatchSetLoadingText.await()
+                viewModelSongs.loadingText, loadingText)
     }
 
 }

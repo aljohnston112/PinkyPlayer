@@ -19,14 +19,6 @@ class SettingsViewModelTest : ViewModelBaseTest(DummySettingsViewModelFragment(C
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
-    private val countDownLatchSettingSaved = CountDownLatch(1)
-    private val liveDataCheckPass =
-            LiveDataUtil.LiveDataCheckPass(countDownLatchSettingSaved)
-
-    private val countDownLatchSettingSaved2 = CountDownLatch(1)
-    private val liveDataCheckPass2 =
-            LiveDataUtil.LiveDataCheckPass(countDownLatchSettingSaved2)
-
     @Test
     fun viewModel() {
         fragment as DummySettingsViewModelFragment
@@ -48,14 +40,12 @@ class SettingsViewModelTest : ViewModelBaseTest(DummySettingsViewModelFragment(C
         viewModelSettings.save(settings)
         LiveDataUtil.checkLiveDataUpdate(
                 viewModelScope, viewLifecycleOwner,
-                viewModelSettings.settings, settings, liveDataCheckPass)
-        countDownLatchSettingSaved.await()
+                viewModelSettings.settings, settings)
         val settings2 = Settings(0.01, 0.5, 0.9, 0.01)
         viewModelSettings.save(settings2)
         LiveDataUtil.checkLiveDataUpdate(
                 viewModelScope, viewLifecycleOwner,
-                viewModelSettings.settings, settings2, liveDataCheckPass2)
-        countDownLatchSettingSaved2.await()
+                viewModelSettings.settings, settings2)
     }
 
 }
