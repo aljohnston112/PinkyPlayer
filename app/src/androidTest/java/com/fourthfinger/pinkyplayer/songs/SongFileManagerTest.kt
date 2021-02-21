@@ -8,17 +8,16 @@ import org.junit.runner.RunWith
 import java.io.File
 
 @RunWith(AndroidJUnit4::class)
-class SongRepoTest: SongDBBaseTest() {
+class SongFileManagerTest : SongDBBaseTest() {
 
     private val songFileManager = SongFileManager()
 
     @Before
     override fun setUp(){
         super.setUp()
-        val songsRepo = SongRepo(songDao, songFileManager)
         runBlocking {
             loadingCallback = Companion.LoadingCallbackImp()
-            val songs = songsRepo.scanSongs(context, loadingCallback)!!
+            val songs = songFileManager.scanSongs(context, loadingCallback, songDao)!!
             for (song in songs) {
                 AudioUri.deleteAudioUri(context, song)
             }
@@ -28,11 +27,10 @@ class SongRepoTest: SongDBBaseTest() {
 
     @Test
     fun testFileAndDBWriting(){
-        val songsRepo = SongRepo(songDao, songFileManager)
         var songs : List<Long>
         runBlocking {
             loadingCallback = Companion.LoadingCallbackImp()
-            songs = songsRepo.scanSongs(context, loadingCallback)!!
+            songs = songFileManager.scanSongs(context, loadingCallback, songDao)!!
             var file: File
             for (song in songs) {
                 file = File(context.filesDir, song.toString())

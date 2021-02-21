@@ -69,8 +69,6 @@ class SongsViewModel @Inject constructor(
         loadingStarted = true
     }
 
-    fun insertAll(vararg songs: Song) = viewModelScope.launch(Dispatchers.IO) { songRepo.insertAll(*songs) }
-
 }
 
 

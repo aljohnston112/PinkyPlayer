@@ -1,5 +1,6 @@
 package com.fourthfinger.pinkyplayer.settings
 
+import android.content.Context
 import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -22,16 +23,26 @@ import com.fourthfinger.pinkyplayer.HiltExt
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.songs.FragmentTitleDirections
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
+import kotlin.math.roundToInt
 
+private const val FILE_SAVE = "settings"
+private const val FILE_SAVE2 = "settings2"
+private const val FILE_SAVE3 = "settings3"
+private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 @HiltAndroidTest
 class FragmentSettingsTest : HiltExt() {
+
+    private val context = ApplicationProvider.getApplicationContext<Context>()
+    private val settingsFileManager = SettingsFileManager()
+    private val SAVE_FILES = listOf(FILE_SAVE, FILE_SAVE2, FILE_SAVE3)
 
     private val countDownLatch: CountDownLatch = CountDownLatch(1)
 
@@ -62,14 +73,26 @@ class FragmentSettingsTest : HiltExt() {
         onView(withId(R.id.scroll_view_fragment_settings)).check(matches(isCompletelyDisplayed()))
         onView(withId(R.id.fab_fragment_settings)).check(matches(isCompletelyDisplayed()))
         onView(withId(R.id.constraint_layout_fragment_settings)).check(matches(isDisplayed()))
-        onView(withId(R.id.edit_text_n_songs))
-        onView(withId(R.id.text_view_n_songs))
-        onView(withId(R.id.text_view_n_song_desc))
-        onView(withId(R.id.text_view_percent_change_up))
-        onView(withId(R.id.edit_text_percent_change_up))
-        onView(withId(R.id.text_view_percent_change_down))
-        onView(withId(R.id.edit_text_percent_change_down))
-        onView(withId(R.id.text_view_percent_changed_desc))
+        lateinit var settingsIn : Settings
+        runBlocking {
+            settingsIn = settingsFileManager.load(context, SAVE_FILES, SAVE_FILE_VERIFICATION_NUMBER)
+        }
+        onView(withId(R.id.edit_text_n_songs)).check(matches(
+                withText((1.0/settingsIn.maxPercent).roundToInt().toString())))
+        onView(withId(R.id.text_view_n_songs)).check(matches(
+                withText(R.string.n_songs)))
+        onView(withId(R.id.text_view_n_song_desc)).check(matches(
+                withText(R.string.n_songs_desc)))
+        onView(withId(R.id.text_view_percent_change_up)).check(matches(
+                withText(R.string.percent_change_up)))
+        onView(withId(R.id.edit_text_percent_change_up)).check(matches(
+                withText((settingsIn.percentChangeUp*100.0).roundToInt().toString())))
+        onView(withId(R.id.text_view_percent_change_down)).check(matches(
+                withText(R.string.percent_change_down)))
+        onView(withId(R.id.edit_text_percent_change_down)).check(matches(
+                withText((settingsIn.percentChangeDown*100.0).roundToInt().toString())))
+        onView(withId(R.id.text_view_percent_changed_desc)).check(matches(
+                withText(R.string.percent_change_desc)))
     }
 
     @Test
@@ -104,6 +127,13 @@ class FragmentSettingsTest : HiltExt() {
         verifyGoodData(fab, goodNSongs3, goodPC4, goodPC2)
         verifyGoodData(fab, goodNSongs3, goodPC4, goodPC3)
         verifyGoodData(fab, goodNSongs3, goodPC3, goodPC4)
+        lateinit var settingsIn : Settings
+        runBlocking {
+            settingsIn = settingsFileManager.load(context, SAVE_FILES, SAVE_FILE_VERIFICATION_NUMBER)
+        }
+        assert(settingsIn.maxPercent == (1.0/goodNSongs3.toInt()))
+        assert(settingsIn.percentChangeUp == (goodPC3.toInt()/100.0))
+        assert(settingsIn.percentChangeDown == (goodPC4.toInt()/100.0))
     }
 
     private fun verifyGoodData(fab: ViewInteraction, nSongs: String, pc1: String, pc2: String) {

@@ -14,9 +14,6 @@ class SongRepo  @Inject constructor(
 
     val songs : LiveData<List<Song>> = songDao.getAll()
 
-    @WorkerThread
-    suspend fun insertAll(vararg songs: Song) = songDao.insertAll(*songs)
-
     suspend fun scanSongs(
             context: Context,
             callback: LoadingCallback,

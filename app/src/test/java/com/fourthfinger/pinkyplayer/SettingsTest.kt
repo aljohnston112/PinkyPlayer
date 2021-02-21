@@ -7,11 +7,15 @@ class SettingsTest {
 
     @Test
     fun validateConstructor() {
-        val settings = Settings(1.0, 1.0,1.0 , 1.0)
-        assert(settings.maxPercent==(1.0))
-        assert(settings.percentChangeUp==(1.0))
-        assert(settings.percentChangeDown==(1.0))
-        assert(settings.lowerProb==(1.0))
+        val maxPercent = 1.234
+        val percentChangeUp = 1.5346
+        val percentChangeDown = 4.345
+        val lowerProb = 32.343
+        val settings = Settings(maxPercent, percentChangeUp,percentChangeDown , lowerProb)
+        assert(settings.maxPercent==maxPercent)
+        assert(settings.percentChangeUp==percentChangeUp)
+        assert(settings.percentChangeDown==percentChangeDown)
+        assert(settings.lowerProb==lowerProb)
     }
 
 }
