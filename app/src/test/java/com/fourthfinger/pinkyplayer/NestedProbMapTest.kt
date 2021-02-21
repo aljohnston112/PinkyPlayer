@@ -18,7 +18,7 @@ class NestedProbMapTest : TestCase() {
 
     private lateinit var nestedProbMap: NestedProbMap
     private val goodHour = 12
-    private val calanderGoodDay = 1
+    private val calendarGoodDay = 1
     private var goodDay = 1
     private val percent = 0.5
 
@@ -35,7 +35,7 @@ class NestedProbMapTest : TestCase() {
     fun bad() {
         nestedProbMap = NestedProbMap()
         val calendarBuilder = Calendar.Builder()
-        calendarBuilder.setDate(0, Calendar.JANUARY, calanderGoodDay + 1)
+        calendarBuilder.setDate(0, Calendar.JANUARY, calendarGoodDay + 1)
         goodDay = calendarBuilder.build().get(Calendar.DAY_OF_WEEK) - 2
         badAllButGoodHour(calendarBuilder)
         for (hour in hours) {
@@ -65,7 +65,7 @@ class NestedProbMapTest : TestCase() {
                 nestedProbMap.bad(percent, calendarBuilder.build())
             }
         }
-        calendarBuilder.setDate(0, Calendar.JANUARY, calanderGoodDay)
+        calendarBuilder.setDate(0, Calendar.JANUARY, calendarGoodDay)
         calendarBuilder.setTimeOfDay(goodHour, 0, 0)
         nestedProbMap.bad(percent, calendarBuilder.build())
         for (hour in hours) {
@@ -119,7 +119,7 @@ class NestedProbMapTest : TestCase() {
 
     fun good() {
         val calendarBuilder = Calendar.Builder()
-        calendarBuilder.setDate(0, Calendar.JANUARY, calanderGoodDay + 1)
+        calendarBuilder.setDate(0, Calendar.JANUARY, calendarGoodDay + 1)
         goodAllButGoodHour(calendarBuilder)
         var goodHourProbs = hourProb + (percent * hourProb)
         for (hour in hours) {
@@ -153,7 +153,7 @@ class NestedProbMapTest : TestCase() {
                 assert(nestedProbMap.getProbForDay(day) == dayProb)
             }
         }
-        calendarBuilder.setDate(0, Calendar.JANUARY, calanderGoodDay)
+        calendarBuilder.setDate(0, Calendar.JANUARY, calendarGoodDay)
         goodAllButGoodHour(calendarBuilder)
         calendarBuilder.setTimeOfDay(goodHour, 0, 0)
         nestedProbMap.good(percent, calendarBuilder.build())

@@ -11,12 +11,13 @@ private const val TOLERANCE = 0.99
 class ProbMapTest : TestCase() {
 
     @Test
-    fun testPutAndOutcome() {
+    fun testPutGetAndOutcome() {
         val rolls = 100000
         val random = Random.Default
         val map = mutableMapOf(true to 0, false to 0)
         val probMap = ProbMap<Int>()
         probMap.put(0, 0.5)
+        assert(probMap.getProb(0) == 0.5)
         for(i in 0..rolls) {
             if(probMap.outcome(0, random)){
                 map[true] = map[true]!!+1

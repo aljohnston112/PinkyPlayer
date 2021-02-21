@@ -14,4 +14,21 @@ class SongTest {
         assert(!song.selected)
     }
 
+    @Test fun compareTo(){
+        val song = Song(1L, "1",)
+        val song1 = Song(1L, "2",)
+        assert(song < song1)
+    }
+
+    @Test fun equalsHashCode(){
+        val song = Song(1L, "1",)
+        val song1 = Song(1L, "2",)
+        assert(song == song1)
+        assert(song.hashCode() == song1.hashCode())
+        val song2 = Song(1L, "1",)
+        val song3 = Song(2L, "2",)
+        assert(song2 != song3)
+        assert(song2.hashCode() != song3.hashCode())
+    }
+
 }

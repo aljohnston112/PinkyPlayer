@@ -22,7 +22,7 @@ data class Song constructor(
     }
 
     override fun hashCode(): Int {
-        return System.identityHashCode(this)
+        return id.hashCode()
     }
 
 }
