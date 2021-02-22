@@ -81,7 +81,9 @@ class FragmentTitle : Fragment() {
         ) == PackageManager.PERMISSION_GRANTED
         when {
              granted-> {
-                findNavController().navigate(R.id.fragmentLoading)
+                if(!loaded){
+                    findNavController().navigate(R.id.fragmentLoading)
+                }
             }
             shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
                 showToast(requireContext(), R.string.permission_read_needed)
