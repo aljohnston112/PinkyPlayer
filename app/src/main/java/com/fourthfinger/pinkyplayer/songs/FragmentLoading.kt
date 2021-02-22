@@ -9,6 +9,7 @@ import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.databinding.FragmentLoadingBinding
+import com.fourthfinger.pinkyplayer.playlists.PlaylistsViewModel
 import com.fourthfinger.pinkyplayer.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,6 +26,8 @@ class FragmentLoading : Fragment() {
 
     private val viewModelSettings: SettingsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
+    private val viewModelPlaylists: PlaylistsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
         _binding = FragmentLoadingBinding.inflate(layoutInflater)
@@ -35,6 +38,7 @@ class FragmentLoading : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModelSettings.loadSettings()
         viewModelSongs.loadSongs()
+        viewModelPlaylists
         observeLoadingProgress()
     }
 

@@ -7,15 +7,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.fourthfinger.pinkyplayer.ActivityMain
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.databinding.RecyclerViewSongListBinding
-import com.fourthfinger.pinkyplayer.settings.SettingsViewModel
 import com.fourthfinger.pinkyplayer.songs.Song
-import com.fourthfinger.pinkyplayer.songs.SongsViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
 
 @AndroidEntryPoint
 class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {
@@ -26,11 +21,7 @@ class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private val viewModelSongs: SongsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
-
-    private val playlistsViewModel: PlaylistsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
-
-    private val settingsViewModel: SettingsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
+    private val viewModelPlaylist: PlaylistsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
     private lateinit var recyclerViewAdapterSongs : RecyclerViewAdapterSongs
 
@@ -53,10 +44,9 @@ class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {
     }
 
     private fun observeSongs() {
-        viewModelSongs.songs.observe(viewLifecycleOwner, { songs ->
-            val sortedSongs =  songs.toMutableList()
+        viewModelPlaylist.masterPlaylist.observe(viewLifecycleOwner, { playlist ->
+            val sortedSongs =  playlist.songs().toMutableList()
             sortedSongs.sort()
-            playlistsViewModel.updateSongs(sortedSongs, settingsViewModel.settings.value!!.maxPercent)
             recyclerViewAdapterSongs.updateList(sortedSongs)
         })
     }

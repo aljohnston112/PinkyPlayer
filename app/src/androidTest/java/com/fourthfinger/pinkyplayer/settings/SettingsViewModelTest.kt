@@ -11,10 +11,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 
-
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
-class SettingsViewModelTest : ViewModelBaseTest(DummySettingsViewModelFragment(CountDownLatch(1))) {
+class SettingsViewModelTest : ViewModelBaseTest(DummySettingsViewModelFragment()) {
 
     @get:Rule
     var hiltRule = HiltAndroidRule(this)

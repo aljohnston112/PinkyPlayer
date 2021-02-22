@@ -1,4 +1,4 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.playlists
 
 import com.fourthfinger.pinkyplayer.songs.ProbMap
 import junit.framework.TestCase

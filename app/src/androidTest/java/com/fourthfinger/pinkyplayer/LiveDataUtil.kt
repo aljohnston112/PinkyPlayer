@@ -36,6 +36,31 @@ class LiveDataUtil {
             countDownLatch.await()
         }
 
+        fun <T> assertLiveDataUpdateNotNull(
+                coroutineScope: CoroutineScope,
+                viewLifecycleOwner: LifecycleOwner,
+                liveData: LiveData<T>,
+        ) {
+            val countDownLatch = CountDownLatch(1)
+            var done = false
+            coroutineScope.launch {
+                liveData.observe(viewLifecycleOwner) {
+                    if (!done) {
+                        if (it != null) {
+                            countDownLatch.countDown()
+                            liveData.removeObservers(viewLifecycleOwner)
+                        }
+                        done = true
+                    } else {
+                        assert(it != null)
+                        countDownLatch.countDown()
+                        liveData.removeObservers(viewLifecycleOwner)
+                    }
+                }
+            }
+            countDownLatch.await()
+        }
+
     }
 
 }

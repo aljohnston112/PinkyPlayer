@@ -13,9 +13,10 @@ private const val LOWER_PROB = 0.0
 
 class SettingsFileManager @Inject constructor() {
 
-    private fun attemptLoadFile(context: Context,
-                                fileSave: String,
-                                saveFileVerificationNumber: Long): Settings? {
+    private fun attemptLoadFile(
+            context: Context,
+            fileSave: String,
+            saveFileVerificationNumber: Long): Settings? {
         var longEOF = 0L
         val file = File(context.filesDir, fileSave)
         var settings: Settings? = null
@@ -43,8 +44,8 @@ class SettingsFileManager @Inject constructor() {
 
     suspend fun load(
             context: Context,
-                     fileNames: List<String>,
-                     saveFileVerificationNumber: Long
+            fileNames: List<String>,
+            saveFileVerificationNumber: Long
     ): Settings {
         return (withContext(Dispatchers.IO) {
             var settings: Settings? = null

@@ -7,8 +7,7 @@ import kotlin.collections.LinkedHashMap
 import kotlin.random.Random
 import kotlin.reflect.KProperty
 
-private const val MIN_VALUE = 0.0000000000000005
-
+const val MIN_VALUE = 0.0000000000000005
 
 // TODO fix max percent like the constructor
 sealed class ProbFun<T>(
@@ -65,10 +64,11 @@ sealed class ProbFun<T>(
             "Must have at least 1 element in the choices passed to the ProbFunTree constructor\n"
         }
         require(choices.size < 2000000000000000) {
-            "ProbFun will not work with a size of 2,000,000,000,000,000"
+            "ProbFun will not work with a size greater than 2,000,000,000,000,000"
         }
         require((maxPercent >= (1.0 / choices.size) && maxPercent <= (1.0 - (choices.size*MIN_VALUE)))) {
-            "maxPercent passed into the ProbFunTree constructor must be above 0 and 1.0 or under"
+            "maxPercent passed into the ProbFunTree constructor must be above 0 and under 1.0" +
+                    "value was $maxPercent"
         }
         probabilityMap = if (comparable) TreeMap() else LinkedHashMap()
         for (choice in choices) {

@@ -33,6 +33,7 @@ import kotlin.math.roundToInt
 private const val FILE_SAVE = "settings"
 private const val FILE_SAVE2 = "settings2"
 private const val FILE_SAVE3 = "settings3"
+private val SAVE_FILES = listOf(FILE_SAVE, FILE_SAVE2, FILE_SAVE3)
 private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
 
 @RunWith(AndroidJUnit4::class)
@@ -42,7 +43,6 @@ class FragmentSettingsTest : HiltExt() {
 
     private val context = ApplicationProvider.getApplicationContext<Context>()
     private val settingsFileManager = SettingsFileManager()
-    private val SAVE_FILES = listOf(FILE_SAVE, FILE_SAVE2, FILE_SAVE3)
 
     private val countDownLatch: CountDownLatch = CountDownLatch(1)
 
