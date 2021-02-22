@@ -9,32 +9,34 @@ import javax.inject.Inject
 
 class PlaylistsFileManager @Inject constructor() {
 
+    private val lock: Any = Any()
+
     private fun attemptLoadPlaylist(
             context: Context,
             playlistName: String,
             saveFileVerificationNumber: Long): RandomPlaylist? {
-        var longEOF = 0L
-        val file = File(context.filesDir, playlistName)
         var randomPlaylist: RandomPlaylist? = null
-        if (file.exists()) {
-            try {
-                context.openFileInput(playlistName).use { fileInputStream ->
-                    ObjectInputStream(fileInputStream).use { objectInputStream ->
-                        randomPlaylist = objectInputStream.readObject() as RandomPlaylist
-                        longEOF = objectInputStream.readLong()
+            var longEOF = 0L
+            val file = File(context.filesDir, playlistName)
+            if (file.exists()) {
+                try {
+                    context.openFileInput(playlistName).use { fileInputStream ->
+                        ObjectInputStream(fileInputStream).use { objectInputStream ->
+                            randomPlaylist = objectInputStream.readObject() as RandomPlaylist
+                            longEOF = objectInputStream.readLong()
+                        }
                     }
+                } catch (e: FileNotFoundException) {
+                    e.printStackTrace()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                } catch (e: ClassNotFoundException) {
+                    e.printStackTrace()
                 }
-            } catch (e: FileNotFoundException) {
-                e.printStackTrace()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            } catch (e: ClassNotFoundException) {
-                e.printStackTrace()
             }
-        }
-        if (longEOF != saveFileVerificationNumber) {
-            return null
-        }
+            if (longEOF != saveFileVerificationNumber) {
+                return null
+            }
         return randomPlaylist
     }
 
@@ -45,12 +47,14 @@ class PlaylistsFileManager @Inject constructor() {
     ): RandomPlaylist? {
         return (withContext(Dispatchers.IO) {
             var randomPlaylist: RandomPlaylist? = null
-            var i = 0
-            while (i < playlistFileNames.size) {
-                randomPlaylist = attemptLoadPlaylist(context, playlistFileNames[i], saveFileVerificationNumber)
-                i++
-                if (randomPlaylist != null) {
-                    break
+            synchronized(lock) {
+                var i = 0
+                while (i < playlistFileNames.size) {
+                    randomPlaylist = attemptLoadPlaylist(context, playlistFileNames[i], saveFileVerificationNumber)
+                    i++
+                    if (randomPlaylist != null) {
+                        break
+                    }
                 }
             }
             return@withContext randomPlaylist
@@ -63,19 +67,21 @@ class PlaylistsFileManager @Inject constructor() {
             playlistFileNames: List<String>,
             saveFileVerificationNumber: Long,
     ) {
-        var file = File(context.filesDir, playlistFileNames[playlistFileNames.size - 1])
-        if (file.exists()) {
-            file.delete()
-        }
-        for (i in ((playlistFileNames.size - 2) downTo (0))) {
-            val file2 = File(context.filesDir, playlistFileNames[i])
-            file2.renameTo(file)
-            file = File(context.filesDir, playlistFileNames[i])
-        }
-        context.openFileOutput(playlistFileNames[0], Context.MODE_PRIVATE).use { fileOutputStream ->
-            ObjectOutputStream(fileOutputStream).use { objectOutputStream ->
-                objectOutputStream.writeObject(randomPlaylist)
-                objectOutputStream.writeLong(saveFileVerificationNumber)
+        synchronized(lock) {
+            var file = File(context.filesDir, playlistFileNames[playlistFileNames.size - 1])
+            if (file.exists()) {
+                file.delete()
+            }
+            for (i in ((playlistFileNames.size - 2) downTo (0))) {
+                val file2 = File(context.filesDir, playlistFileNames[i])
+                file2.renameTo(file)
+                file = File(context.filesDir, playlistFileNames[i])
+            }
+            context.openFileOutput(playlistFileNames[0], Context.MODE_PRIVATE).use { fileOutputStream ->
+                ObjectOutputStream(fileOutputStream).use { objectOutputStream ->
+                    objectOutputStream.writeObject(randomPlaylist)
+                    objectOutputStream.writeLong(saveFileVerificationNumber)
+                }
             }
         }
     }

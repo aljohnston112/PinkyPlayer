@@ -38,7 +38,7 @@ class FragmentLoading : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModelSettings.loadSettings()
         viewModelSongs.loadSongs()
-        viewModelPlaylists
+        viewModelPlaylists.loadPlaylists()
         observeLoadingProgress()
     }
 

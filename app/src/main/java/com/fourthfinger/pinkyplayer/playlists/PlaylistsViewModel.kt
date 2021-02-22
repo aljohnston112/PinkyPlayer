@@ -45,21 +45,23 @@ class PlaylistsViewModel @Inject constructor(
     }
 
     private val songObserver: Observer<List<Song>> = Observer<List<Song>> {
-        if (maxPercent == -1.0) {
-            val a = ((it.size) * MIN_VALUE)
-            maxPercent = (1.0 - ((it.size) * MIN_VALUE))
+        if (it.isNotEmpty()) {
+            if (maxPercent == -1.0) {
+                val a = ((it.size) * MIN_VALUE)
+                maxPercent = (1.0 - ((it.size) * MIN_VALUE))
+            }
+            if (!this::_masterPlaylist.isInitialized) {
+                val comparable = true
+                _masterPlaylist = RandomPlaylist(FILE_SAVE, it, maxPercent, comparable)
+            } else {
+                _masterPlaylist.updateSongs(it)
+            }
+            masterPlaylistMLD.postValue(_masterPlaylist)
+            playlistRepo.savePlaylist(
+                    _masterPlaylist, getApplication(),
+                    MASTER_PLAYLIST_FILES, SAVE_FILE_VERIFICATION_NUMBER
+            )
         }
-        if (!this::_masterPlaylist.isInitialized) {
-            val comparable = true
-            _masterPlaylist = RandomPlaylist(FILE_SAVE, it, maxPercent, comparable)
-        } else {
-            _masterPlaylist.updateSongs(it)
-        }
-        masterPlaylistMLD.postValue(_masterPlaylist)
-        playlistRepo.savePlaylist(
-                _masterPlaylist, getApplication(),
-                MASTER_PLAYLIST_FILES, SAVE_FILE_VERIFICATION_NUMBER
-        )
     }
 
     private val settingsObserver: Observer<Settings> = Observer<Settings> {
