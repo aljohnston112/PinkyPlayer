@@ -46,6 +46,10 @@ class FragmentLoadingTest : HiltExt() {
             actualNavController.addOnDestinationChangedListener { navController: NavController, navDestination: NavDestination, bundle: Bundle? ->
                 if (navDestination.id == R.id.fragmentTitle) {
                     countDownLatch.countDown()
+                } else if(navDestination.id == R.id.fragmentLoading){
+                    onView(withId(R.id.constraint_layout_fragment_loading)).check(matches(isCompletelyDisplayed()))
+                    onView(withId(R.id.text_view_loading)).check(matches(isCompletelyDisplayed()))
+                    onView(withId(R.id.progress_bar_loading)).check(matches(isCompletelyDisplayed()))
                 }
             }
         }
@@ -53,9 +57,6 @@ class FragmentLoadingTest : HiltExt() {
 
     @Test
     fun verifyLayout() {
-        onView(withId(R.id.constraint_layout_fragment_loading)).check(matches(isCompletelyDisplayed()))
-        onView(withId(R.id.text_view_loading)).check(matches(isCompletelyDisplayed()))
-        onView(withId(R.id.progress_bar_loading)).check(matches(isCompletelyDisplayed()))
         countDownLatch.await()
         onView(withId(R.id.constraint_layout_fragment_loading)).check(doesNotExist())
         onView(withId(R.id.text_view_loading)).check(doesNotExist())
