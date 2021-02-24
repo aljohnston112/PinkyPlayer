@@ -1,6 +1,5 @@
 package com.fourthfinger.pinkyplayer
 
-import com.fourthfinger.pinkyplayer.settings.Settings
 import com.fourthfinger.pinkyplayer.songs.Song
 import org.junit.Test
 

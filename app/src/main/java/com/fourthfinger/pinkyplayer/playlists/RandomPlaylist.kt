@@ -8,6 +8,15 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
 
+/**
+ * A random playlist.
+ *
+ * @param name            The name of this RandomPlaylist.
+ * @param music           The List of AudioURIs to add to this playlist.
+ * @param maxPercent      The max percentage that any AudioUri can have
+ * of being returned when fun() is called.
+ * @throws IllegalArgumentException if there is not at least one AudioURI in music.
+ */
 class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
                      val comparable: Boolean) : Serializable {
 
@@ -172,18 +181,9 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
         }
     }
 
-    /**
-     * Creates a random playlist.
-     *
-     * @param name            The name of this RandomPlaylist.
-     * @param music           The List of AudioURIs to add to this playlist.
-     * @param maxPercent      The max percentage that any AudioUri can have
-     * of being returned when fun() is called.
-     * @throws IllegalArgumentException if there is not at least one AudioURI in music.
-     */
     init {
         require(music.isNotEmpty()) { "List music must contain at least one AudioURI" }
-        val songs: Set<Song> = TreeSet<Song>(music)
+        val songs: Set<Song> = TreeSet(music)
         probabilityFunction = if (comparable) {
             ProbFun.ProbFunTreeMap(songs, maxPercent)
         } else {
@@ -200,6 +200,30 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
             }
         }
         playlistIterator = playlistArray.listIterator()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if(other is RandomPlaylist) {
+            for (song in songs()) {
+                if (!other.contains(song)){
+                    return false
+                }
+            }
+            for(song in other.songs()){
+                if(!contains(song)){
+                    return false
+                }
+            }
+            return (getMaxPercent() == other.getMaxPercent()) && (comparable == other.comparable)
+        }
+        return false
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + comparable.hashCode()
+        result = 31 * result + playlistArray.hashCode()
+        return result
     }
 
     companion object {

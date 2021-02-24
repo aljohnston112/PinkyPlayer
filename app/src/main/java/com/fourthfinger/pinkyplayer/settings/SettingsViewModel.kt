@@ -6,12 +6,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Singleton
 
 private const val FILE_SAVE = "settings"
-private const val FILE_SAVE2 = "settings2"
-private const val FILE_SAVE3 = "settings3"
-private val SAVE_FILES = listOf(FILE_SAVE, FILE_SAVE2, FILE_SAVE3)
 private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
 
 @HiltViewModel
@@ -36,7 +32,7 @@ class SettingsViewModel @Inject constructor(
     fun loadSettings() {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoaded.postValue(false)
-            settingsRepo.load(getApplication(), SAVE_FILES, SAVE_FILE_VERIFICATION_NUMBER)
+            settingsRepo.load(getApplication(), FILE_SAVE, SAVE_FILE_VERIFICATION_NUMBER)
             _isLoaded.postValue(true)
         }
     }
@@ -46,7 +42,7 @@ class SettingsViewModel @Inject constructor(
             settingsRepo.save(
                     settings,
                     getApplication<Application>().applicationContext,
-                    SAVE_FILES,
+                    FILE_SAVE,
                     SAVE_FILE_VERIFICATION_NUMBER,
             )
         }

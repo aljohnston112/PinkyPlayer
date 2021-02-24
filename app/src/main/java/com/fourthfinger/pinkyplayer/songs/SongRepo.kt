@@ -1,7 +1,6 @@
 package com.fourthfinger.pinkyplayer.songs
 
 import android.content.Context
-import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import javax.inject.Inject
 import javax.inject.Singleton

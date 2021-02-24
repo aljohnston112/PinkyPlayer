@@ -19,6 +19,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.fourthfinger.pinkyplayer.ActivityMain
+import com.fourthfinger.pinkyplayer.FileUtil
 import com.fourthfinger.pinkyplayer.HiltExt
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.songs.FragmentTitleDirections
@@ -30,10 +31,7 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import kotlin.math.roundToInt
 
-private const val FILE_SAVE = "settings"
-private const val FILE_SAVE2 = "settings2"
-private const val FILE_SAVE3 = "settings3"
-private val SAVE_FILES = listOf(FILE_SAVE, FILE_SAVE2, FILE_SAVE3)
+private const val SAVE_FILE = "settings"
 private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
 
 @RunWith(AndroidJUnit4::class)
@@ -41,8 +39,9 @@ private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
 @HiltAndroidTest
 class FragmentSettingsTest : HiltExt() {
 
+    private val settingsRepo = SettingsRepo()
+
     private val context = ApplicationProvider.getApplicationContext<Context>()
-    private val settingsFileManager = SettingsFileManager()
 
     private val countDownLatch: CountDownLatch = CountDownLatch(1)
 
@@ -75,7 +74,7 @@ class FragmentSettingsTest : HiltExt() {
         onView(withId(R.id.constraint_layout_fragment_settings)).check(matches(isDisplayed()))
         lateinit var settingsIn : Settings
         runBlocking {
-            settingsIn = settingsFileManager.load(context, SAVE_FILES, SAVE_FILE_VERIFICATION_NUMBER)
+            settingsIn = settingsRepo.load(context, SAVE_FILE, SAVE_FILE_VERIFICATION_NUMBER)!!
         }
         onView(withId(R.id.edit_text_n_songs)).check(matches(
                 withText((1.0/settingsIn.maxPercent).roundToInt().toString())))
@@ -129,7 +128,7 @@ class FragmentSettingsTest : HiltExt() {
         verifyGoodData(fab, goodNSongs3, goodPC3, goodPC4)
         lateinit var settingsIn : Settings
         runBlocking {
-            settingsIn = settingsFileManager.load(context, SAVE_FILES, SAVE_FILE_VERIFICATION_NUMBER)
+            settingsIn = settingsRepo.load(context, SAVE_FILE, SAVE_FILE_VERIFICATION_NUMBER)!!
         }
         assert(settingsIn.maxPercent == (1.0/goodNSongs3.toInt()))
         assert(settingsIn.percentChangeUp == (goodPC3.toInt()/100.0))

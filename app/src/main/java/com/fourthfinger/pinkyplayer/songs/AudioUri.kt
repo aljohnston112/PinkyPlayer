@@ -9,9 +9,6 @@ import java.io.*
 import java.util.*
 import kotlin.random.Random
 
-@Transient
-const val TAG = "AudioURI"
-
 class AudioUri(
         val displayName: String,
         val artist: String,

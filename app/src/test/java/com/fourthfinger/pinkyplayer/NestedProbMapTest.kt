@@ -32,7 +32,7 @@ class NestedProbMapTest : TestCase() {
         resetProbabilities()
     }
 
-    fun bad() {
+    private fun bad() {
         nestedProbMap = NestedProbMap()
         val calendarBuilder = Calendar.Builder()
         calendarBuilder.setDate(0, Calendar.JANUARY, calendarGoodDay + 1)
@@ -117,7 +117,7 @@ class NestedProbMapTest : TestCase() {
         }
     }
 
-    fun good() {
+    private fun good() {
         val calendarBuilder = Calendar.Builder()
         calendarBuilder.setDate(0, Calendar.JANUARY, calendarGoodDay + 1)
         goodAllButGoodHour(calendarBuilder)
@@ -183,7 +183,7 @@ class NestedProbMapTest : TestCase() {
         }
     }
 
-    fun resetProbabilities() {
+    private fun resetProbabilities() {
         nestedProbMap.resetProbabilities()
         for(month in months){
             assert(nestedProbMap.getProbForMonth(month) == 1.0)

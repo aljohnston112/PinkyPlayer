@@ -3,16 +3,9 @@ package com.fourthfinger.pinkyplayer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
-import com.fourthfinger.pinkyplayer.settings.SettingsRepo
-import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.hamcrest.core.AllOf.allOf
-import org.junit.ClassRule
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 

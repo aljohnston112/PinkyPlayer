@@ -32,7 +32,7 @@ open class SongDBBaseTest {
     }
 
     companion object {
-        val context = ApplicationProvider.getApplicationContext<Context>()
+        val context: Context = ApplicationProvider.getApplicationContext()
         lateinit var loadingCallback : LoadingCallback
         class LoadingCallbackImp : LoadingCallback {
             private var loadingText =  context.resources.getString(R.string.loading1)

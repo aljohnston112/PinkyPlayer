@@ -18,8 +18,8 @@ class SettingsRepoTest {
 
     companion object {
         private val context = ApplicationProvider.getApplicationContext<Context>()
-        private val settingsRepo = SettingsRepo(SettingsFileManager())
-        private val fileNames = listOf<String>("0", "1", "2")
+        private val settingsRepo = SettingsRepo()
+        private const val fileName: String = "0"
         private const val fileVerificationNumber = 1234567898765432123
     }
 
@@ -32,55 +32,53 @@ class SettingsRepoTest {
     }
 
     private fun deleteTestFiles() {
-        for(fileName in fileNames){
             val file = File(context.filesDir, fileName)
             file.delete()
-        }
     }
 
     @Test fun loadFile(){
         val settings = Settings(0.0, 1.0, 2.0, 3.0)
-        settingsRepo.save(settings, context, fileNames, fileVerificationNumber)
+        settingsRepo.save(settings, context, fileName, fileVerificationNumber)
         var settingsA : Settings
-        runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber) }
+        runBlocking { settingsA = settingsRepo.load(context, fileName, fileVerificationNumber) }
         assert(settings == settingsA)
         val settings1 = Settings(3.0, 2.0, 1.0, 0.0)
-        settingsRepo.save(settings1, context, fileNames, fileVerificationNumber +1)
-        runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber +1) }
+        settingsRepo.save(settings1, context, fileName, fileVerificationNumber +1)
+        runBlocking { settingsA = settingsRepo.load(context, fileName, fileVerificationNumber +1) }
         assert(settings1 == settingsA)
         val settings2 = Settings(10.0, 11.0, 12.0, 13.0)
-        settingsRepo.save(settings2, context, fileNames, fileVerificationNumber +2)
-        runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber +2) }
+        settingsRepo.save(settings2, context, fileName, fileVerificationNumber +2)
+        runBlocking { settingsA = settingsRepo.load(context, fileName, fileVerificationNumber +2) }
         assert(settings2 == settingsA)
-        runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber) }
+        runBlocking { settingsA = settingsRepo.load(context, fileName, fileVerificationNumber) }
         assert(settings == settingsA)
-        runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber +1) }
+        runBlocking { settingsA = settingsRepo.load(context, fileName, fileVerificationNumber +1) }
         assert(settings1 == settingsA)
-        runBlocking { settingsA = settingsRepo.load(context, fileNames, fileVerificationNumber +2) }
+        runBlocking { settingsA = settingsRepo.load(context, fileName, fileVerificationNumber +2) }
         assert(settings2 == settingsA)
     }
 
     @Test
     fun testSaveFile() {
         val settings = Settings(0.0, 1.0, 2.0, 3.0)
-        settingsRepo.save(settings, context, fileNames, fileVerificationNumber)
-        assertFileHasSettings(fileNames[0], settings)
-        assertEmptyFile(File(context.filesDir, fileNames[1]))
-        assertEmptyFile(File(context.filesDir, fileNames[2]))
+        settingsRepo.save(settings, context, fileName, fileVerificationNumber)
+        assertFileHasSettings(settings)
+        assertEmptyFile(File(context.filesDir, fileName))
+        assertEmptyFile(File(context.filesDir, fileName))
         val settings1 = Settings(3.0, 2.0, 1.0, 0.0)
-        settingsRepo.save(settings1, context, fileNames, fileVerificationNumber)
-        assertFileHasSettings(fileNames[0], settings1)
-        assertFileHasSettings(fileNames[1], settings)
-        assertEmptyFile(File(context.filesDir, fileNames[2]))
+        settingsRepo.save(settings1, context, fileName, fileVerificationNumber)
+        assertFileHasSettings(settings1)
+        assertFileHasSettings(settings)
+        assertEmptyFile(File(context.filesDir, fileName))
         val settings2 = Settings(10.0, 11.0, 12.0, 13.0)
-        settingsRepo.save(settings2, context, fileNames, fileVerificationNumber)
-        assertFileHasSettings(fileNames[0], settings2)
-        assertFileHasSettings(fileNames[1], settings1)
-        assertFileHasSettings(fileNames[2], settings)
+        settingsRepo.save(settings2, context, fileName, fileVerificationNumber)
+        assertFileHasSettings(settings2)
+        assertFileHasSettings(settings1)
+        assertFileHasSettings(settings)
     }
 
-    private fun assertFileHasSettings(fileName: String, settings: Settings) {
-        val file = File(context.filesDir, fileName)
+    private fun assertFileHasSettings(settings: Settings) {
+        val file = File(context.filesDir, fileName+0.toString())
         assert(file.exists())
         try {
             context.openFileInput(fileName).use { fileInputStream ->

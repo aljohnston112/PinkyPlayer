@@ -5,8 +5,8 @@ import androidx.lifecycle.MediatorLiveData
 
 class MediatorLiveDataLoading {
 
-    var songLoadedValue: Boolean? = null
-    var settingsLoadedValue: Boolean? = null
+    private var songLoadedValue: Boolean? = null
+    private var settingsLoadedValue: Boolean? = null
 
     fun isLoaded(
             songsLoaded: LiveData<Boolean>, settingsLoaded: LiveData<Boolean>

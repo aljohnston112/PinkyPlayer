@@ -108,10 +108,10 @@ class ProbFunTreeMapMapTest {
         var percent1 = (1.0 / choices.size)
         for(i in 0..100000) {
             if(pf.good(1, percentGood) != -1.0) {
-                if (percent1 > 0.5) {
-                    percent1 += (1.0 - percent1) * percentGood
+                percent1 += if (percent1 > 0.5) {
+                    (1.0 - percent1) * percentGood
                 } else {
-                    percent1 += percent1 * percentGood
+                    percent1 * percentGood
                 }
 
                 percent1 += (percent1 * percentGood)

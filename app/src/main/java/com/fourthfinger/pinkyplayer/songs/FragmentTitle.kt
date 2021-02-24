@@ -11,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import com.fourthfinger.pinkyplayer.R
@@ -19,10 +18,6 @@ import com.fourthfinger.pinkyplayer.ToastUtil.Companion.showToast
 import com.fourthfinger.pinkyplayer.databinding.FragmentTitleBinding
 import com.fourthfinger.pinkyplayer.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class FragmentTitle : Fragment() {
@@ -48,9 +43,6 @@ class FragmentTitle : Fragment() {
                 ) { isGranted: Boolean ->
                     if (isGranted) {
                         findNavController().navigate(R.id.fragmentLoading)
-                    } else {
-                        //showToast(requireContext(), R.string.permission_read_needed)
-                       // requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                     }
                 }
     }

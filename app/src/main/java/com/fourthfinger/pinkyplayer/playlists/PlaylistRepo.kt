@@ -3,13 +3,14 @@ package com.fourthfinger.pinkyplayer.playlists
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.fourthfinger.pinkyplayer.FileUtil
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class PlaylistRepo @Inject constructor(private val playlistsFileManager: PlaylistsFileManager) {
+class PlaylistRepo @Inject constructor() {
 
-    private val playlistsField: MutableList<RandomPlaylist> = ArrayList()
+    private val playlistsField: MutableSet<RandomPlaylist> = HashSet()
 
     private val _playlists: MutableLiveData<List<RandomPlaylist>> by lazy {
         MutableLiveData<List<RandomPlaylist>>()
@@ -17,15 +18,15 @@ class PlaylistRepo @Inject constructor(private val playlistsFileManager: Playlis
 
     val playlists = _playlists as LiveData<List<RandomPlaylist>>
 
-    suspend fun loadPlaylist(
+    fun loadPlaylist(
             context: Context,
-            fileNames: List<String>,
+            fileName: String,
             saveFileVerificationNumber: Long,
     ): RandomPlaylist? {
-        val playlist = playlistsFileManager.load(context, fileNames, saveFileVerificationNumber)
+        val playlist = FileUtil.load<RandomPlaylist>(context, fileName, saveFileVerificationNumber)
         if (playlist != null) {
             playlistsField.add(playlist)
-            _playlists.postValue(playlistsField)
+            _playlists.postValue(playlistsField.toList())
         }
         return playlist
     }
@@ -33,7 +34,7 @@ class PlaylistRepo @Inject constructor(private val playlistsFileManager: Playlis
     fun savePlaylist(
             randomPlaylist: RandomPlaylist,
             context: Context,
-            fileNames: List<String>,
+            fileName: String,
             saveFileVerificationNumber: Long,
     ) {
         val playlistIterator = playlistsField.iterator()
@@ -43,8 +44,8 @@ class PlaylistRepo @Inject constructor(private val playlistsFileManager: Playlis
             }
         }
         playlistsField.add(randomPlaylist)
-        _playlists.postValue(playlistsField)
-        playlistsFileManager.save(randomPlaylist, context, fileNames, saveFileVerificationNumber)
+        _playlists.postValue(playlistsField.toList())
+        FileUtil.save(randomPlaylist, context, fileName, saveFileVerificationNumber)
     }
 
 }

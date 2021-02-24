@@ -3,11 +3,17 @@ package com.fourthfinger.pinkyplayer.settings
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.fourthfinger.pinkyplayer.FileUtil
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val MAX_PERCENT = 0.1
+private const val PERCENT_CHANGE_UP = 0.5
+private const val PERCENT_CHANGE_DOWN = 0.9
+private const val LOWER_PROB = 0.0
+
 @Singleton
-class SettingsRepo @Inject constructor(private val settingsFileManager: SettingsFileManager) {
+class SettingsRepo @Inject constructor() {
 
     private val _settings: MutableLiveData<Settings> by lazy {
         MutableLiveData<Settings>()
@@ -15,12 +21,15 @@ class SettingsRepo @Inject constructor(private val settingsFileManager: Settings
 
     val settings = _settings as LiveData<Settings>
 
-    suspend fun load(
+    fun load(
             context: Context,
-            fileNames: List<String>,
+            fileName: String,
             saveFileVerificationNumber: Long,
     ): Settings {
-        val settings = settingsFileManager.load(context, fileNames, saveFileVerificationNumber)
+        var settings: Settings? = FileUtil.load<Settings>(context, fileName, saveFileVerificationNumber)
+        if (settings == null) {
+            settings = Settings(MAX_PERCENT, PERCENT_CHANGE_UP, PERCENT_CHANGE_DOWN, LOWER_PROB)
+        }
         _settings.postValue(settings)
         return settings
     }
@@ -28,11 +37,11 @@ class SettingsRepo @Inject constructor(private val settingsFileManager: Settings
     fun save(
             settings: Settings,
             context: Context,
-            fileNames: List<String>,
+            fileName: String,
             saveFileVerificationNumber: Long,
     ){
         this._settings.postValue(settings)
-        settingsFileManager.save(settings, context, fileNames, saveFileVerificationNumber)
+        FileUtil.save(settings, context, fileName, saveFileVerificationNumber)
     }
 
 }

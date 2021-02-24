@@ -32,7 +32,7 @@ class FragmentTitleTest : HiltExt() {
 
     private val countDownLatch: CountDownLatch = CountDownLatch(1)
 
-    lateinit var actualNavController : NavController
+    private lateinit var actualNavController : NavController
 
     @Before
     fun setUp() {

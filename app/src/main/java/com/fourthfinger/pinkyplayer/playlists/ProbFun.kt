@@ -66,7 +66,7 @@ sealed class ProbFun<T>(
         require(choices.size < 2000000000000000) {
             "ProbFun will not work with a size greater than 2,000,000,000,000,000"
         }
-        require((maxPercent >= (1.0 / choices.size) && maxPercent <= (1.0 - (choices.size*MIN_VALUE)))) {
+        require((maxPercent > (0) && maxPercent <= (1.0 - (choices.size*MIN_VALUE)))) {
             "maxPercent passed into the ProbFunTree constructor must be above 0 and under 1.0" +
                     "value was $maxPercent"
         }
@@ -183,8 +183,6 @@ sealed class ProbFun<T>(
      * @param element as the element to make appear more often
      * @param percent as the percentage between 0 and 1 (exclusive),
      * of the probability of getting element to add to the probability.
-     * @param scale   as whether or not to scale the percent down
-     * to avoid hitting a ceiling for the probability.
      * @return the adjusted probability.
      * @throws NullPointerException     if element is null.
      * @throws IllegalArgumentException if the percent isn't between 0 and 1 exclusive.

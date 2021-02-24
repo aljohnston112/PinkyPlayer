@@ -11,10 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-private const val FILE_SAVE = "MASTER_PLAYLIST_NAME"
-private const val FILE_SAVE2 = "MASTER_PLAYLIST_NAME2"
-private const val FILE_SAVE3 = "MASTER_PLAYLIST_NAME3"
-private val MASTER_PLAYLIST_FILES = listOf(FILE_SAVE, FILE_SAVE2, FILE_SAVE3)
+private const val MASTER_PLAYLIST_FILE_NAME = "MASTER_PLAYLIST_NAME"
 private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
 
 @HiltViewModel
@@ -39,7 +36,7 @@ class PlaylistsViewModel @Inject constructor(
     fun loadPlaylists(){
         viewModelScope.launch(Dispatchers.IO) {
             playlistRepo.loadPlaylist(
-                    getApplication(), MASTER_PLAYLIST_FILES, SAVE_FILE_VERIFICATION_NUMBER
+                    getApplication(), MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
             )
         }
     }
@@ -47,19 +44,18 @@ class PlaylistsViewModel @Inject constructor(
     private val songObserver: Observer<List<Song>> = Observer<List<Song>> {
         if (it.isNotEmpty()) {
             if (maxPercent == -1.0) {
-                val a = ((it.size) * MIN_VALUE)
                 maxPercent = (1.0 - ((it.size) * MIN_VALUE))
             }
             if (!this::_masterPlaylist.isInitialized) {
                 val comparable = true
-                _masterPlaylist = RandomPlaylist(FILE_SAVE, it, maxPercent, comparable)
+                _masterPlaylist = RandomPlaylist(MASTER_PLAYLIST_FILE_NAME, it, maxPercent, comparable)
             } else {
                 _masterPlaylist.updateSongs(it)
             }
             masterPlaylistMLD.postValue(_masterPlaylist)
             playlistRepo.savePlaylist(
                     _masterPlaylist, getApplication(),
-                    MASTER_PLAYLIST_FILES, SAVE_FILE_VERIFICATION_NUMBER
+                    MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
             )
         }
     }
@@ -74,7 +70,7 @@ class PlaylistsViewModel @Inject constructor(
             masterPlaylistMLD.postValue(_masterPlaylist)
             playlistRepo.savePlaylist(
                     _masterPlaylist, getApplication(),
-                    MASTER_PLAYLIST_FILES, SAVE_FILE_VERIFICATION_NUMBER
+                    MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
             )
         }
     }

@@ -3,7 +3,6 @@ package com.fourthfinger.pinkyplayer.playlists
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.fourthfinger.pinkyplayer.playlists.RandomPlaylist
 import com.fourthfinger.pinkyplayer.songs.AudioUri
 import com.fourthfinger.pinkyplayer.songs.Song
 import org.junit.Before
@@ -168,7 +167,7 @@ class RandomPlaylistTest {
         assert(!AudioUri.doesAudioUriExist(context, song.id))
     }
 
-    fun testPrevious(rp : RandomPlaylist){
+    private fun testPrevious(rp : RandomPlaylist){
         assert(!AudioUri.doesAudioUriExist(context, song.id))
         assert(AudioUri.saveAudioUri(context, audioUri))
         assert(AudioUri.doesAudioUriExist(context, song.id))

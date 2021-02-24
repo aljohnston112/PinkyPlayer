@@ -11,17 +11,15 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
-import com.fourthfinger.pinkyplayer.songs.FragmentLoading
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import org.junit.Before
-import org.junit.BeforeClass
 import org.junit.Rule
 
 @LargeTest
 @HiltAndroidTest
 open class HiltExt {
 
+    @Suppress("LeakingThis")
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
@@ -30,13 +28,16 @@ open class HiltExt {
         inline fun <reified T : Fragment> launchFragmentInHiltContainer(
                 navController: NavController,
                 navHost: Int, navGraph: Int,
-                @StyleRes themeResId: Int = R.style.FragmentScenarioEmptyFragmentActivityTheme):
-                ActivityScenario<ActivityMain> {
+                @StyleRes themeResId: Int = R.style.FragmentScenarioEmptyFragmentActivityTheme
+        ): ActivityScenario<ActivityMain> {
             val startActivityIntent = Intent.makeMainActivity(
                     ComponentName(
                             ApplicationProvider.getApplicationContext(),
                             ActivityMain::class.java)
-            ).putExtra(FragmentScenario.EmptyFragmentActivity.THEME_EXTRAS_BUNDLE_KEY, themeResId)
+            ).putExtra(
+                    "androidx.fragment.app.testing.FragmentScenario.EmptyFragmentActivity.THEME_EXTRAS_BUNDLE_KEY",
+                    themeResId
+            )
             return ActivityScenario.launch<ActivityMain>(startActivityIntent).onActivity {
                 activity ->
                 val navHostFragment = activity.supportFragmentManager.findFragmentById(navHost) as NavHostFragment
