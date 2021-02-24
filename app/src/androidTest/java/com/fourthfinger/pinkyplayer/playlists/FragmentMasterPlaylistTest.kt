@@ -82,7 +82,7 @@ class FragmentMasterPlaylistTest : HiltExt() {
                     hasDescendant(withText(song.value.title)),
                     hasDescendant(withId(R.id.song_handle)),
                     withId(R.id.constraint_layout_song_name),
-                    //hasDescendant(EspressoTestMatcher.withDrawable(R.drawable.ic_more_vert_white_18dp))
+                    hasDescendant(EspressoTestMatcher.withDrawable(R.drawable.ic_more_vert_white_18dp))
             ))
             vh.check(matches(isCompletelyDisplayed()))
         }
