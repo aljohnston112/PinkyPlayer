@@ -5,7 +5,7 @@ import java.io.*
 
 private const val N_BACKUPS = 2
 
-private val lock: Any = Any()
+private val fileLock: Any = Any()
 
 class FileUtil {
 
@@ -34,7 +34,7 @@ class FileUtil {
                 saveFileVerificationNumber: Long,
         ) {
             val fileNames = getFileNames(fileName)
-            synchronized(lock) {
+            synchronized(fileLock) {
                 var file = File(context.filesDir, fileNames[fileNames.size - 1])
                 if (file.exists()) {
                     file.delete()
@@ -65,7 +65,7 @@ class FileUtil {
         ): T? {
             var longEOF = 0L
             var t: T? = null
-            synchronized(lock) {
+            synchronized(fileLock) {
                 val file = File(context.filesDir, fileSave)
                 if (file.exists()) {
                     try {

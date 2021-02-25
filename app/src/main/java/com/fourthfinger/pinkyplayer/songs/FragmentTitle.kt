@@ -11,8 +11,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
-import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
+import com.fourthfinger.pinkyplayer.NavUtil.Companion.safeNav
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.ToastUtil.Companion.showToast
 import com.fourthfinger.pinkyplayer.databinding.FragmentTitleBinding
@@ -93,21 +93,18 @@ class FragmentTitle : Fragment() {
         super.onStart()
         binding.buttonSettings.setOnClickListener {
             if (checkPermissions()) {
-                safeNav(FragmentTitleDirections.actionFragmentTitleToFragmentSettings())
+                safeNav(
+                        this, R.id.fragmentTitle,
+                        FragmentTitleDirections.actionFragmentTitleToFragmentSettings()
+                )
             }
         }
         binding.buttonSongs.setOnClickListener {
             if (checkPermissions()) {
-                safeNav(FragmentTitleDirections.actionFragmentTitleToFragmentSongs())
-            }
-        }
-    }
-
-    private fun safeNav(action: NavDirections) {
-        val dest = findNavController().currentDestination
-        if (dest != null) {
-            if (dest.id == R.id.fragmentTitle) {
-                findNavController().navigate(action)
+                safeNav(
+                        this, R.id.fragmentTitle,
+                        FragmentTitleDirections.actionFragmentTitleToFragmentSongs()
+                )
             }
         }
     }

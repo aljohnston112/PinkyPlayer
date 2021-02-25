@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.fourthfinger.pinkyplayer.NavUtil
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.databinding.RecyclerViewSongListBinding
 import com.fourthfinger.pinkyplayer.songs.Song
@@ -22,6 +23,8 @@ class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {
     private val binding get() = _binding!!
 
     private val viewModelPlaylist: PlaylistsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
+
+    private val mediaViewModel: MediaViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
     private lateinit var recyclerViewAdapterSongs : RecyclerViewAdapterSongs
 
@@ -44,11 +47,11 @@ class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {
     }
 
     private fun observeSongs() {
-        viewModelPlaylist.masterPlaylist.observe(viewLifecycleOwner, { playlist ->
+        viewModelPlaylist.masterPlaylist.observe(viewLifecycleOwner) { playlist ->
             val sortedSongs =  playlist.songs().toMutableList()
             sortedSongs.sort()
             recyclerViewAdapterSongs.updateList(sortedSongs)
-        })
+        }
     }
 
     override fun onDestroyView() {
@@ -56,15 +59,19 @@ class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {
         _binding = null
     }
 
-    override fun onClickViewHolder(song: Song?) {
+    override fun onClickViewHolder(song: Song) {
+        mediaViewModel.setCurrentSong(requireContext(), song)
+        NavUtil.safeNav(
+                this, R.id.fragmentMasterPlaylist,
+                FragmentMasterPlaylistDirections.actionFragmentMasterPlaylistToFragmentSong()
+        )
+    }
+
+    override fun onMenuItemClickAddToPlaylist(song: Song): Boolean {
         TODO("Not yet implemented")
     }
 
-    override fun onMenuItemClickAddToPlaylist(song: Song?): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun onMenuItemClickAddToQueue(song: Song?): Boolean {
+    override fun onMenuItemClickAddToQueue(song: Song): Boolean {
         TODO("Not yet implemented")
     }
 

@@ -9,9 +9,9 @@ import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.songs.Song
 
 interface ListenerCallbackSongs {
-    fun onClickViewHolder(song: Song?)
-    fun onMenuItemClickAddToPlaylist(song: Song?): Boolean
-    fun onMenuItemClickAddToQueue(song: Song?): Boolean
+    fun onClickViewHolder(song: Song)
+    fun onMenuItemClickAddToPlaylist(song: Song): Boolean
+    fun onMenuItemClickAddToQueue(song: Song): Boolean
 }
 
 class RecyclerViewAdapterSongs(
@@ -39,7 +39,7 @@ class RecyclerViewAdapterSongs(
 
         holder.songView.setOnClickListener {
             if (position != RecyclerView.NO_POSITION) {
-                listenerCallbackSongs.onClickViewHolder(holder.song)
+                listenerCallbackSongs.onClickViewHolder(holder.song!!)
             }
         }
 
@@ -47,11 +47,11 @@ class RecyclerViewAdapterSongs(
             menu: ContextMenu, _: View?, _: ContextMenuInfo? ->
             val menuItemAddToPlaylist: MenuItem = menu.add(R.string.add_to_playlist)
             menuItemAddToPlaylist.setOnMenuItemClickListener {
-                listenerCallbackSongs.onMenuItemClickAddToPlaylist(holder.song)
+                listenerCallbackSongs.onMenuItemClickAddToPlaylist(holder.song!!)
             }
             val menuItemAddToQueue: MenuItem = menu.add(R.string.add_to_queue)
             menuItemAddToQueue.setOnMenuItemClickListener {
-                listenerCallbackSongs.onMenuItemClickAddToQueue(holder.song)
+                listenerCallbackSongs.onMenuItemClickAddToQueue(holder.song!!)
             }
         }
     }

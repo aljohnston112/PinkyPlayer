@@ -18,9 +18,23 @@
     <string name="folder_search">Folder Search</string>
 
     <!-- FragmentSongs-->
+    <string name="song_menu">Song menu</string>
     <string name="add_to_playlist">Add to playlist</string>
     <string name="add_to_queue">Add to queue</string>
 
+    <!-- FragmentSong -->
+    <string name="song_art">This is the song art</string>
+    <string name="thumb_down">
+        This button is for when you do not want to hear the currently playing song as often
+    </string>
+    <string name="thumb_up">
+        This button is for when you do want to hear the currently playing song more often
+    </string>
+    <string name="button_shuffle">This button toggles shuffling</string>
+    <string name="button_next">This button plays the next song, if there is one</string>
+    <string name="button_prev">This button plays the previous song, if there is one</string>
+    <string name="button_repeat">This button toggles repeat</string>
+    <string name="button_play_pause">This button toggles play and pause</string>
 
     <!-- FragmentSettings -->
     <string name="n_songs">Min number of songs</string>
@@ -44,6 +58,5 @@
     <string name="percent_change_down"><b>Mod Down:</b></string>
     <string name="percent_change_error">Mod must be between 1 and 100</string>
     <string name="save">Save</string>
-    <string name="song_menu">Song menu</string>
 
 </resources>
