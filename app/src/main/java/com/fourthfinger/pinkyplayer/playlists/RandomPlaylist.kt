@@ -23,7 +23,7 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
     // The ProbFun that randomly picks the media to play
     private var probabilityFunction: ProbFun<Song>
 
-    fun songs() = probabilityFunction.getKeys()
+    fun songs(): List<Song> = probabilityFunction.getKeys()
 
     fun getMaxPercent(): Double {
         return probabilityFunction.maxPercent
@@ -82,7 +82,7 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
 
     private val playlistArray: MutableList<Long> = ArrayList()
 
-    fun songIds(): MutableList<Long> {
+    fun songIds(): List<Long> {
         if(comparable) {
             playlistArray.sort()
         }

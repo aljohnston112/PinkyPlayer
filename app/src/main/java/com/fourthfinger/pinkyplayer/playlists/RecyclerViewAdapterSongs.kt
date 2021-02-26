@@ -18,7 +18,8 @@ class RecyclerViewAdapterSongs(
         private var listenerCallbackSongs: ListenerCallbackSongs,
 ) : RecyclerView.Adapter<RecyclerViewAdapterSongs.ViewHolder>() {
 
-    private var songs: List<Song> = emptyList()
+    var songs: List<Song> = emptyList()
+        private set
 
     fun updateList(songs: List<Song>) {
         this.songs = songs

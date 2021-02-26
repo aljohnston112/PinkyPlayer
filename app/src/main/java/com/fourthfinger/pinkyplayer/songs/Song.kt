@@ -18,7 +18,7 @@ data class Song constructor(
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Song && id == other.id
+        return other is Song && title == other.title
     }
 
     override fun hashCode(): Int {

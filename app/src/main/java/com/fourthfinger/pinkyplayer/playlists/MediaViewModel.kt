@@ -24,4 +24,34 @@ class MediaViewModel @Inject constructor(
         _currentAudioUri.postValue(AudioUri.getAudioUri(context, song.id))
     }
 
+    private val _looping: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>()
+    }
+
+    val looping = _looping as LiveData<Boolean>
+
+    fun setLooping(context: Context, looping: Boolean){
+        _looping.postValue(looping)
+    }
+
+    private val _loopingOne: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>()
+    }
+
+    val loopingOne = _loopingOne as LiveData<Boolean>
+
+    fun setLoopingOne(context: Context, loopingOne: Boolean){
+        _loopingOne.postValue(loopingOne)
+    }
+
+    private val _shuffling: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>()
+    }
+
+    val shuffling = _shuffling as LiveData<Boolean>
+
+    fun setShuffling(context: Context, shuffling: Boolean){
+        _shuffling.postValue(shuffling)
+    }
+
 }

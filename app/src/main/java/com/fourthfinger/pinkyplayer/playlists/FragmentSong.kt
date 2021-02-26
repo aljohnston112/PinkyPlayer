@@ -36,6 +36,7 @@ class FragmentSong(): Fragment(){
         mediaViewModel.currentAudioUri.observe(viewLifecycleOwner) {
             binding.textViewSongName.text = it.title
         }
+
     }
 
     override fun onDestroyView() {
