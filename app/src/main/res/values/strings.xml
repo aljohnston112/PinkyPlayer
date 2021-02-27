@@ -6,10 +6,10 @@
 
     <!-- FragmentLoading -->
     <string name="loading">Loading</string>
-    <string name="loading1">Please wait while scanning the system for audio files (1/4)</string>
-    <string name="loading2">Please wait while loading audio files (2/4)</string>
-    <string name="loading3">Please wait while adding new audio files to the playlist (3/4)</string>
-    <string name="loading4">Please wait while removing missing audio files from the playlist (4/4)</string>
+    <string name="loadingSettings">Please wait while loading settings</string>
+    <string name="loadingPlaylists">Please wait while loading playlists</string>
+    <string name="loadingScanFiles">Please wait while scanning the system for audio files</string>
+    <string name="loadingFiles">Please wait while loading audio files</string>
 
     <!-- FragmentTitle -->
     <string name="playlists">Playlists</string>

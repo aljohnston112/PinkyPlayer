@@ -1,6 +1,14 @@
 package com.fourthfinger.pinkyplayer
 
 import android.content.Context
+import android.graphics.*
+import android.media.MediaMetadataRetriever
+import android.net.Uri
+import android.os.Build
+import android.util.Size
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.content.res.ResourcesCompat.getColor
+import com.fourthfinger.pinkyplayer.songs.AudioUri
 import java.io.*
 
 private const val N_BACKUPS = 2
@@ -16,8 +24,8 @@ class FileUtil {
          */
         private fun getFileNames(fileName: String): List<String> {
             val list = mutableListOf<String>()
-            for(i in 0..N_BACKUPS){
-                list.add(fileName+i.toString())
+            for (i in 0..N_BACKUPS) {
+                list.add(fileName + i.toString())
             }
             return list
         }
@@ -57,7 +65,7 @@ class FileUtil {
          * Tries to load [fileSave].
          * [saveFileVerificationNumber] is the number passed to [save]
          * and is used to verify the file.
-        */
+         */
         private fun <T> attemptLoadFile(
                 context: Context,
                 fileSave: String,
@@ -103,16 +111,16 @@ class FileUtil {
         ): T? {
             val fileNames = getFileNames(fileName)
             var t: T? = null
-                var i = 0
-                while (i < fileNames.size) {
-                    t = attemptLoadFile(context, fileNames[i], saveFileVerificationNumber)
-                    i++
-                    if (t != null) {
-                        break
-                    }
+            var i = 0
+            while (i < fileNames.size) {
+                t = attemptLoadFile(context, fileNames[i], saveFileVerificationNumber)
+                i++
+                if (t != null) {
+                    break
                 }
-                return t
             }
+            return t
+        }
 
     }
 

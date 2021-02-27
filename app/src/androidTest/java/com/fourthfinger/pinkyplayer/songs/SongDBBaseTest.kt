@@ -35,19 +35,19 @@ open class SongDBBaseTest {
         val context: Context = ApplicationProvider.getApplicationContext()
         lateinit var loadingCallback : LoadingCallback
         class LoadingCallbackImp : LoadingCallback {
-            private var loadingText =  context.resources.getString(R.string.loading1)
+            private var loadingText =  context.resources.getString(R.string.loadingScanFiles)
             private var loadingProgress = 0.0
             override fun setLoadingText(text: String) {
-                if(text ==  context.resources.getString(R.string.loading1)){
-                    assert(loadingText == context.resources.getString(R.string.loading1))
+                if(text ==  context.resources.getString(R.string.loadingScanFiles)){
+                    assert(loadingText == context.resources.getString(R.string.loadingScanFiles))
                 }
                 loadingText = text
-                if(loadingText == context.resources.getString(R.string.loading2)){
-                    assert(text != context.resources.getString(R.string.loading1))
+                if(loadingText == context.resources.getString(R.string.loadingFiles)){
+                    assert(text != context.resources.getString(R.string.loadingScanFiles))
                 }
             }
             override fun setLoadingProgress(progress: Double) {
-                if(loadingText != context.resources.getString(R.string.loading2) || progress != 0.0){
+                if(loadingText != context.resources.getString(R.string.loadingFiles) || progress != 0.0){
                     assert(loadingProgress <= progress)
                 }
                 loadingProgress = progress

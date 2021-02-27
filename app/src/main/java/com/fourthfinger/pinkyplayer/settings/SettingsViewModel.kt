@@ -1,7 +1,10 @@
 package com.fourthfinger.pinkyplayer.settings
 
 import android.app.Application
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.*
+import com.fourthfinger.pinkyplayer.R
+import com.fourthfinger.pinkyplayer.songs.LoadingCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,21 +22,17 @@ class SettingsViewModel @Inject constructor(
 
     val settings = settingsRepo.settings
 
-    private val _isLoaded: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>()
-    }
-
-    val isLoaded get() = _isLoaded as LiveData<Boolean>
-
-    init {
-        _isLoaded.postValue(false)
-    }
-
-    fun loadSettings() {
+    fun loadSettings(loadingCallback: LoadingCallback) {
         viewModelScope.launch(Dispatchers.IO) {
-            _isLoaded.postValue(false)
+            loadingCallback.setLoadingProgress(0.0)
+            loadingCallback.setLoadingProgress(0.25)
+            loadingCallback.setLoadingProgress(0.5)
+            loadingCallback.setLoadingText(
+                    getApplication<Application>().applicationContext.getString(R.string.loadingSettings))
             settingsRepo.load(getApplication(), FILE_SAVE, SAVE_FILE_VERIFICATION_NUMBER)
-            _isLoaded.postValue(true)
+            loadingCallback.setLoadingProgress(0.75)
+            loadingCallback.setLoadingProgress(1.0)
+            loadingCallback.setSettingsLoaded(true)
         }
     }
 

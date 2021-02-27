@@ -5,47 +5,43 @@ import androidx.lifecycle.MediatorLiveData
 
 class MediatorLiveDataLoading {
 
-    private var songLoadedValue: Boolean? = null
+    private var songsLoadedValue: Boolean? = null
     private var settingsLoadedValue: Boolean? = null
+    private var playlistsLoadedValue: Boolean? = null
 
     fun isLoaded(
-            songsLoaded: LiveData<Boolean>, settingsLoaded: LiveData<Boolean>
+            songsLoaded: LiveData<Boolean>, settingsLoaded: LiveData<Boolean>, playlistsLoaded: LiveData<Boolean>
     ): LiveData<Boolean> = MediatorLiveData<Boolean>().also { mediator ->
-        songLoadedValue = songsLoaded.value
-        settingsLoadedValue = settingsLoaded.value
-        val songsLoadedValue = this.songLoadedValue
-        val settingsLoadedValue = this.settingsLoadedValue
-        if(songsLoadedValue == null || settingsLoadedValue == null) {
+        this.songsLoadedValue = songsLoaded.value
+        this.settingsLoadedValue = settingsLoaded.value
+        this.playlistsLoadedValue = playlistsLoaded.value
+        if(songsLoadedValue == null || settingsLoadedValue == null || playlistsLoadedValue == null) {
             mediator.value = false
         } else {
-            mediator.value = (songsLoadedValue && settingsLoadedValue)
+            mediator.value = (songsLoadedValue!! && settingsLoadedValue!! && playlistsLoadedValue!!)
         }
         mediator.addSource(songsLoaded) {
-            this.songLoadedValue = it
-            val songLoadedValue = this.songLoadedValue
-            val settingLoadedValue = this.settingsLoadedValue
-            if(settingLoadedValue == null){
+            this.songsLoadedValue = it
+            if(songsLoadedValue == null || settingsLoadedValue == null || playlistsLoadedValue == null) {
                 mediator.value = false
             } else {
-                if(songLoadedValue == null){
-                    mediator.value = false
-                } else {
-                    mediator.value = (songLoadedValue) && (settingLoadedValue)
-                }
+                mediator.value = (songsLoadedValue!! && settingsLoadedValue!! && playlistsLoadedValue!!)
             }
         }
         mediator.addSource(settingsLoaded) {
             this.settingsLoadedValue = it
-            val songLoadedValue = this.songLoadedValue
-            val settingLoadedValue = this.settingsLoadedValue
-            if(songLoadedValue == null){
+            if(songsLoadedValue == null || settingsLoadedValue == null || playlistsLoadedValue == null) {
                 mediator.value = false
             } else {
-                if(settingLoadedValue == null){
-                    mediator.value = false
-                } else {
-                    mediator.value = (songLoadedValue && settingLoadedValue)
-                }
+                mediator.value = (songsLoadedValue!! && settingsLoadedValue!! && playlistsLoadedValue!!)
+            }
+        }
+        mediator.addSource(playlistsLoaded) {
+            this.playlistsLoadedValue = it
+            if(songsLoadedValue == null || settingsLoadedValue == null || playlistsLoadedValue == null) {
+                mediator.value = false
+            } else {
+                mediator.value = (songsLoadedValue!! && settingsLoadedValue!! && playlistsLoadedValue!!)
             }
         }
     }

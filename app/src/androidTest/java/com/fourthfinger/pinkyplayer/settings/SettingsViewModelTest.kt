@@ -24,7 +24,7 @@ class SettingsViewModelTest : ViewModelBaseTest(DummySettingsViewModelFragment()
         val viewModelSettings = fragment.viewModel
         val viewModelScope = viewModelSettings.viewModelScope
         val viewLifecycleOwner = fragment.viewLifecycleOwner
-        viewModelSettings.loadSettings()
+        viewModelSettings.loadSettings(loadingCallback)
         val countDownLatchSettingLoaded = CountDownLatch(1)
         viewModelScope.launch {
             viewModelSettings.isLoaded.observe(viewLifecycleOwner) {

@@ -10,23 +10,17 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import com.fourthfinger.pinkyplayer.NavUtil.Companion.safeNav
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.ToastUtil.Companion.showToast
 import com.fourthfinger.pinkyplayer.databinding.FragmentTitleBinding
-import com.fourthfinger.pinkyplayer.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class FragmentTitle : Fragment() {
 
     private var _binding: FragmentTitleBinding? = null
-
-    private val viewModelSongs: SongsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
-
-    private val viewModelSettings: SettingsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -35,6 +29,8 @@ class FragmentTitle : Fragment() {
     private lateinit var requestPermissionLauncher : ActivityResultLauncher<String>
 
     private var loaded = false
+
+    private var loading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,8 +52,12 @@ class FragmentTitle : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        MediatorLiveDataLoading().isLoaded(
-                viewModelSongs.isLoaded, viewModelSettings.isLoaded
+        val loadingCallback = LoadingCallback.getInstance()
+        val mediatorLiveDataLoading = MediatorLiveDataLoading()
+                mediatorLiveDataLoading.isLoaded(
+                        loadingCallback.songsLoaded,
+                        loadingCallback.settingsLoaded,
+                        loadingCallback.playlistsLoaded,
         ).observe(viewLifecycleOwner, { _isLoaded ->
             loaded = _isLoaded
             if (_isLoaded != true) {
@@ -73,8 +73,9 @@ class FragmentTitle : Fragment() {
         ) == PackageManager.PERMISSION_GRANTED
         when {
              granted-> {
-                if(!loaded){
+                if(!loaded && !loading){
                     findNavController().navigate(R.id.fragmentLoading)
+                    loading = true
                 }
             }
             shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {

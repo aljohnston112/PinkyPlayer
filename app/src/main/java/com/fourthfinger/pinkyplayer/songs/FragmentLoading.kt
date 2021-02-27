@@ -36,21 +36,26 @@ class FragmentLoading : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModelSettings.loadSettings()
-        viewModelSongs.loadSongs()
-        viewModelPlaylists.loadPlaylists()
-        observeLoadingProgress()
+        val loadingCallback = LoadingCallback.getInstance()
+        viewModelSettings.loadSettings(loadingCallback)
+        viewModelSongs.loadSongs(loadingCallback)
+        viewModelPlaylists.loadPlaylists(loadingCallback)
+        observeLoadingProgress(loadingCallback)
     }
 
-    private fun observeLoadingProgress() {
-        viewModelSongs.loadingProgress.observe(viewLifecycleOwner, { progress ->
+    private fun observeLoadingProgress(loadingCallback: LoadingCallback) {
+        loadingCallback.loadingProgress.observe(viewLifecycleOwner, { progress ->
             binding.progressBarLoading.progress = progress
         })
-        viewModelSongs.loadingText.observe(viewLifecycleOwner, { text ->
+        loadingCallback.loadingText.observe(viewLifecycleOwner, { text ->
             binding.textViewLoading.text = text
         })
-        val loaded = MediatorLiveDataLoading().isLoaded(viewModelSongs.isLoaded, viewModelSettings.isLoaded)
-        loaded.observe(viewLifecycleOwner, { isLoaded ->
+        val mediatorLiveDataLoading = MediatorLiveDataLoading()
+        mediatorLiveDataLoading.isLoaded(
+                loadingCallback.songsLoaded,
+                loadingCallback.settingsLoaded,
+                loadingCallback.playlistsLoaded
+        ).observe(viewLifecycleOwner, { isLoaded ->
             if (isLoaded) {
                 findNavController().popBackStack()
             }

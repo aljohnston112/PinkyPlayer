@@ -34,7 +34,7 @@ class SongFileManager @Inject constructor() {
                     val artistCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST_ID)
                     val nSongs = cursor.count
                     callback.setLoadingProgress(0.0)
-                    callback.setLoadingText(context.resources.getString(R.string.loading1))
+                    callback.setLoadingText(context.resources.getString(R.string.loadingScanFiles))
                     var currentSongPosition = 0
                     while (cursor.moveToNext()) {
                         val id = cursor.getLong(idCol)
@@ -53,13 +53,15 @@ class SongFileManager @Inject constructor() {
                                 currentSongPosition.toDouble() / nSongs.toDouble())
                         currentSongPosition++
                     }
-                    callback.setLoadingText(context.resources.getString(R.string.loading2))
+                    callback.setLoadingText(context.resources.getString(R.string.loadingFiles))
                     callback.setLoadingProgress(0.0)
                     val nNewSongs = newSongs.size
                     for ((index, song) in newSongs.withIndex()) {
                         songDao.insertAll(song)
                         callback.setLoadingProgress(index.toDouble() / nNewSongs.toDouble())
                     }
+                    callback.setLoadingProgress(1.0)
+                    callback.setSongsLoaded(true)
                     return@use songsThatExist
                 }
             }
