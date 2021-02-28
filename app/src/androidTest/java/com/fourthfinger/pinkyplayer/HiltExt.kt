@@ -18,7 +18,7 @@ import org.junit.Rule
 import java.util.concurrent.CountDownLatch
 import kotlin.reflect.KClass
 
-open class HiltExt<U: AppCompatActivity>(private val u: KClass<U>) {
+open class HiltExt<U : AppCompatActivity>(private val u: KClass<U>) {
 
     @Suppress("LeakingThis")
     @get:Rule
@@ -35,7 +35,8 @@ open class HiltExt<U: AppCompatActivity>(private val u: KClass<U>) {
         scenario.onActivity {
             activity = it
             navController = it.findNavController(R.id.nav_host_fragment)
-            navController.addOnDestinationChangedListener { _: NavController, navDestination: NavDestination, _: Bundle? ->
+            navController.addOnDestinationChangedListener {
+                _: NavController, navDestination: NavDestination, _: Bundle? ->
                 if (navDestination.id == R.id.fragmentTitle) {
                     countDownLatchTitleLoaded.countDown()
                 }
