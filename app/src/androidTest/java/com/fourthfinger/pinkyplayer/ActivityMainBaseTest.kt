@@ -5,10 +5,12 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import org.junit.After
 import org.junit.Rule
 
-open class ActivityMainBaseTest : HiltExt() {
+open class ActivityMainBaseTest : HiltExt<ActivityMain>(ActivityMain::class) {
 
     @get:Rule
     var activityRule: ActivityScenarioRule<ActivityMain> = ActivityScenarioRule(ActivityMain::class.java)
+
+    override fun setUpActivity() {}
 
     @After
     open fun tearDown() {

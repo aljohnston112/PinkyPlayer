@@ -41,6 +41,7 @@ class FragmentLoading : Fragment() {
         viewModelSongs.loadSongs(loadingCallback)
         viewModelPlaylists.loadPlaylists(loadingCallback)
         observeLoadingProgress(loadingCallback)
+
     }
 
     private fun observeLoadingProgress(loadingCallback: LoadingCallback) {

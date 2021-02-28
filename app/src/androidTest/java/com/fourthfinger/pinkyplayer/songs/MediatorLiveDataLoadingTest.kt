@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.fourthfinger.pinkyplayer.ActivityMainBaseTest
-import com.fourthfinger.pinkyplayer.LiveDataUtil
+import com.fourthfinger.pinkyplayer.LiveDataTestUtil
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -29,48 +29,96 @@ class MediatorLiveDataLoadingTest: ActivityMainBaseTest()  {
             activityStarted.countDown()
         }
         activityStarted.await()
-        val ldb = MutableLiveData<Boolean>()
+        val ldb0 = MutableLiveData<Boolean>()
+        val ldb1 = MutableLiveData<Boolean>()
         val ldb2 = MutableLiveData<Boolean>()
         lateinit var mediatorLiveDataLoading: LiveData<Boolean>
         val countDownLatchInit = CountDownLatch(1)
         lifecycleScope.launch {
-            mediatorLiveDataLoading = MediatorLiveDataLoading().isLoaded(ldb, ldb2)
+            mediatorLiveDataLoading = MediatorLiveDataLoading().isLoaded(ldb0, ldb1, ldb2)
             countDownLatchInit.countDown()
         }
         countDownLatchInit.await()
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false,)
-        lifecycleScope.launch {
-            ldb.postValue(false)
+        var val0: Int
+        var val1: Int
+        var val2: Int
+        for(i in 0..2){
+            val0 = i
+            for(j in 0..2){
+                val1 = i
+                for(k in 0..2){
+                    val2 = i
+                    when(val0){
+                        0 ->
+                        {
+                            ldb0.postValue(null)
+                            checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                        }
+                        1 ->
+                        {
+                            ldb0.postValue(false)
+                            checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                        }
+                        2 ->
+                        {
+                            ldb0.postValue(true)
+                            if(val1 == 1 && val2 == 1) {
+                                checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, true, )
+                            } else {
+                                checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                            }
+                        }
+                    }
+                    when(val1){
+                        0 ->
+                        {
+                            ldb1.postValue(null)
+                            checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                        }
+                        1 ->
+                        {
+                            ldb1.postValue(false)
+                            checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                        }
+                        2 ->
+                        {
+                            ldb1.postValue(true)
+                            if(val0 == 1 && val2 == 1) {
+                                checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, true, )
+                            } else {
+                                checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                            }
+                        }
+                    }
+                    when(val2){
+                        0 ->
+                        {
+                            ldb2.postValue(null)
+                            checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                        }
+                        1 ->
+                        {
+                            ldb2.postValue(false)
+                            checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                        }
+                        2 ->
+                        {
+                            ldb2.postValue(true)
+                            if(val0 == 1 && val1 == 1) {
+                                checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, true, )
+                            } else {
+                                checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                            }
+                        }
+                    }
+
+                }
+            }
         }
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false,)
+
         lifecycleScope.launch {
-            ldb.postValue(true)
+            ldb0.postValue(false)
         }
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false,)
-        lifecycleScope.launch {
-            ldb2.postValue(false)
-        }
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false,)
-        val countDownLatchPost = CountDownLatch(1)
-        lifecycleScope.launch {
-            ldb.postValue(false)
-            ldb2.postValue(true)
-            countDownLatchPost.countDown()
-        }
-        countDownLatchPost.await()
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false,)
-        lifecycleScope.launch {
-            ldb.postValue(true)
-        }
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, true,)
-        lifecycleScope.launch {
-            ldb2.postValue(null)
-        }
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false,)
-        lifecycleScope.launch {
-            ldb.postValue(false)
-        }
-        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false,)
 
     }
 
@@ -79,7 +127,7 @@ class MediatorLiveDataLoadingTest: ActivityMainBaseTest()  {
             mediatorLiveDataLoading: LiveData<Boolean>,
             data: Boolean,
     ) {
-        LiveDataUtil.checkLiveDataUpdate(
+        LiveDataTestUtil.checkLiveDataUpdate(
                 lifecycleScope, activity, mediatorLiveDataLoading, data
         )
     }

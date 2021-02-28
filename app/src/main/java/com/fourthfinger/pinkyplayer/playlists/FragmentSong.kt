@@ -11,8 +11,8 @@ import com.fourthfinger.pinkyplayer.BitmapUtil
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.StringUtil
 import com.fourthfinger.pinkyplayer.databinding.FragmentSongBinding
-import com.fourthfinger.pinkyplayer.songs.MediatorLiveDataLoading
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -37,6 +37,22 @@ class FragmentSong() : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeMedia()
         observeControls()
+        observeDetails()
+    }
+
+    private fun observeDetails() {
+        val mediatorLiveDataBitmap = MediatorLiveDataBitmap()
+        mediatorLiveDataBitmap.currentSongBitmap(
+                mediaViewModel.currentSongBitmap
+        ).observe(viewLifecycleOwner) {
+            binding.imageViewSongArtFragmentSong.setImageBitmap(it)
+        }
+        mediaViewModel.currentSongTime.observe(viewLifecycleOwner) {
+            binding.editTextCurrentTime.text = it
+        }
+        mediaViewModel.currentSongEndTime.observe(viewLifecycleOwner) {
+            binding.editTextEndTime.text = it
+        }
     }
 
     private fun observeControls() {
@@ -79,41 +95,30 @@ class FragmentSong() : Fragment() {
 
     private fun observeMedia() {
         mediaViewModel.currentAudioUri.observe(viewLifecycleOwner) {
-            binding.textViewSongName.text = it.title
-            binding.editTextCurrentTime.post {
-                lifecycleScope.launch {
-                    var locale = StringUtil.getLocale(requireContext())
-                    if (locale == null) {
-                        locale = Locale.getDefault()
-                    }
-                    if (locale != null) {
-                        binding.editTextEndTime.text = StringUtil.formatMillis(locale, 0)
+            if(it != null) {
+                binding.textViewSongName.text = it.title
+                binding.editTextCurrentTime.post {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        mediaViewModel.setCurrentSongTime(StringUtil.formatMillis(0))
                     }
                 }
-            }
-            binding.editTextEndTime.post {
-                lifecycleScope.launch {
-                    var locale2 = StringUtil.getLocale(requireContext())
-                    if (locale2 == null) {
-                        locale2 = Locale.getDefault()
-                    }
-                    if (locale2 != null) {
-                        binding.editTextEndTime.text = StringUtil.formatMillis(
-                                locale2,
-                                it.getDuration(requireContext())
+                binding.editTextEndTime.post {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        mediaViewModel.setCurrentSongEndTime(
+                                StringUtil.formatMillis(it.getDuration(requireContext()))
                         )
                     }
                 }
-            }
-            binding.imageViewSongArtFragmentSong.post {
-                lifecycleScope.launch {
-                    val imageViewSongArt = binding.imageViewSongArtFragmentSong
-                    var songArtDimen: Int = imageViewSongArt.measuredWidth
-                    if (imageViewSongArt.measuredHeight != 0) {
-                        songArtDimen = minOf(songArtDimen, imageViewSongArt.measuredHeight)
-                    }
-                    if (songArtDimen > 0) {
-                        imageViewSongArt.setImageBitmap(BitmapUtil.getSongBitmap(requireContext(), it, songArtDimen))
+                binding.imageViewSongArtFragmentSong.post {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val imageViewSongArt = binding.imageViewSongArtFragmentSong
+                        var songArtDimen: Int = imageViewSongArt.measuredWidth
+                        if (imageViewSongArt.measuredHeight != 0) {
+                            songArtDimen = minOf(songArtDimen, imageViewSongArt.measuredHeight)
+                        }
+                        if (songArtDimen > 0) {
+                            BitmapUtil.getSongBitmap(requireContext(), it, songArtDimen)?.let { it1 -> mediaViewModel.setCurrentSongBitmap(it1) }
+                        }
                     }
                 }
             }

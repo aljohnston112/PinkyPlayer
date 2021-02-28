@@ -1,23 +1,18 @@
 package com.fourthfinger.pinkyplayer
 
 import android.content.Context
-import android.graphics.*
-import android.media.MediaMetadataRetriever
-import android.net.Uri
-import android.os.Build
-import android.util.Size
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.content.res.ResourcesCompat.getColor
-import com.fourthfinger.pinkyplayer.songs.AudioUri
+import kotlinx.coroutines.sync.Mutex
 import java.io.*
 
 private const val N_BACKUPS = 2
 
-private val fileLock: Any = Any()
-
 class FileUtil {
 
     companion object {
+
+        private val fileLock = Any()
+
+        val mutex = Mutex()
 
         /**
          * Returns a [List] of strings appending a number 0 through [N_BACKUPS] to [fileName]
@@ -84,7 +79,8 @@ class FileUtil {
                                 longEOF = objectInputStream.readLong()
                             }
                         }
-                    } catch (e: FileNotFoundException) {
+                    }
+                    catch (e: FileNotFoundException) {
                         e.printStackTrace()
                     } catch (e: IOException) {
                         e.printStackTrace()

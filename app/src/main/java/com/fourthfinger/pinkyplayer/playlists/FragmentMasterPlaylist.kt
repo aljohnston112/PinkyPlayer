@@ -13,6 +13,7 @@ import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.databinding.RecyclerViewSongListBinding
 import com.fourthfinger.pinkyplayer.songs.Song
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -50,11 +51,12 @@ class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {
 
     private fun observeSongs() {
         viewModelPlaylist.masterPlaylist.observe(viewLifecycleOwner) { playlist ->
-            lifecycleScope.launch {
+            /*
                 val sortedSongs = playlist.songs().toMutableList()
                 sortedSongs.sort()
-                recyclerViewAdapterSongs.updateList(sortedSongs)
-            }
+
+             */
+            recyclerViewAdapterSongs.updateList(playlist.songs())
         }
     }
 

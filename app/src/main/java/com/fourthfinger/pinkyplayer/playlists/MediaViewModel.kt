@@ -1,6 +1,7 @@
 package com.fourthfinger.pinkyplayer.playlists
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -30,7 +31,7 @@ class MediaViewModel @Inject constructor(
 
     val isPlaying = _isPlaying as LiveData<Boolean>
 
-    fun setIsPlaying(context: Context, playing: Boolean){
+    fun setIsPlaying(playing: Boolean){
         _isPlaying.postValue(playing)
     }
 
@@ -40,7 +41,7 @@ class MediaViewModel @Inject constructor(
 
     val looping = _looping as LiveData<Boolean>
 
-    fun setLooping(context: Context, looping: Boolean){
+    fun setLooping(looping: Boolean){
         _looping.postValue(looping)
     }
 
@@ -50,7 +51,7 @@ class MediaViewModel @Inject constructor(
 
     val loopingOne = _loopingOne as LiveData<Boolean>
 
-    fun setLoopingOne(context: Context, loopingOne: Boolean){
+    fun setLoopingOne(loopingOne: Boolean){
         _loopingOne.postValue(loopingOne)
     }
 
@@ -60,8 +61,38 @@ class MediaViewModel @Inject constructor(
 
     val shuffling = _shuffling as LiveData<Boolean>
 
-    fun setShuffling(context: Context, shuffling: Boolean){
+    fun setShuffling(shuffling: Boolean){
         _shuffling.postValue(shuffling)
+    }
+
+    private val _currentSongBitmap: MutableLiveData<Bitmap> by lazy {
+        MutableLiveData<Bitmap>()
+    }
+
+    val currentSongBitmap = _currentSongBitmap as LiveData<Bitmap>
+
+    fun setCurrentSongBitmap(bitmap: Bitmap){
+        _currentSongBitmap.postValue(bitmap)
+    }
+
+    private val _currentSongTime: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    val currentSongTime = _currentSongTime as LiveData<String>
+
+    fun setCurrentSongTime(currentTime: String){
+        _currentSongTime.postValue(currentTime)
+    }
+
+    private val _currentSongEndTime: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    val currentSongEndTime = _currentSongEndTime as LiveData<String>
+
+    fun setCurrentSongEndTime(currentEndTime: String){
+        _currentSongEndTime.postValue(currentEndTime)
     }
 
 }

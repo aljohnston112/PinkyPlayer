@@ -2,9 +2,12 @@ package com.fourthfinger.pinkyplayer.songs
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.fourthfinger.pinkyplayer.FileUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -22,10 +25,12 @@ class SongsViewModel @Inject constructor(
     fun loadSongs(loadingCallback: LoadingCallback) {
         if(!loadingStarted) {
             viewModelScope.launch(Dispatchers.IO) {
-                val songs = songRepo.scanSongs(
-                        getApplication<Application>().applicationContext,
-                        loadingCallback,
-                )
+                runBlocking {
+                    val songs = songRepo.scanSongs(
+                            getApplication<Application>().applicationContext,
+                            loadingCallback,
+                    )
+                }
             }
         }
         loadingCallback.setSongsLoaded(true)

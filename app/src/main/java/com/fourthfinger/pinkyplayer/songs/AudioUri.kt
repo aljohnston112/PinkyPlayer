@@ -28,10 +28,10 @@ class AudioUri(
         }
         private set
 
-    private var duration: Int = -1
+    private var duration: Long = -1L
 
-    fun getDuration(context: Context): Int {
-        if(duration == -1) {
+    fun getDuration(context: Context): Long {
+        if(duration == -1L) {
             val mediaMetadataRetriever = MediaMetadataRetriever()
             mediaMetadataRetriever.setDataSource(context, uri)
             var time = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
@@ -39,7 +39,7 @@ class AudioUri(
             if (time == null) {
                 time = "-1"
             }
-            duration = time.toInt()
+            duration = time.toLong()
         }
         return duration
     }
@@ -113,7 +113,11 @@ class AudioUri(
                         objectInputStream ->
                         return objectInputStream.readObject() as AudioUri
                     } }
-                } catch (e: FileNotFoundException) {
+                }catch (e: InvalidClassException){
+                    SongFileManager.createAudioUri(context, songID)
+                    return getAudioUri(context, songID)
+                }
+                catch (e: FileNotFoundException) {
                     e.printStackTrace()
                 } catch (e: IOException) {
                     e.printStackTrace()

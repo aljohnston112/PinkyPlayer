@@ -2,7 +2,7 @@ package com.fourthfinger.pinkyplayer.playlists
 
 import androidx.lifecycle.viewModelScope
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.fourthfinger.pinkyplayer.LiveDataUtil
+import com.fourthfinger.pinkyplayer.LiveDataTestUtil
 import com.fourthfinger.pinkyplayer.ViewModelBaseTest
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -37,7 +37,7 @@ class PlaylistsViewModelTest: ViewModelBaseTest(DummyPlaylistsViewModelFragment(
         val viewLifecycleOwner = fragment.viewLifecycleOwner
         val countDownLatch = CountDownLatch(1)
         viewModelScope.launch {
-            LiveDataUtil.assertLiveDataUpdateNotNull(viewModelScope, viewLifecycleOwner, viewModelPlaylists.masterPlaylist)
+            LiveDataTestUtil.assertLiveDataUpdateNotNull(viewModelScope, viewLifecycleOwner, viewModelPlaylists.masterPlaylist)
             countDownLatch.countDown()
         }
         countDownLatch.await()

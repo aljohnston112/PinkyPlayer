@@ -13,7 +13,7 @@ import org.junit.runner.RunWith
 class IntentTest : ActivityMainBaseTest() {
 
         @Before
-        fun setUp() {
+        override fun setUpActivity() {
             Intents.init()
         }
 

@@ -8,6 +8,7 @@ import com.fourthfinger.pinkyplayer.songs.LoadingCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 private const val FILE_SAVE = "settings"
@@ -29,7 +30,9 @@ class SettingsViewModel @Inject constructor(
             loadingCallback.setLoadingProgress(0.5)
             loadingCallback.setLoadingText(
                     getApplication<Application>().applicationContext.getString(R.string.loadingSettings))
-            settingsRepo.load(getApplication(), FILE_SAVE, SAVE_FILE_VERIFICATION_NUMBER)
+            runBlocking {
+                settingsRepo.load(getApplication(), FILE_SAVE, SAVE_FILE_VERIFICATION_NUMBER)
+            }
             loadingCallback.setLoadingProgress(0.75)
             loadingCallback.setLoadingProgress(1.0)
             loadingCallback.setSettingsLoaded(true)

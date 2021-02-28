@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.fourthfinger.pinkyplayer.FileUtil
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,17 +19,19 @@ class PlaylistRepo @Inject constructor() {
 
     val playlists = _playlists as LiveData<List<RandomPlaylist>>
 
-    fun loadPlaylist(
+    suspend fun loadPlaylist(
             context: Context,
             fileName: String,
             saveFileVerificationNumber: Long,
     ): RandomPlaylist? {
-        val playlist = FileUtil.load<RandomPlaylist>(context, fileName, saveFileVerificationNumber)
-        if (playlist != null) {
-            playlistsField.add(playlist)
-            _playlists.postValue(playlistsField.toList())
+        FileUtil.mutex.withLock {
+            val playlist = FileUtil.load<RandomPlaylist>(context, fileName, saveFileVerificationNumber)
+            if (playlist != null) {
+                playlistsField.add(playlist)
+                _playlists.postValue(playlistsField.toList())
+            }
+            return playlist
         }
-        return playlist
     }
 
     fun savePlaylist(

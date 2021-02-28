@@ -1,12 +1,8 @@
 package com.fourthfinger.pinkyplayer.settings
 
 import android.content.Context
-import android.os.Bundle
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
-import androidx.navigation.testing.TestNavHostController
-import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.ViewInteraction
@@ -19,7 +15,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.fourthfinger.pinkyplayer.ActivityMain
-import com.fourthfinger.pinkyplayer.FileUtil
 import com.fourthfinger.pinkyplayer.HiltExt
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.songs.FragmentTitleDirections
@@ -28,7 +23,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
 import kotlin.math.roundToInt
 
 private const val SAVE_FILE = "settings"
@@ -37,33 +31,19 @@ private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 @HiltAndroidTest
-class FragmentSettingsTest : HiltExt() {
+class FragmentSettingsTest : HiltExt<ActivityMain>(ActivityMain::class) {
 
     private val settingsRepo = SettingsRepo()
 
     private val context = ApplicationProvider.getApplicationContext<Context>()
-
-    private val countDownLatch: CountDownLatch = CountDownLatch(1)
+    private lateinit var navController: NavController
 
     @Before
-    fun setUp() {
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        lateinit var actualNavController : NavController
-        lateinit var scenario: ActivityScenario<ActivityMain>
-        scenario = launchFragmentInHiltContainer<FragmentSettings>(
-                    navController,
-                    R.id.nav_host_fragment, R.navigation.nav_graph, R.style.Theme_PinkyPlayer)
-            scenario.onActivity {
-                actualNavController = it.findNavController(R.id.nav_host_fragment)
-                actualNavController.addOnDestinationChangedListener { navController: NavController, navDestination: NavDestination, bundle: Bundle? ->
-                    if (navDestination.id == R.id.fragmentTitle) {
-                        countDownLatch.countDown()
-                    }
-                }
-            }
-            countDownLatch.await()
+    override fun setUpActivity() {
+        super.setUpActivity()
+        navController = activity.findNavController(R.id.nav_host_fragment)
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
-            actualNavController.navigate(FragmentTitleDirections.actionFragmentTitleToFragmentSettings())
+            navController.navigate(FragmentTitleDirections.actionFragmentTitleToFragmentSettings())
         }
     }
 
@@ -72,12 +52,12 @@ class FragmentSettingsTest : HiltExt() {
         onView(withId(R.id.scroll_view_fragment_settings)).check(matches(isCompletelyDisplayed()))
         onView(withId(R.id.fab_fragment_settings)).check(matches(isCompletelyDisplayed()))
         onView(withId(R.id.constraint_layout_fragment_settings)).check(matches(isDisplayed()))
-        lateinit var settingsIn : Settings
+        lateinit var settingsIn: Settings
         runBlocking {
-            settingsIn = settingsRepo.load(context, SAVE_FILE, SAVE_FILE_VERIFICATION_NUMBER)!!
+            settingsIn = settingsRepo.load(context, SAVE_FILE, SAVE_FILE_VERIFICATION_NUMBER)
         }
         onView(withId(R.id.edit_text_n_songs)).check(matches(
-                withText((1.0/settingsIn.maxPercent).roundToInt().toString())))
+                withText((1.0 / settingsIn.maxPercent).roundToInt().toString())))
         onView(withId(R.id.text_view_n_songs)).check(matches(
                 withText(R.string.n_songs)))
         onView(withId(R.id.text_view_n_song_desc)).check(matches(
@@ -85,11 +65,11 @@ class FragmentSettingsTest : HiltExt() {
         onView(withId(R.id.text_view_percent_change_up)).check(matches(
                 withText(R.string.percent_change_up)))
         onView(withId(R.id.edit_text_percent_change_up)).check(matches(
-                withText((settingsIn.percentChangeUp*100.0).roundToInt().toString())))
+                withText((settingsIn.percentChangeUp * 100.0).roundToInt().toString())))
         onView(withId(R.id.text_view_percent_change_down)).check(matches(
                 withText(R.string.percent_change_down)))
         onView(withId(R.id.edit_text_percent_change_down)).check(matches(
-                withText((settingsIn.percentChangeDown*100.0).roundToInt().toString())))
+                withText((settingsIn.percentChangeDown * 100.0).roundToInt().toString())))
         onView(withId(R.id.text_view_percent_changed_desc)).check(matches(
                 withText(R.string.percent_change_desc)))
     }
@@ -126,13 +106,13 @@ class FragmentSettingsTest : HiltExt() {
         verifyGoodData(fab, goodNSongs3, goodPC4, goodPC2)
         verifyGoodData(fab, goodNSongs3, goodPC4, goodPC3)
         verifyGoodData(fab, goodNSongs3, goodPC3, goodPC4)
-        lateinit var settingsIn : Settings
+        lateinit var settingsIn: Settings
         runBlocking {
-            settingsIn = settingsRepo.load(context, SAVE_FILE, SAVE_FILE_VERIFICATION_NUMBER)!!
+            settingsIn = settingsRepo.load(context, SAVE_FILE, SAVE_FILE_VERIFICATION_NUMBER)
         }
-        assert(settingsIn.maxPercent == (1.0/goodNSongs3.toInt()))
-        assert(settingsIn.percentChangeUp == (goodPC3.toInt()/100.0))
-        assert(settingsIn.percentChangeDown == (goodPC4.toInt()/100.0))
+        assert(settingsIn.maxPercent == (1.0 / goodNSongs3.toInt()))
+        assert(settingsIn.percentChangeUp == (goodPC3.toInt() / 100.0))
+        assert(settingsIn.percentChangeDown == (goodPC4.toInt() / 100.0))
     }
 
     private fun verifyGoodData(fab: ViewInteraction, nSongs: String, pc1: String, pc2: String) {

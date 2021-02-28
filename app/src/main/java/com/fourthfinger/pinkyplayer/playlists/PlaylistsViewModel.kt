@@ -11,6 +11,7 @@ import com.fourthfinger.pinkyplayer.songs.SongRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 private const val MASTER_PLAYLIST_FILE_NAME = "MASTER_PLAYLIST_NAME"
@@ -42,9 +43,11 @@ class PlaylistsViewModel @Inject constructor(
             loadingCallback.setLoadingProgress(0.5)
             loadingCallback.setLoadingText(
                     getApplication<Application>().applicationContext.getString(R.string.loadingPlaylists))
-            playlistRepo.loadPlaylist(
-                    getApplication(), MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
-            )
+            runBlocking {
+                playlistRepo.loadPlaylist(
+                        getApplication(), MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
+                )
+            }
             loadingCallback.setLoadingProgress(0.75)
             loadingCallback.setLoadingProgress(1.0)
             loadingCallback.setPlaylistsLoaded(true)

@@ -3,10 +3,11 @@ package com.fourthfinger.pinkyplayer
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.CountDownLatch
 
-class LiveDataUtil {
+class LiveDataTestUtil {
 
     companion object {
 

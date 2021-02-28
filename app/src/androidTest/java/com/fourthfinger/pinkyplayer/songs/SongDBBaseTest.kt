@@ -33,26 +33,7 @@ open class SongDBBaseTest {
 
     companion object {
         val context: Context = ApplicationProvider.getApplicationContext()
-        lateinit var loadingCallback : LoadingCallback
-        class LoadingCallbackImp : LoadingCallback {
-            private var loadingText =  context.resources.getString(R.string.loadingScanFiles)
-            private var loadingProgress = 0.0
-            override fun setLoadingText(text: String) {
-                if(text ==  context.resources.getString(R.string.loadingScanFiles)){
-                    assert(loadingText == context.resources.getString(R.string.loadingScanFiles))
-                }
-                loadingText = text
-                if(loadingText == context.resources.getString(R.string.loadingFiles)){
-                    assert(text != context.resources.getString(R.string.loadingScanFiles))
-                }
-            }
-            override fun setLoadingProgress(progress: Double) {
-                if(loadingText != context.resources.getString(R.string.loadingFiles) || progress != 0.0){
-                    assert(loadingProgress <= progress)
-                }
-                loadingProgress = progress
-            }
-        }
+        val loadingCallback = LoadingCallback()
     }
 
 }
