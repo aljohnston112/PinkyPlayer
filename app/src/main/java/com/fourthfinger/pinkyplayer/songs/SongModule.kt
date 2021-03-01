@@ -1,6 +1,7 @@
 package com.fourthfinger.pinkyplayer.songs
 
 import android.content.Context
+import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +16,11 @@ class SongModule {
     @Provides
     @Singleton
     fun provideSongDB(@ApplicationContext context: Context): SongDB {
-        return SongDB.getDatabase(context)
+        return Room.databaseBuilder(
+                context.applicationContext,
+                SongDB::class.java,
+                "song_database"
+        ).build()
     }
 
     @Provides

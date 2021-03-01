@@ -12,12 +12,12 @@ class SongRepo  @Inject constructor(private val songDao: SongDao, ) {
 
     val songs : LiveData<List<Song>> = songDao.getAll()
 
-    suspend fun scanSongs(
+    suspend fun scanSongsAndWriteAudioUris(
             context: Context,
             callback: LoadingCallback,
     ): ArrayList<Long>? {
         FileUtil.mutex.withLock {
-            return SongFileManager.scanSongs(context, callback, songDao)
+            return SongFileManager.scanSongsAndWriteAudioUris(context, callback, songDao)
         }
     }
 

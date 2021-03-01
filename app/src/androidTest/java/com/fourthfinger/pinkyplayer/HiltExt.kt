@@ -24,8 +24,8 @@ open class HiltExt<U : AppCompatActivity>(private val u: KClass<U>) {
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
-    lateinit var scenario: ActivityScenario<U>
-    lateinit var activity: U
+    open lateinit var scenario: ActivityScenario<U>
+    open lateinit var activity: U
 
     @Before
     open fun setUpActivity() {

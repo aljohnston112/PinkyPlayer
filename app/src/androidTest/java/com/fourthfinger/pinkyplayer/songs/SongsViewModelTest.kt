@@ -38,16 +38,6 @@ class SongsViewModelTest: ViewModelBaseTest(DummySongsViewModelFragment(CountDow
             }
         }
         countDownLatchIsLoaded.await()
-        val loadingProgress = 0.2349058
-        loadingCallback.setLoadingProgress(loadingProgress)
-        LiveDataTestUtil.checkLiveDataUpdate(
-                viewModelScope, viewLifecycleOwner,
-                loadingCallback.loadingProgress, (loadingProgress * 100).roundToInt())
-        val loadingText = "akjgunasgui"
-        loadingCallback.setLoadingText(loadingText)
-        LiveDataTestUtil.checkLiveDataUpdate(
-                viewModelScope, viewLifecycleOwner,
-                loadingCallback.loadingText, loadingText)
     }
 
 }

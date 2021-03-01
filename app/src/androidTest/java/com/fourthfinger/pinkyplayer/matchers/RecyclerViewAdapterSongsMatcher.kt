@@ -1,8 +1,6 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.matchers
 
-import android.graphics.drawable.Drawable
 import android.view.View
-import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.RecyclerView
 import com.fourthfinger.pinkyplayer.playlists.RecyclerViewAdapterSongs
 import com.fourthfinger.pinkyplayer.songs.Song

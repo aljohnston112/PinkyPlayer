@@ -3,7 +3,7 @@ package com.fourthfinger.pinkyplayer.settings
 import androidx.lifecycle.viewModelScope
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.fourthfinger.pinkyplayer.*
-import com.fourthfinger.pinkyplayer.songs.SongDBBaseTest.Companion.loadingCallback
+import com.fourthfinger.pinkyplayer.songs.LoadingCallback
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.launch
@@ -25,6 +25,7 @@ class SettingsViewModelTest : ViewModelBaseTest(DummySettingsViewModelFragment()
         val viewModelSettings = fragment.viewModel
         val viewModelScope = viewModelSettings.viewModelScope
         val viewLifecycleOwner = fragment.viewLifecycleOwner
+        val loadingCallback = LoadingCallback.getInstance()
         viewModelSettings.loadSettings(loadingCallback)
         val countDownLatchSettingLoaded = CountDownLatch(1)
         viewModelScope.launch {

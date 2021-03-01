@@ -37,11 +37,10 @@ class FragmentLoading : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val loadingCallback = LoadingCallback.getInstance()
+        viewModelPlaylists.loadPlaylists(loadingCallback)
         viewModelSettings.loadSettings(loadingCallback)
         viewModelSongs.loadSongs(loadingCallback)
-        viewModelPlaylists.loadPlaylists(loadingCallback)
         observeLoadingProgress(loadingCallback)
-
     }
 
     private fun observeLoadingProgress(loadingCallback: LoadingCallback) {

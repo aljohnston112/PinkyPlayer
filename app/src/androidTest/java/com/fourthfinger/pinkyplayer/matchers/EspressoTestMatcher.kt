@@ -1,7 +1,6 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.matchers
 
 import android.view.View
-import com.fourthfinger.pinkyplayer.playlists.RecyclerViewAdapterSongs
 import com.fourthfinger.pinkyplayer.songs.Song
 import org.hamcrest.Matcher
 
@@ -19,6 +18,10 @@ class EspressoTestMatcher {
 
         fun withSongAtPosition(pos: Int, song: Song): Matcher<View> {
             return RecyclerViewAdapterSongMatcher(pos, song)
+        }
+
+        fun withHeightOfAtLeast(height: Int): Matcher<View> {
+            return ViewHeightMatcher(height)
         }
 
     }

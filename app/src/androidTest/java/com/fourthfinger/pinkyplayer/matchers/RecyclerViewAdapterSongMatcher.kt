@@ -1,4 +1,4 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.matchers
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

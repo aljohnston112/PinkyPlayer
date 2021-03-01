@@ -1,4 +1,4 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.matchers
 
 import android.content.res.Resources
 import android.graphics.drawable.Drawable

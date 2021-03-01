@@ -4,36 +4,23 @@ import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import com.fourthfinger.pinkyplayer.R
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import java.io.IOException
 
+@HiltAndroidTest
 open class SongDBBaseTest {
+
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
-    lateinit var songDao: SongDao
-    private lateinit var songDB: SongDB
-
-    @Before
-    open fun setUp() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        songDB = Room.inMemoryDatabaseBuilder(context, SongDB::class.java).build()
-        songDao = songDB.songDao()
-    }
-
-    @After
-    @Throws(IOException::class)
-    fun closeDb() {
-        songDB.close()
-    }
-
-    companion object {
-        val context: Context = ApplicationProvider.getApplicationContext()
-        val loadingCallback = LoadingCallback()
-    }
+    val context: Context = ApplicationProvider.getApplicationContext()
+    val loadingCallback = LoadingCallback()
 
 }

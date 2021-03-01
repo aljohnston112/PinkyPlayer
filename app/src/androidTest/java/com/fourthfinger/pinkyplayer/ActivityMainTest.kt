@@ -4,6 +4,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.fourthfinger.pinkyplayer.matchers.EspressoTestMatcher.Companion.withHeightOfAtLeast
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.hamcrest.core.AllOf.allOf
 import org.junit.Test
@@ -21,6 +22,7 @@ class ActivityMainTest : ActivityMainBaseTest() {
         check(matches(isCompletelyDisplayed()))
         // A View with height 0 is not considered completely displayed?
         // onView(withId(R.id.fragment_song_pane)).check(matches(isCompletelyDisplayed()))
+        onView(withId(R.id.fragment_song_pane)).check(matches(withHeightOfAtLeast(0)))
     }
 
     @Test fun verifyProperRestart(){

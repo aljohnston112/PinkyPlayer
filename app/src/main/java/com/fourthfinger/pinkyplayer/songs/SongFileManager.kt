@@ -42,7 +42,7 @@ class SongFileManager {
             }
         }
 
-        suspend fun scanSongs(
+        suspend fun scanSongsAndWriteAudioUris(
                 context: Context,
                 callback: LoadingCallback,
                 songDao: SongDao,

@@ -39,7 +39,6 @@ class BitmapUtil {
 
         private fun getThumbnail(uri: Uri, width: Int, height: Int, context: Context): Bitmap? {
             var bitmap: Bitmap? = null
-            /*
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 try {
                     bitmap = context.contentResolver.loadThumbnail(
@@ -49,7 +48,6 @@ class BitmapUtil {
                     e.printStackTrace()
                 }
             } else {
-            */
                 val mmr = MediaMetadataRetriever()
                 try {
                     mmr.setDataSource(context.contentResolver.openFileDescriptor(
@@ -67,7 +65,7 @@ class BitmapUtil {
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace()
                 }
-            // }
+            }
             return bitmap
         }
 

@@ -114,8 +114,7 @@ class AudioUri(
                         return objectInputStream.readObject() as AudioUri
                     } }
                 }catch (e: InvalidClassException){
-                    SongFileManager.createAudioUri(context, songID)
-                    return getAudioUri(context, songID)
+                    e.printStackTrace()
                 }
                 catch (e: FileNotFoundException) {
                     e.printStackTrace()
