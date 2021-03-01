@@ -195,4 +195,5 @@ class NestedProbMapTest : TestCase() {
             assert(nestedProbMap.getProbForHour(hour) == 1.0)
         }
     }
+
 }

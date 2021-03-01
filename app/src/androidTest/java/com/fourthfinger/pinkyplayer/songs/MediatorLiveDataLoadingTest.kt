@@ -9,6 +9,7 @@ import com.fourthfinger.pinkyplayer.ActivityMainBaseTest
 import com.fourthfinger.pinkyplayer.LiveDataTestUtil
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,9 +25,11 @@ class MediatorLiveDataLoadingTest: ActivityMainBaseTest()  {
         lateinit var activity: LifecycleOwner
         lateinit var lifecycleScope: CoroutineScope
         activityRule.scenario.onActivity {
-            activity = it
-            lifecycleScope = it.lifecycleScope
-            activityStarted.countDown()
+            it.lifecycleScope.launch(Dispatchers.IO) {
+                activity = it
+                lifecycleScope = it.lifecycleScope
+                activityStarted.countDown()
+            }
         }
         activityStarted.await()
         val ldb0 = MutableLiveData<Boolean>()
@@ -39,57 +42,57 @@ class MediatorLiveDataLoadingTest: ActivityMainBaseTest()  {
             countDownLatchInit.countDown()
         }
         countDownLatchInit.await()
-        var val0: Int
-        var val1: Int
-        var val2: Int
+        var val0: Int = 0
+        var val1: Int = 0
+        var val2: Int = 0
         for(i in 0..2){
             val0 = i
+            when(val0){
+                0 ->
+                {
+                    ldb0.postValue(null)
+                    checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                }
+                1 ->
+                {
+                    ldb0.postValue(false)
+                    checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                }
+                2 ->
+                {
+                    ldb0.postValue(true)
+                    if(val1 == 2 && val2 == 2) {
+                        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, true, )
+                    } else {
+                        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                    }
+                }
+            }
             for(j in 0..2){
-                val1 = i
+                val1 = j
+                when(val1){
+                    0 ->
+                    {
+                        ldb1.postValue(null)
+                        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                    }
+                    1 ->
+                    {
+                        ldb1.postValue(false)
+                        checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                    }
+                    2 ->
+                    {
+                        ldb1.postValue(true)
+                        if(val0 == 2 && val2 == 2) {
+                            checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, true, )
+                        } else {
+                            checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
+                        }
+                    }
+                }
                 for(k in 0..2){
-                    val2 = i
-                    when(val0){
-                        0 ->
-                        {
-                            ldb0.postValue(null)
-                            checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
-                        }
-                        1 ->
-                        {
-                            ldb0.postValue(false)
-                            checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
-                        }
-                        2 ->
-                        {
-                            ldb0.postValue(true)
-                            if(val1 == 1 && val2 == 1) {
-                                checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, true, )
-                            } else {
-                                checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
-                            }
-                        }
-                    }
-                    when(val1){
-                        0 ->
-                        {
-                            ldb1.postValue(null)
-                            checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
-                        }
-                        1 ->
-                        {
-                            ldb1.postValue(false)
-                            checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
-                        }
-                        2 ->
-                        {
-                            ldb1.postValue(true)
-                            if(val0 == 1 && val2 == 1) {
-                                checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, true, )
-                            } else {
-                                checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
-                            }
-                        }
-                    }
+                    val2 = k
                     when(val2){
                         0 ->
                         {
@@ -104,7 +107,7 @@ class MediatorLiveDataLoadingTest: ActivityMainBaseTest()  {
                         2 ->
                         {
                             ldb2.postValue(true)
-                            if(val0 == 1 && val1 == 1) {
+                            if(val0 == 2 && val1 == 2) {
                                 checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, true, )
                             } else {
                                 checkIsLoaded(lifecycleScope, activity, mediatorLiveDataLoading, false, )
@@ -114,10 +117,6 @@ class MediatorLiveDataLoadingTest: ActivityMainBaseTest()  {
 
                 }
             }
-        }
-
-        lifecycleScope.launch {
-            ldb0.postValue(false)
         }
 
     }

@@ -1,10 +1,11 @@
-package com.fourthfinger.pinkyplayer
+package com.fourthfinger.pinkyplayer.songs
 
 import androidx.lifecycle.lifecycleScope
-import com.fourthfinger.pinkyplayer.songs.LoadingCallback
+import com.fourthfinger.pinkyplayer.ActivityMain
+import com.fourthfinger.pinkyplayer.HiltExt
+import com.fourthfinger.pinkyplayer.LiveDataTestUtil
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Test
-import java.util.concurrent.CountDownLatch
 import kotlin.math.roundToInt
 
 @HiltAndroidTest
