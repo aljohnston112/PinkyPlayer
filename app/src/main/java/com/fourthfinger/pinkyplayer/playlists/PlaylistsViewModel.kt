@@ -37,21 +37,18 @@ class PlaylistsViewModel @Inject constructor(
     val masterPlaylist = masterPlaylistMLD as LiveData<RandomPlaylist>
 
     fun loadPlaylists(loadingCallback: LoadingCallback) {
+        loadingCallback.setLoadingProgress(0.5)
+        loadingCallback.setLoadingText(
+                getApplication<Application>().applicationContext.getString(R.string.loadingPlaylists))
         viewModelScope.launch(Dispatchers.IO) {
-            loadingCallback.setLoadingProgress(0.0)
-            loadingCallback.setLoadingProgress(0.25)
-            loadingCallback.setLoadingProgress(0.5)
-            loadingCallback.setLoadingText(
-                    getApplication<Application>().applicationContext.getString(R.string.loadingPlaylists))
             runBlocking {
-                playlistRepo.loadPlaylist(
+                masterPlaylistMLD.postValue(playlistRepo.loadPlaylist(
                         getApplication(), MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
-                )
+                ))
             }
-            loadingCallback.setLoadingProgress(0.75)
-            loadingCallback.setLoadingProgress(1.0)
-            loadingCallback.setPlaylistsLoaded(true)
         }
+        loadingCallback.setLoadingProgress(1.0)
+        loadingCallback.setPlaylistsLoaded(true)
     }
 
     private val lock = Any()
@@ -70,8 +67,6 @@ class PlaylistsViewModel @Inject constructor(
                         _masterPlaylist.updateSongs(it)
                     }
                     masterPlaylistMLD.postValue(_masterPlaylist)
-                }
-                synchronized(lock) {
                     playlistRepo.savePlaylist(
                             _masterPlaylist, getApplication(),
                             MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
