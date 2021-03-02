@@ -118,6 +118,21 @@ class FileUtil {
             return t
         }
 
+        fun delete(
+                context: Context,
+                fileName: String,
+        ) {
+            val fileNames = getFileNames(fileName)
+            synchronized(fileLock) {
+                for (fn in fileNames) {
+                    val file = File(context.filesDir, fn)
+                    if (file.exists()) {
+                        file.delete()
+                    }
+                }
+            }
+        }
+
     }
 
 }

@@ -6,7 +6,7 @@ import javax.inject.Singleton
 import kotlin.math.roundToInt
 
 @Singleton
-class LoadingCallback {
+class LoadingCallback private constructor() {
 
     private val _songsLoaded: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>(false)

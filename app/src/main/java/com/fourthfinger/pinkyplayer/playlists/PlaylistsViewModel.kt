@@ -54,40 +54,50 @@ class PlaylistsViewModel @Inject constructor(
         }
     }
 
+    private val lock = Any()
+
     private val songObserver: Observer<List<Song>> = Observer<List<Song>> {
         viewModelScope.launch(Dispatchers.IO) {
             if (it.isNotEmpty()) {
-                if (maxPercent == -1.0) {
-                    maxPercent = (1.0 - ((it.size) * MIN_VALUE))
+                synchronized(lock) {
+                    if (maxPercent == -1.0) {
+                        maxPercent = (1.0 - ((it.size) * MIN_VALUE))
+                    }
+                    if (!this@PlaylistsViewModel::_masterPlaylist.isInitialized) {
+                        val comparable = true
+                        _masterPlaylist = RandomPlaylist(MASTER_PLAYLIST_FILE_NAME, it, maxPercent, comparable)
+                    } else {
+                        _masterPlaylist.updateSongs(it)
+                    }
+                    masterPlaylistMLD.postValue(_masterPlaylist)
                 }
-                if (!this@PlaylistsViewModel::_masterPlaylist.isInitialized) {
-                    val comparable = true
-                    _masterPlaylist = RandomPlaylist(MASTER_PLAYLIST_FILE_NAME, it, maxPercent, comparable)
-                } else {
-                    _masterPlaylist.updateSongs(it)
+                synchronized(lock) {
+                    playlistRepo.savePlaylist(
+                            _masterPlaylist, getApplication(),
+                            MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
+                    )
                 }
-                masterPlaylistMLD.postValue(_masterPlaylist)
-                playlistRepo.savePlaylist(
-                        _masterPlaylist, getApplication(),
-                        MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
-                )
             }
         }
     }
 
     private val settingsObserver: Observer<Settings> = Observer<Settings> {
         viewModelScope.launch(Dispatchers.IO) {
-            maxPercent = it.maxPercent
-            if (this@PlaylistsViewModel::_masterPlaylist.isInitialized) {
-                if (maxPercent == 1.0) {
-                    maxPercent = (1.0 - (_masterPlaylist.size() * MIN_VALUE))
+            synchronized(lock) {
+                maxPercent = it.maxPercent
+                if (this@PlaylistsViewModel::_masterPlaylist.isInitialized) {
+                    if (maxPercent == 1.0) {
+                        maxPercent = (1.0 - (_masterPlaylist.size() * MIN_VALUE))
+                    }
+                    this@PlaylistsViewModel._masterPlaylist.setMaxPercent(maxPercent)
+                    masterPlaylistMLD.postValue(_masterPlaylist)
+                    synchronized(lock) {
+                        playlistRepo.savePlaylist(
+                                _masterPlaylist, getApplication(),
+                                MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
+                        )
+                    }
                 }
-                this@PlaylistsViewModel._masterPlaylist.setMaxPercent(maxPercent)
-                masterPlaylistMLD.postValue(_masterPlaylist)
-                playlistRepo.savePlaylist(
-                        _masterPlaylist, getApplication(),
-                        MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
-                )
             }
         }
     }

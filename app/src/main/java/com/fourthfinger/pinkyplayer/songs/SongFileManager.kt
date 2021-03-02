@@ -82,6 +82,9 @@ class SongFileManager {
                                 songsThatExist.add(id)
                             } else {
                                 songsThatExist.add(id)
+                                if(songDao.getSong(id) == null){
+                                    newSongs.add(Song(id, title))
+                                }
                             }
                             callback.setLoadingProgress(
                                     currentSongPosition.toDouble() / nSongs.toDouble())
@@ -95,7 +98,6 @@ class SongFileManager {
                             callback.setLoadingProgress(index.toDouble() / nNewSongs.toDouble())
                         }
                         callback.setLoadingProgress(1.0)
-                        callback.setSongsLoaded(true)
                         return@use songsThatExist
                     }
                 }

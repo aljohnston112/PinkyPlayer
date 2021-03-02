@@ -94,7 +94,7 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
     }
 
     @Transient
-    private var playlistIterator: ListIterator<Long>
+    private var playlistIterator: MutableListIterator<Long>
 
     fun goToFront(){
         playlistIterator = playlistArray.listIterator()

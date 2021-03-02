@@ -20,7 +20,7 @@ class SettingsViewModelTest : ViewModelBaseTest(DummySettingsViewModelFragment()
     var hiltRule = HiltAndroidRule(this)
 
     @Test
-    fun viewModel() {
+    fun testLoadAndSave() {
         fragment as DummySettingsViewModelFragment
         val viewModelSettings = fragment.viewModel
         val viewModelScope = viewModelSettings.viewModelScope

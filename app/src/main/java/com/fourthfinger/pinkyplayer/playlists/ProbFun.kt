@@ -109,7 +109,7 @@ sealed class ProbFun<T>(
             "percent passed to add() is not between 0.0 and 1.0 (exclusive)"
         }
         val scale = 1.0 - percent
-        val probabilities = probabilityMap.entries
+        val probabilities = probabilityMap.entries.toList()
         for (e in probabilities) {
             e.setValue(e.value * scale)
         }
@@ -164,9 +164,7 @@ sealed class ProbFun<T>(
         return probabilityMap.containsKey(t)
     }
 
-    fun getKeys() = ArrayList(probabilityMap.keys)
-
-    fun iterator() = probabilityMap.iterator()
+    fun getKeys() = probabilityMap.keys.toList()
 
     /**
      * Returns the number of elements in this ProbFunTree.
@@ -206,8 +204,8 @@ sealed class ProbFun<T>(
         val leftover = 1.0 - goodProbability
         val sumOfLeftovers = probSum() - goodProbability
         val leftoverScale = leftover / sumOfLeftovers
-        for (e in probabilityMap.entries) {
-            e.setValue(e.value * leftoverScale)
+        for (e in probabilityMap.entries.toList()) {
+            probabilityMap[e.key] = (e.value * leftoverScale)
         }
         probabilityMap[element] = goodProbability
         fixProbSum()
@@ -247,8 +245,8 @@ sealed class ProbFun<T>(
         val leftover = 1.0 - badProbability
         val sumOfLeftovers = probSum() - badProbability
         val leftoverScale = leftover / sumOfLeftovers
-        for (e in probabilityMap.entries) {
-            e.setValue(e.value * leftoverScale)
+        for (e in probabilityMap.entries.toList()) {
+            probabilityMap[e.key] = (e.value * leftoverScale)
         }
         probabilityMap[element] = badProbability
         fixProbSum()
@@ -262,7 +260,7 @@ sealed class ProbFun<T>(
      */
     fun lowerProbs(low: Double) {
         require((low >= (size()*MIN_VALUE)) && low <= (1.0 - (size()*MIN_VALUE)))
-        val probs: Collection<T> = probabilityMap.keys
+        val probs: Collection<T> = probabilityMap.keys.toList()
         for (t in probs) {
             if (probabilityMap[t]!! > low) {
                 probabilityMap[t] = low
@@ -291,8 +289,8 @@ sealed class ProbFun<T>(
      * Sets the probabilities to there being an equal chance of getting any element from this ProbFunTree.
      */
     fun resetProbabilities() {
-        for (e in probabilityMap.entries) {
-            e.setValue(1.0)
+        for (e in probabilityMap.entries.toList()) {
+            probabilityMap[e.key] = 1.0
         }
         scaleProbs()
     }
@@ -320,7 +318,7 @@ sealed class ProbFun<T>(
      * @return the sum of all the probabilities in order to fix rounding error.
      */
     private fun probSum(): Double {
-        val probabilities = probabilityMap.values
+        val probabilities = probabilityMap.values.toList()
         var sum = 0.0
         for (p in probabilities) {
             sum += p
@@ -333,7 +331,7 @@ sealed class ProbFun<T>(
      */
     private fun scaleProbs() {
         val scale = 1.0 / probSum()
-        val probabilities = probabilityMap.entries
+        val probabilities = probabilityMap.entries.toList()
         for (e in probabilities) {
             e.setValue(e.value * scale)
         }
@@ -372,7 +370,7 @@ sealed class ProbFun<T>(
         sb.append("PF ")
         sb.append(id)
         sb.append(": [")
-        for ((key, value) in probabilityMap) {
+        for ((key, value) in probabilityMap.toList()) {
             sb.append("[")
             sb.append(key)
             sb.append(" = ")

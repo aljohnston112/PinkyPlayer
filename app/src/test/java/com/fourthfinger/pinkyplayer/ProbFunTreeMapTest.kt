@@ -10,7 +10,6 @@ private const val roundingError = 0.001
 private const val TOLERANCE = 0.95
 private const val rolls = 100000
 
-// TODO scale up to 10000 goods or bads
 class ProbFunTreeMapMapTest {
 
     @Test
@@ -225,20 +224,20 @@ class ProbFunTreeMapMapTest {
         val choices = setOf(0, 1, 2)
         val maxPercent = 0.5
         val pf = ProbFunLinkedMap(choices, maxPercent)
-        var keys = pf.iterator()
-        assert(keys.next().key == 0)
-        assert(keys.next().key == 1)
-        assert(keys.next().key == 2)
+        var keys = pf.getKeys().iterator()
+        assert(keys.next() == 0)
+        assert(keys.next() == 1)
+        assert(keys.next() == 2)
         pf.swapTwoPositions(2, 1)
-        keys = pf.iterator()
-        assert(keys.next().key == 0)
-        assert(keys.next().key == 2)
-        assert(keys.next().key == 1)
+        keys = pf.getKeys().iterator()
+        assert(keys.next() == 0)
+        assert(keys.next() == 2)
+        assert(keys.next() == 1)
         pf.swapTwoPositions(0, 2)
-        keys = pf.iterator()
-        assert(keys.next().key == 1)
-        assert(keys.next().key == 2)
-        assert(keys.next().key == 0)
+        keys = pf.getKeys().iterator()
+        assert(keys.next() == 1)
+        assert(keys.next() == 2)
+        assert(keys.next() == 0)
     }
 
     @Test

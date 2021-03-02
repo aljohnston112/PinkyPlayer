@@ -7,24 +7,37 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-private const val displayName = "a"
-private const val artist = "b"
-private const val title = "c"
-private const val id = 4L
-private val audioUri = AudioUri(displayName, artist, title, id)
-
 @RunWith(AndroidJUnit4::class)
 class AudioUriCompanionTest{
 
     private val context = ApplicationProvider.getApplicationContext<Context>()
 
-    @Before
-    fun delete(){
-        AudioUri.deleteAudioUri(context, id)
+    @Test fun testHashCodeEquals(){
+        val displayName = "a"
+        val artist = "b"
+        val title = "c"
+        val id = 4L
+        val audioUri = AudioUri(displayName, artist, title, id)
+        val displayName2 = "e"
+        val artist2 = "f"
+        val title2 = "g"
+        val id2 = 8L
+        val audioUri2 = AudioUri(displayName2, artist2, title2, id2)
+        assert(audioUri != audioUri2)
+        assert(audioUri.hashCode() != audioUri2.hashCode())
+        val audioUri3 = AudioUri(displayName, artist, title, id)
+        assert(audioUri == audioUri3)
+        assert(audioUri.hashCode() == audioUri3.hashCode())
     }
 
     @Test
     fun testDoesAudioExistSaveAndDelete(){
+        val displayName = "a"
+        val artist = "b"
+        val title = "c"
+        val id = 4L
+        AudioUri.deleteAudioUri(context, id)
+        val audioUri = AudioUri(displayName, artist, title, id)
         assert(!AudioUri.doesAudioUriExist(context, id))
         assert(AudioUri.saveAudioUri(context, audioUri))
         assert(AudioUri.doesAudioUriExist(context, id))
@@ -34,6 +47,12 @@ class AudioUriCompanionTest{
 
     @Test
     fun testSaveAndGet(){
+        val displayName = "a"
+        val artist = "b"
+        val title = "c"
+        val id = 4L
+        AudioUri.deleteAudioUri(context, id)
+        val audioUri = AudioUri(displayName, artist, title, id)
         assert(AudioUri.saveAudioUri(context, audioUri))
         val get = AudioUri.getAudioUri(context, id)!!
         assert(get.displayName == displayName)

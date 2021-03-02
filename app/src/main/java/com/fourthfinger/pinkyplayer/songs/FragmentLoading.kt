@@ -45,10 +45,10 @@ class FragmentLoading : Fragment() {
 
     private fun observeLoadingProgress(loadingCallback: LoadingCallback) {
         loadingCallback.loadingProgress.observe(viewLifecycleOwner, { progress ->
-            binding.progressBarLoading.progress = progress
+                binding.progressBarLoading.progress = progress
         })
         loadingCallback.loadingText.observe(viewLifecycleOwner, { text ->
-            binding.textViewLoading.text = text
+                    binding.textViewLoading.text = text
         })
         val mediatorLiveDataLoading = MediatorLiveDataLoading()
         mediatorLiveDataLoading.isLoaded(
@@ -56,8 +56,10 @@ class FragmentLoading : Fragment() {
                 loadingCallback.settingsLoaded,
                 loadingCallback.playlistsLoaded
         ).observe(viewLifecycleOwner, { isLoaded ->
-            if (isLoaded) {
-                findNavController().popBackStack()
+            requireActivity().runOnUiThread {
+                if (isLoaded) {
+                    findNavController().popBackStack()
+                }
             }
         })
     }

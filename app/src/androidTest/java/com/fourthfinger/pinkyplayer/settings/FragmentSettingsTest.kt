@@ -36,12 +36,11 @@ class FragmentSettingsTest : HiltExt<ActivityMain>(ActivityMain::class) {
     private val settingsRepo = SettingsRepo()
 
     private val context = ApplicationProvider.getApplicationContext<Context>()
-    private lateinit var navController: NavController
 
     @Before
     override fun setUpActivity() {
         super.setUpActivity()
-        navController = activity.findNavController(R.id.nav_host_fragment)
+        val navController: NavController = activity.findNavController(R.id.nav_host_fragment)
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
             navController.navigate(FragmentTitleDirections.actionFragmentTitleToFragmentSettings())
         }
@@ -51,6 +50,7 @@ class FragmentSettingsTest : HiltExt<ActivityMain>(ActivityMain::class) {
     fun verifyLayout() {
         onView(withId(R.id.scroll_view_fragment_settings)).check(matches(isCompletelyDisplayed()))
         onView(withId(R.id.fab_fragment_settings)).check(matches(isCompletelyDisplayed()))
+        onView(withId(R.id.constraint_layout_fragment_settings_fab)).check(matches(isDisplayed()))
         onView(withId(R.id.constraint_layout_fragment_settings)).check(matches(isDisplayed()))
         lateinit var settingsIn: Settings
         runBlocking {

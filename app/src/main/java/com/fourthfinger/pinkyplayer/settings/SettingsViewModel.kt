@@ -24,19 +24,17 @@ class SettingsViewModel @Inject constructor(
     val settings = settingsRepo.settings
 
     fun loadSettings(loadingCallback: LoadingCallback) {
+        loadingCallback.setLoadingProgress(0.5)
+        loadingCallback.setLoadingText(
+                getApplication<Application>().applicationContext.getString(R.string.loadingSettings))
         viewModelScope.launch(Dispatchers.IO) {
-            loadingCallback.setLoadingProgress(0.0)
-            loadingCallback.setLoadingProgress(0.25)
-            loadingCallback.setLoadingProgress(0.5)
-            loadingCallback.setLoadingText(
-                    getApplication<Application>().applicationContext.getString(R.string.loadingSettings))
             runBlocking {
                 settingsRepo.load(getApplication(), FILE_SAVE, SAVE_FILE_VERIFICATION_NUMBER)
             }
-            loadingCallback.setLoadingProgress(0.75)
-            loadingCallback.setLoadingProgress(1.0)
-            loadingCallback.setSettingsLoaded(true)
+
         }
+        loadingCallback.setLoadingProgress(1.0)
+        loadingCallback.setSettingsLoaded(true)
     }
 
     fun save(settings: Settings) {

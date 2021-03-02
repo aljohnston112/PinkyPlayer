@@ -21,6 +21,6 @@ open class SongDBBaseTest {
     var instantExecutorRule = InstantTaskExecutorRule()
 
     val context: Context = ApplicationProvider.getApplicationContext()
-    val loadingCallback = LoadingCallback()
+    val loadingCallback = LoadingCallback.getInstance()
 
 }
