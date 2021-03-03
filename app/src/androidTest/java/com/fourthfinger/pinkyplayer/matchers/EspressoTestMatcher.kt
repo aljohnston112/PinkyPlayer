@@ -1,6 +1,7 @@
 package com.fourthfinger.pinkyplayer.matchers
 
 import android.view.View
+import com.fourthfinger.pinkyplayer.songs.AudioUri
 import com.fourthfinger.pinkyplayer.songs.Song
 import org.hamcrest.Matcher
 
@@ -22,6 +23,10 @@ class EspressoTestMatcher {
 
         fun withHeightOfAtLeast(height: Int): Matcher<View> {
             return ViewHeightMatcher(height)
+        }
+
+        fun withSameBitmapAs(audioUri: AudioUri): Matcher<View> {
+            return AudioUriBitmapMatcher(audioUri)
         }
 
     }

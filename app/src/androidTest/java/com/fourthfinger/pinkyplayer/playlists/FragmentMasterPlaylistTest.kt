@@ -3,6 +3,7 @@ package com.fourthfinger.pinkyplayer.playlists
 import android.content.Context
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -18,6 +19,7 @@ import com.fourthfinger.pinkyplayer.songs.FragmentTitleDirections
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.core.AllOf.allOf
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,8 +44,6 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
         }
     }
 
-    /*
-
     @Test
     fun verifyLayout() {
         lateinit var randomPlaylist: RandomPlaylist
@@ -67,8 +67,7 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
         }
     }
 
-
-     */
+    // TODO make sure to check the playlist is in order
 
     @Test
     fun verifyClickViewHolder() {

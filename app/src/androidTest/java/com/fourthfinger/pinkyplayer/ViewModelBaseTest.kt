@@ -22,7 +22,7 @@ open class ViewModelBaseTest(val fragment : DummyViewModelFragmentBase) {
             val navHostFragment = activity.supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
             val fragmentTransaction: FragmentTransaction = navHostFragment.childFragmentManager.beginTransaction()
             fragmentTransaction.add(fragment, "")
-            fragmentTransaction.commit()
+            fragmentTransaction.commitNow()
         }
         fragment.fragmentLoaded.await()
     }

@@ -8,7 +8,7 @@ class MediatorLiveDataLooping {
     private var loopingValue: Boolean? = null
     private var loopingOneValue: Boolean? = null
 
-    fun isLooping(
+    fun isNotLooping(
             looping: LiveData<Boolean>, loopingOne: LiveData<Boolean>
     ): LiveData<Boolean> = MediatorLiveData<Boolean>().also { mediator ->
         this.loopingValue = looping.value

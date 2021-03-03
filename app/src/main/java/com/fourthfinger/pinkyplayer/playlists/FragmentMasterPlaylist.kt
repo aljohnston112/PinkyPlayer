@@ -6,15 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fourthfinger.pinkyplayer.NavUtil
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.databinding.RecyclerViewSongListBinding
 import com.fourthfinger.pinkyplayer.songs.Song
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {

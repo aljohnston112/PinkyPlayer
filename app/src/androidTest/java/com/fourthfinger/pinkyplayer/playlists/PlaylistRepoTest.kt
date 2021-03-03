@@ -1,12 +1,14 @@
 package com.fourthfinger.pinkyplayer.playlists
 
 import android.content.Context
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.fourthfinger.pinkyplayer.FileUtil
 import com.fourthfinger.pinkyplayer.songs.Song
 import kotlinx.coroutines.runBlocking
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch

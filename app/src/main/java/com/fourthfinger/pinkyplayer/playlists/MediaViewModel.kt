@@ -1,7 +1,9 @@
 package com.fourthfinger.pinkyplayer.playlists
 
+import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,8 +14,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MediaViewModel @Inject constructor(
+        application: Application,
         private val mediaController: MediaController,
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     private val _currentAudioUri: MutableLiveData<AudioUri> by lazy {
         MutableLiveData<AudioUri>()
@@ -36,7 +39,7 @@ class MediaViewModel @Inject constructor(
     }
 
     private val _looping: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>()
+        MutableLiveData<Boolean>(false)
     }
 
     val looping = _looping as LiveData<Boolean>

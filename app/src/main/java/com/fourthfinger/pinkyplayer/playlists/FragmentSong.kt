@@ -14,7 +14,6 @@ import com.fourthfinger.pinkyplayer.databinding.FragmentSongBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 
 @AndroidEntryPoint
 class FragmentSong() : Fragment() {
@@ -57,11 +56,11 @@ class FragmentSong() : Fragment() {
 
     private fun observeControls() {
         val mediatorLiveDataLooping = MediatorLiveDataLooping()
-        mediatorLiveDataLooping.isLooping(
+        mediatorLiveDataLooping.isNotLooping(
                 mediaViewModel.looping, mediaViewModel.loopingOne
         ).observe(viewLifecycleOwner) {
             val buttonLoop = binding.imageButtonRepeat
-            if (it) {
+            if (!it) {
                 buttonLoop.setImageResource(R.drawable.repeat_black_24dp)
             } else {
                 buttonLoop.setImageResource(R.drawable.repeat_white_24dp)
@@ -117,7 +116,8 @@ class FragmentSong() : Fragment() {
                             songArtDimen = minOf(songArtDimen, imageViewSongArt.measuredHeight)
                         }
                         if (songArtDimen > 0) {
-                            BitmapUtil.getSongBitmap(requireContext(), it, songArtDimen)?.let { it1 -> mediaViewModel.setCurrentSongBitmap(it1) }
+                            BitmapUtil.getSongBitmap(requireContext(), it, songArtDimen)?.let {
+                                it1 -> mediaViewModel.setCurrentSongBitmap(it1) }
                         }
                     }
                 }

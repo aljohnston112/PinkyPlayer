@@ -42,11 +42,9 @@ class MediatorLiveDataLoadingTest: ActivityMainBaseTest()  {
             countDownLatchInit.countDown()
         }
         countDownLatchInit.await()
-        var val0: Int = 0
-        var val1: Int = 0
-        var val2: Int = 0
-        for(i in 0..2){
-            val0 = i
+        var val1 = 0
+        var val2 = 0
+        for(val0 in 0..2){
             when(val0){
                 0 ->
                 {
