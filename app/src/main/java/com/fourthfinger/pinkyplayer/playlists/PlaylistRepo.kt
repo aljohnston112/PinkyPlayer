@@ -24,14 +24,12 @@ class PlaylistRepo @Inject constructor() {
             fileName: String,
             saveFileVerificationNumber: Long,
     ): RandomPlaylist? {
-        FileUtil.mutex.withLock {
             val playlist = FileUtil.load<RandomPlaylist>(context, fileName, saveFileVerificationNumber)
             if (playlist != null) {
                 playlistsField.add(playlist)
                 _playlists.postValue(playlistsField.toList())
             }
             return playlist
-        }
     }
 
     fun savePlaylist(

@@ -1,6 +1,7 @@
 package com.fourthfinger.pinkyplayer.playlists
 
 import android.content.Context
+import android.os.SystemClock
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -27,6 +28,7 @@ import org.hamcrest.core.AllOf.allOf
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.concurrent.thread
 
 private const val MASTER_PLAYLIST_FILE = "MASTER_PLAYLIST_NAME"
 private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
@@ -65,10 +67,12 @@ class FragmentSongTest : HiltExt<ActivityMain>(ActivityMain::class) {
             )
             onView(withId(R.id.recycler_view_song_list)).perform(
                     actionOnItemAtPosition<RecyclerViewAdapterSongs.ViewHolder>(pos, ViewActions.click()))
+            if(pos == 0) {
+                Thread.sleep(1000)
+            }
             assertThat(navController.currentDestination?.id
                     ?: assert(false)).isEqualTo(R.id.fragmentSong)
             onView(withId(R.id.linear_layout_fragment_song)).check(matches(isCompletelyDisplayed()))
-            // Not square!!! TODO
 
             onView(withId(R.id.image_view_song_art_fragment_song)).check(matches(allOf(
                     isCompletelyDisplayed(), withSameBitmapAs(audioUri))))

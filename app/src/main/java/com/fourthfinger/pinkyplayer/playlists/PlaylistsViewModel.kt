@@ -2,6 +2,7 @@ package com.fourthfinger.pinkyplayer.playlists
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.fourthfinger.pinkyplayer.FileUtil
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.settings.Settings
 import com.fourthfinger.pinkyplayer.settings.SettingsRepo
@@ -12,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 private const val MASTER_PLAYLIST_FILE_NAME = "MASTER_PLAYLIST_NAME"
@@ -37,18 +39,20 @@ class PlaylistsViewModel @Inject constructor(
     val masterPlaylist = masterPlaylistMLD as LiveData<RandomPlaylist>
 
     fun loadPlaylists(loadingCallback: LoadingCallback) {
-        loadingCallback.setLoadingProgress(0.5)
-        loadingCallback.setLoadingText(
-                getApplication<Application>().applicationContext.getString(R.string.loadingPlaylists))
         viewModelScope.launch(Dispatchers.IO) {
-            runBlocking {
-                masterPlaylistMLD.postValue(playlistRepo.loadPlaylist(
-                        getApplication(), MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
-                ))
+            FileUtil.mutex.withLock {
+                loadingCallback.setLoadingProgress(0.5)
+                loadingCallback.setLoadingText(
+                        getApplication<Application>().applicationContext.getString(R.string.loadingPlaylists))
+                runBlocking {
+                    masterPlaylistMLD.postValue(playlistRepo.loadPlaylist(
+                            getApplication(), MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
+                    ))
+                }
+                loadingCallback.setLoadingProgress(1.0)
+                loadingCallback.setPlaylistsLoaded(true)
             }
         }
-        loadingCallback.setLoadingProgress(1.0)
-        loadingCallback.setPlaylistsLoaded(true)
     }
 
     private val lock = Any()

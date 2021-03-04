@@ -27,14 +27,12 @@ class SettingsRepo @Inject constructor() {
             fileName: String,
             saveFileVerificationNumber: Long,
     ): Settings {
-        FileUtil.mutex.withLock {
             var settings = FileUtil.load<Settings>(context, fileName, saveFileVerificationNumber)
             if (settings == null) {
                 settings = Settings(MAX_PERCENT, PERCENT_CHANGE_UP, PERCENT_CHANGE_DOWN, LOWER_PROB)
             }
             _settings.postValue(settings)
             return settings
-        }
     }
 
     fun save(

@@ -16,9 +16,7 @@ class SongRepo  @Inject constructor(private val songDao: SongDao, ) {
             context: Context,
             callback: LoadingCallback,
     ): ArrayList<Long>? {
-        FileUtil.mutex.withLock {
             return SongFileManager.scanSongsAndWriteAudioUris(context, callback, songDao)
-        }
     }
 
 }

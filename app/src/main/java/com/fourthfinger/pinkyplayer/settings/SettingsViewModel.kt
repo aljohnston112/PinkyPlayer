@@ -3,12 +3,14 @@ package com.fourthfinger.pinkyplayer.settings
 import android.app.Application
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.*
+import com.fourthfinger.pinkyplayer.FileUtil
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.songs.LoadingCallback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 private const val FILE_SAVE = "settings"
@@ -24,17 +26,18 @@ class SettingsViewModel @Inject constructor(
     val settings = settingsRepo.settings
 
     fun loadSettings(loadingCallback: LoadingCallback) {
-        loadingCallback.setLoadingProgress(0.5)
-        loadingCallback.setLoadingText(
-                getApplication<Application>().applicationContext.getString(R.string.loadingSettings))
         viewModelScope.launch(Dispatchers.IO) {
-            runBlocking {
-                settingsRepo.load(getApplication(), FILE_SAVE, SAVE_FILE_VERIFICATION_NUMBER)
+            FileUtil.mutex.withLock {
+                loadingCallback.setLoadingProgress(0.5)
+                loadingCallback.setLoadingText(
+                        getApplication<Application>().applicationContext.getString(R.string.loadingSettings))
+                runBlocking {
+                    settingsRepo.load(getApplication(), FILE_SAVE, SAVE_FILE_VERIFICATION_NUMBER)
+                }
+                loadingCallback.setLoadingProgress(1.0)
+                loadingCallback.setSettingsLoaded(true)
             }
-
         }
-        loadingCallback.setLoadingProgress(1.0)
-        loadingCallback.setSettingsLoaded(true)
     }
 
     fun save(settings: Settings) {

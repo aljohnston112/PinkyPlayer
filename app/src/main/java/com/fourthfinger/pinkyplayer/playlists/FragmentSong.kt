@@ -112,7 +112,7 @@ class FragmentSong() : Fragment() {
                     lifecycleScope.launch(Dispatchers.IO) {
                         val imageViewSongArt = binding.imageViewSongArtFragmentSong
                         var songArtDimen: Int = imageViewSongArt.measuredWidth
-                        if (imageViewSongArt.measuredHeight != 0) {
+                        if (imageViewSongArt.measuredHeight > 2) {
                             songArtDimen = minOf(songArtDimen, imageViewSongArt.measuredHeight)
                         }
                         if (songArtDimen > 0) {

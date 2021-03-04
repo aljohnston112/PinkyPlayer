@@ -11,8 +11,6 @@ import org.hamcrest.Description
 
 class AudioUriBitmapMatcher(private val audioUri: AudioUri): BaseMatcher<View>() {
 
-    // TODO recycle bitmaps
-
     override fun describeTo(description: Description?) {
         description?.appendText("has same bitmap as the audioUri with the song: ")
         description?.appendText(audioUri.title)
@@ -20,13 +18,19 @@ class AudioUriBitmapMatcher(private val audioUri: AudioUri): BaseMatcher<View>()
 
     override fun matches(item: Any?): Boolean {
         if(item is ImageView){
+            if(audioUri.title == "3D"){
+                print(true)
+            }
             val bitmap = item.drawToBitmap()
             val h = bitmap.height
             val w = bitmap.width
             val bm = BitmapUtil.getSongBitmap(item.context, audioUri, h)
             return if(bm != null && !bm.sameAs(bitmap)){
                 val bm1 = BitmapUtil.getSongBitmap(item.context, audioUri, w)
-                bm1 != null && bm1.sameAs(bitmap)
+                val b = (bm1 != null && bm1.sameAs(bitmap))
+                bitmap.recycle()
+                bm.recycle()
+                b
             } else {
                 true
             }

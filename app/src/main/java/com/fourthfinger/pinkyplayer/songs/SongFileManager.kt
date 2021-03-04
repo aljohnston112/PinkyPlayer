@@ -75,16 +75,13 @@ class SongFileManager {
                             val displayName = cursor.getString(nameCol)
                             val title = cursor.getString(titleCol)
                             val artist = cursor.getString(artistCol)
-                            if (!AudioUri.doesAudioUriExist(context, id)) {
+                            if (!AudioUri.doesAudioUriExist(context, id) || songDao.getSong(id) == null) {
                                 val audioURI = AudioUri(displayName, artist, title, id)
                                 newSongs.add(Song(id, title))
                                 AudioUri.saveAudioUri(context, audioURI)
                                 songsThatExist.add(id)
                             } else {
                                 songsThatExist.add(id)
-                                if(songDao.getSong(id) == null){
-                                    newSongs.add(Song(id, title))
-                                }
                             }
                             callback.setLoadingProgress(
                                     currentSongPosition.toDouble() / nSongs.toDouble())

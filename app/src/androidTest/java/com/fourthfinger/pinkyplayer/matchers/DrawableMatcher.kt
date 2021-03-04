@@ -13,8 +13,6 @@ import org.hamcrest.Description
 
 class DrawableMatcher(private val resourceId: Int) : BaseMatcher<View>() {
 
-    // Recycle bitmaps TODO
-
     override fun describeTo(description: Description?) {
         description?.appendText("has drawable with id: ")
         description?.appendText(resourceId.toString())
@@ -22,15 +20,24 @@ class DrawableMatcher(private val resourceId: Int) : BaseMatcher<View>() {
 
     override fun matches(item: Any?): Boolean {
         if (item is AppCompatImageView) {
+
             val imageView: AppCompatImageView = item
             val expectedDrawable: Drawable = item.context.getDrawable(resourceId) ?: return false
             val bitmap = imageView.drawable.toBitmap()
-            return bitmap.sameAs(expectedDrawable.toBitmap(bitmap.width, bitmap.height))
+            val bitmap2 = expectedDrawable.toBitmap(bitmap.width, bitmap.height)
+            val b = bitmap.sameAs(bitmap2)
+            bitmap.recycle()
+            bitmap2.recycle()
+            return b
         } else if(item is ImageButton){
             val imageView: ImageButton = item
             val expectedDrawable: Drawable = item.context.getDrawable(resourceId) ?: return false
             val bitmap = imageView.drawable.toBitmap()
-            return bitmap.sameAs(expectedDrawable.toBitmap(bitmap.width, bitmap.height))
+            val bitmap2 = expectedDrawable.toBitmap(bitmap.width, bitmap.height)
+            val b = bitmap.sameAs(bitmap2)
+            bitmap.recycle()
+            bitmap2.recycle()
+            return b
         }
         return false
     }
