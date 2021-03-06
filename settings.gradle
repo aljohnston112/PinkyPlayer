@@ -1,2 +1,3 @@
+include ':ProbFunTree'
 include ':app'
 rootProject.name = "Pinky Player"

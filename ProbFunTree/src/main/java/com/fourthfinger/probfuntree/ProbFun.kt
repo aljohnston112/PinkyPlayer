@@ -1,4 +1,4 @@
-package com.fourthfinger.pinkyplayer.playlists
+package com.fourthfinger.probfuntree
 
 import java.io.Serializable
 import java.util.*
@@ -11,15 +11,17 @@ const val MIN_VALUE = 0.0000000000000005
 
 // TODO fix max percent like the constructor
 sealed class ProbFun<T>(
-        choices: Set<T>, var maxPercent: Double, comparable: Boolean
+    choices: Set<T>,
+    var maxPercent: Double,
+    comparable: Boolean
 ) : Serializable, Cloneable {
 
     class ProbFunLinkedMap<T>(
-            choices: Set<T>, maxPercent: Double
+        choices: Set<T>, maxPercent: Double
     ) : ProbFun<T>(choices, maxPercent, false) {
 
         constructor(probFun: ProbFunLinkedMap<T>) : this(
-                probFun.probabilityMap.keys, probFun.maxPercent
+            probFun.probabilityMap.keys, probFun.maxPercent
         ) {
             for ((key, value) in probFun.probabilityMap) {
                 probabilityMap[key] = value
@@ -34,11 +36,11 @@ sealed class ProbFun<T>(
     }
 
     class ProbFunTreeMap<T : Comparable<T>>(
-            choices: Set<T>, maxPercent: Double
+        choices: Set<T>, maxPercent: Double
     ) : ProbFun<T>(choices, maxPercent, true) {
 
         constructor(probFun: ProbFunTreeMap<T>) : this(
-                probFun.probabilityMap.keys, probFun.maxPercent
+            probFun.probabilityMap.keys, probFun.maxPercent
         ) {
             for ((key, value) in probFun.probabilityMap) {
                 probabilityMap[key] = value
@@ -66,9 +68,14 @@ sealed class ProbFun<T>(
         require(choices.size < 2000000000000000) {
             "ProbFun will not work with a size greater than 2,000,000,000,000,000"
         }
-        require((maxPercent > (0) && maxPercent <= (1.0 - (choices.size*MIN_VALUE)))) {
+        require((maxPercent > (0) && maxPercent <= 1.0)) {
             "maxPercent passed into the ProbFunTree constructor must be above 0 and under 1.0" +
                     "value was $maxPercent"
+        }
+        if (maxPercent == 1.0) {
+            this.maxPercent = (1.0 - (choices.size * MIN_VALUE))
+        } else {
+            this.maxPercent = maxPercent
         }
         probabilityMap = if (comparable) TreeMap() else LinkedHashMap()
         for (choice in choices) {
@@ -87,8 +94,8 @@ sealed class ProbFun<T>(
      */
     fun add(element: T) {
         Objects.requireNonNull(element)
-        val probability = 1.0 / probabilityMap.size
         if (!probabilityMap.containsKey(element)) {
+            val probability = 1.0 / probabilityMap.size
             probabilityMap[element] = probability
             scaleProbs()
         }
@@ -105,7 +112,7 @@ sealed class ProbFun<T>(
      */
     fun add(element: T, percent: Double) {
         Objects.requireNonNull(element)
-        require((percent >= ((size()+1)*MIN_VALUE)) && percent <= (1.0 - ((size()+1)*MIN_VALUE))) {
+        require((percent >= ((size() + 1) * MIN_VALUE)) && percent <= (1.0 - ((size() + 1) * MIN_VALUE))) {
             "percent passed to add() is not between 0.0 and 1.0 (exclusive)"
         }
         val scale = 1.0 - percent
@@ -134,6 +141,86 @@ sealed class ProbFun<T>(
         }
         scaleProbs()
         return true
+    }
+
+    /**
+     * Removes elements with the lowest probability of occurring when [fun] is called.
+     * If elements have the same maximum probability of occurring, no elements will be removed.
+     * If after a removal,
+     * elements have the same maximum probability of occurring,
+     * no more elements will be removed.
+     * If parentSize() == 1, no elements will be removed.
+     * If parentSize() == 1 after a removal, no more elements will be removed.
+     */
+    fun prune() {
+        if (size() == 1) {
+            return
+        }
+        val min = probabilityMap.values.stream().parallel().min { d1: Double, d2: Double ->
+            (d1).compareTo((d2))
+        }
+        val max = probabilityMap.values.stream().parallel().max { d1: Double, d2: Double ->
+            (d1).compareTo((d2))
+
+        }
+        if (max == min) {
+            return
+        }
+        val probabilities = probabilityMap.entries
+        val it = probabilities.iterator()
+        while (it.hasNext()) {
+            val e = it.next()
+            if (e.value <= min.get() && e.value < (max.get() - roundingError)) {
+                it.remove()
+                if (size() == 1) {
+                    scaleProbs()
+                    return
+                }
+            }
+        }
+        scaleProbs()
+    }
+
+    /**
+     * Removes elements with lower than [percent] probability of occurring when [fun] is called.
+     * If elements have the same maximum probability of occurring, no elements will be removed.
+     * If after a removal,
+     * elements have the same maximum probability of occurring,
+     * no more elements will be removed.
+     * If parentSize() == 1, no elements will be removed.
+     * If parentSize() == 1 after a removal, no more elements will be removed.
+     * @param  percent as the upper limit, inclusive, of the probability of elements being returned to be removed from this ProbFunTree.
+     * @throws IllegalArgumentException if percent is not between 0.0 and 1.0 (exclusive)
+     */
+    fun prune(percent: Double) {
+        if (percent >= 1.0 || percent <= 0.0) {
+            throw IllegalArgumentException("percent passed to prune() is not between 0.0 and 1.0 (exclusive)")
+        }
+        val max = probabilityMap.values.stream().parallel().max { d1: Double, d2: Double ->
+            (d1).compareTo((d2))
+
+        }
+        val min = probabilityMap.values.stream().parallel().min { d1: Double, d2: Double ->
+            (d1).compareTo((d2))
+
+        }
+        if (size() == 1 || (max.get() <= percent && min.get() == max.get())) {
+            return
+        }
+        val probabilities = probabilityMap.entries
+        val it: MutableIterator<Map.Entry<T, Double>> = probabilities.iterator()
+        var e: Map.Entry<T, Double>
+        while (it.hasNext()) {
+            e = it.next()
+            if (e.value <= min.get() && e.value < max.get() - roundingError) {
+                it.remove()
+                if (size() == 1) {
+                    scaleProbs()
+                    return
+                }
+            }
+        }
+        scaleProbs()
     }
 
     fun swapTwoPositions(oldPosition: Int, newPosition: Int) {
@@ -199,7 +286,7 @@ sealed class ProbFun<T>(
             add = probToAddForGood(oldProb, newPercent)
         }
         val goodProbability = oldProb + add
-        if(goodProbability >= (1.0-(size()*MIN_VALUE))) return -1.0
+        if (goodProbability >= (1.0 - (size() * MIN_VALUE))) return -1.0
         probabilityMap[element] = goodProbability
         val leftover = 1.0 - goodProbability
         val sumOfLeftovers = probSum() - goodProbability
@@ -240,7 +327,7 @@ sealed class ProbFun<T>(
         val sub = oldProb * percent
         if (oldProb - sub <= roundingError) return oldProb
         val badProbability = oldProb - sub
-        if(badProbability <= (size()*MIN_VALUE)) return -1.0
+        if (badProbability <= (size() * MIN_VALUE)) return -1.0
         probabilityMap[element] = badProbability
         val leftover = 1.0 - badProbability
         val sumOfLeftovers = probSum() - badProbability
@@ -259,7 +346,7 @@ sealed class ProbFun<T>(
      * @param low as the low chance between 0.0 and 1.0.
      */
     fun lowerProbs(low: Double) {
-        require((low >= (size()*MIN_VALUE)) && low <= (1.0 - (size()*MIN_VALUE)))
+        require((low >= (size() * MIN_VALUE)) && low <= (1.0 - (size() * MIN_VALUE)))
         val probs: Collection<T> = probabilityMap.keys.toList()
         for (t in probs) {
             if (probabilityMap[t]!! > low) {
@@ -388,13 +475,6 @@ sealed class ProbFun<T>(
             return hashCode() == other.hashCode()
         }
         return false
-    }
-
-    operator fun getValue(randomPlaylist: RandomPlaylist, property: KProperty<*>): Double {
-        if(property.name == "maxPercent"){
-            return maxPercent
-        }
-        return -1.0
     }
 
     companion object {

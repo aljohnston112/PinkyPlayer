@@ -1,9 +1,13 @@
 package com.fourthfinger.pinkyplayer.playlists
 
 import android.os.Bundle
+import android.view.Gravity.BOTTOM
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import androidx.core.view.doOnLayout
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.lifecycleScope
@@ -29,6 +33,7 @@ class FragmentSong() : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
         _binding = FragmentSongBinding.inflate(layoutInflater)
+        setUpLayout()
         return binding.root
     }
 
@@ -37,6 +42,57 @@ class FragmentSong() : Fragment() {
         observeMedia()
         observeControls()
         observeDetails()
+    }
+
+    private fun setUpLayout() {
+        binding.imageViewSongArtFragmentSong.doOnPreDraw {
+            val lp = LinearLayout.LayoutParams(it.measuredWidth, it.measuredWidth)
+            val m = resources.getDimension(R.dimen.margin).toInt()
+            lp.setMargins(m, m, m, m)
+            it.layoutParams = lp
+        }
+        binding.buttonThumbDown.doOnPreDraw {
+            val lp = LinearLayout.LayoutParams(it.measuredWidth, it.measuredWidth)
+            val m = resources.getDimension(R.dimen.half_margin).toInt()
+            lp.setMargins(0, 0, m, 0)
+            it.layoutParams = lp
+        }
+        binding.buttonThumbUp.doOnPreDraw {
+            val lp = LinearLayout.LayoutParams(it.measuredWidth, it.measuredWidth)
+            val m = resources.getDimension(R.dimen.half_margin).toInt()
+            lp.setMargins(m, 0, 0, 0)
+            it.layoutParams = lp
+        }
+        binding.imageButtonShuffle.doOnPreDraw {
+            val lp = LinearLayout.LayoutParams(it.measuredWidth, it.measuredWidth)
+            val m = resources.getDimension(R.dimen.half_margin).toInt()
+            lp.setMargins(0, 0, m, 0)
+            it.layoutParams = lp
+        }
+        binding.imageButtonPrev.doOnPreDraw {
+            val lp = LinearLayout.LayoutParams(it.measuredWidth, it.measuredWidth)
+            val m = resources.getDimension(R.dimen.half_margin).toInt()
+            lp.setMargins(m, 0, m, 0)
+            it.layoutParams = lp
+        }
+        binding.imageButtonNext.doOnPreDraw {
+            val lp = LinearLayout.LayoutParams(it.measuredWidth, it.measuredWidth)
+            val m = resources.getDimension(R.dimen.half_margin).toInt()
+            lp.setMargins(m, 0, m, 0)
+            it.layoutParams = lp
+        }
+        binding.imageButtonPlayPause.doOnPreDraw {
+            val lp = LinearLayout.LayoutParams(it.measuredWidth, it.measuredWidth)
+            val m = resources.getDimension(R.dimen.half_margin).toInt()
+            lp.setMargins(m, 0, m, 0)
+            it.layoutParams = lp
+        }
+        binding.imageButtonRepeat.doOnPreDraw {
+            val lp = LinearLayout.LayoutParams(it.measuredWidth, it.measuredWidth)
+            val m = resources.getDimension(R.dimen.half_margin).toInt()
+            lp.setMargins(m, 0, 0, 0)
+            it.layoutParams = lp
+        }
     }
 
     private fun observeDetails() {
@@ -94,7 +150,7 @@ class FragmentSong() : Fragment() {
 
     private fun observeMedia() {
         mediaViewModel.currentAudioUri.observe(viewLifecycleOwner) {
-            if(it != null) {
+            if (it != null) {
                 binding.textViewSongName.text = it.title
                 binding.editTextCurrentTime.post {
                     lifecycleScope.launch(Dispatchers.IO) {
@@ -116,8 +172,7 @@ class FragmentSong() : Fragment() {
                             songArtDimen = minOf(songArtDimen, imageViewSongArt.measuredHeight)
                         }
                         if (songArtDimen > 0) {
-                            BitmapUtil.getSongBitmap(requireContext(), it, songArtDimen)?.let {
-                                it1 -> mediaViewModel.setCurrentSongBitmap(it1) }
+                            BitmapUtil.getSongBitmap(requireContext(), it, songArtDimen)?.let { it1 -> mediaViewModel.setCurrentSongBitmap(it1) }
                         }
                     }
                 }
