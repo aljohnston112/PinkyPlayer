@@ -18,15 +18,8 @@ class AudioUri(
 
     private val nestProbMap: NestedProbMap = NestedProbMap()
 
-    @Transient
-    var uri: Uri? = null
-        get() : Uri? {
-            if(field == null){
-                field = getUri(id)
-            }
-            return field
-        }
-        private set
+    @delegate:Transient
+    val uri: Uri by lazy{ getUri(id) }
 
     private var duration: Long = -1L
 
@@ -61,7 +54,7 @@ class AudioUri(
     }
 
     override operator fun compareTo(other: AudioUri): Int {
-        return title.compareTo(other.title)
+        return uri.compareTo(other.uri)
     }
 
     override fun equals(other: Any?): Boolean {

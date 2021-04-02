@@ -1,6 +1,5 @@
 package com.fourthfinger.pinkyplayer
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.media.MediaMetadataRetriever
@@ -21,8 +20,10 @@ class BitmapUtil {
         fun getSongBitmap(context: Context, audioUri: AudioUri?, songArtDimen: Int): Bitmap? {
             var bitmap = audioUri?.uri?.let { getThumbnail(it, songArtDimen, songArtDimen, context) }
             if (bitmap == null) {
-                val drawable = ResourcesCompat.getDrawable(context.resources,
-                        R.drawable.music_note_black_48dp, null
+                val drawable = ResourcesCompat.getDrawable(
+                        context.resources,
+                        R.drawable.music_note_black_48dp,
+                        null
                 )
                 if (drawable != null) {
                     drawable.setBounds(0, 0, songArtDimen, songArtDimen)

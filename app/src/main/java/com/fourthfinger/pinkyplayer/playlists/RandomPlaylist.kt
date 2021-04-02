@@ -1,6 +1,7 @@
 package com.fourthfinger.pinkyplayer.playlists
 
 import android.content.Context
+import com.fourthfinger.pinkyplayer.ProbFun
 import com.fourthfinger.pinkyplayer.songs.AudioUri
 import com.fourthfinger.pinkyplayer.songs.Song
 import java.io.Serializable
@@ -17,8 +18,11 @@ import kotlin.random.Random
  * of being returned when fun() is called.
  * @throws IllegalArgumentException if there is not at least one AudioURI in music.
  */
-class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
-                     val comparable: Boolean) : Serializable {
+class RandomPlaylist(
+        val name: String, music: List<Song>,
+        maxPercent: Double,
+        val comparable: Boolean
+) : Serializable {
 
     // The ProbFun that randomly picks the media to play
     private var probabilityFunction: ProbFun<Song>
@@ -26,11 +30,11 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
     fun songs(): List<Song> = probabilityFunction.getKeys()
 
     fun getMaxPercent(): Double {
-        return probabilityFunction.maxPercent
+        return probabilityFunction.maxPercent()
     }
 
-    fun setMaxPercent(maxPercent : Double){
-        probabilityFunction.maxPercent = maxPercent
+    fun setMaxPercent(maxPercent: Double) {
+        probabilityFunction.setMaxPercent(maxPercent)
     }
 
     fun size(): Int {
@@ -73,17 +77,21 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
     }
 
     fun swapTwoSongPositions(oldPosition: Int, newPosition: Int) {
-        probabilityFunction.swapTwoPositions(oldPosition, newPosition)
+        if(!comparable) {
+            (probabilityFunction as ProbFun.ProbFunLinkedMap<Song>).swapTwoPositions(oldPosition, newPosition)
+        }
     }
 
     fun switchOneSongsPosition(oldPosition: Int, newPosition: Int) {
-        probabilityFunction.switchOnesPosition(oldPosition, newPosition)
+        if(!comparable) {
+            (probabilityFunction as ProbFun.ProbFunLinkedMap<Song>).switchOnesPosition(oldPosition, newPosition)
+        }
     }
 
     private val playlistArray: MutableList<Long> = ArrayList()
 
     fun songIds(): List<Long> {
-        if(comparable) {
+        if (comparable) {
             playlistArray.sort()
         }
         return playlistArray
@@ -96,7 +104,7 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
     @Transient
     private var playlistIterator: MutableListIterator<Long>
 
-    fun goToFront(){
+    fun goToFront() {
         playlistIterator = playlistArray.listIterator()
     }
 
@@ -168,14 +176,14 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
         }
     }
 
-    fun updateSongs(newSongs: List<Song>){
-        for(s in newSongs){
-            if(!contains(s)){
+    fun updateSongs(newSongs: List<Song>) {
+        for (s in newSongs) {
+            if (!contains(s)) {
                 add(s)
             }
         }
-        for(s in songs()){
-            if(!newSongs.contains(s)){
+        for (s in songs()) {
+            if (!newSongs.contains(s)) {
                 remove(s)
             }
         }
@@ -203,14 +211,14 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
     }
 
     override fun equals(other: Any?): Boolean {
-        if(other is RandomPlaylist) {
+        if (other is RandomPlaylist) {
             for (song in songs()) {
-                if (!other.contains(song)){
+                if (!other.contains(song)) {
                     return false
                 }
             }
-            for(song in other.songs()){
-                if(!contains(song)){
+            for (song in other.songs()) {
+                if (!contains(song)) {
                     return false
                 }
             }
@@ -220,9 +228,9 @@ class RandomPlaylist(val name: String, music: List<Song>, maxPercent: Double,
     }
 
     override fun hashCode(): Int {
-        var result = name.hashCode()
+        var result = songs().hashCode()
+        result = 31 * result + getMaxPercent().hashCode()
         result = 31 * result + comparable.hashCode()
-        result = 31 * result + playlistArray.hashCode()
         return result
     }
 

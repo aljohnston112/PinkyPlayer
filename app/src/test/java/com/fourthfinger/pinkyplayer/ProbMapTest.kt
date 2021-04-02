@@ -1,7 +1,6 @@
 package com.fourthfinger.pinkyplayer
 
 import com.fourthfinger.pinkyplayer.songs.ProbMap
-import junit.framework.TestCase
 import org.junit.Test
 import kotlin.math.roundToInt
 import kotlin.random.Random
@@ -28,6 +27,7 @@ class ProbMapTest {
         assert(map[true]!! >= ((rolls/2)* TOLERANCE).roundToInt())
     }
 
+    @Test
     fun testGood() {
         val prob = 0.5
         val percent = 0.5
@@ -40,6 +40,7 @@ class ProbMapTest {
         assert(probMap.getProb(0) == 1.0)
     }
 
+    @Test
     fun testBad() {
         val prob = 0.5
         val percent = 0.5
@@ -50,10 +51,12 @@ class ProbMapTest {
         assert(probMap.getProb(0) == newProb)
     }
 
+    @Test
     fun testResetProbabilities() {
         val probMap = ProbMap<Int>()
         probMap.put(0, 0.5)
         probMap.resetProbabilities()
         assert(probMap.getProb(0) == 1.0)
     }
+
 }

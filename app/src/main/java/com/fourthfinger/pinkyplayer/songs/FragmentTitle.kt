@@ -29,7 +29,6 @@ class FragmentTitle : Fragment() {
     private lateinit var requestPermissionLauncher : ActivityResultLauncher<String>
 
     private var loaded = false
-
     private var loading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,8 +43,10 @@ class FragmentTitle : Fragment() {
     }
 
     // container: ViewGroup? means container may be null
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater,
+                              container: ViewGroup?,
+                              savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentTitleBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -95,7 +96,8 @@ class FragmentTitle : Fragment() {
         binding.buttonSettings.setOnClickListener {
             if (checkPermissions()) {
                 safeNav(
-                        this, R.id.fragmentTitle,
+                        this,
+                        R.id.fragmentTitle,
                         FragmentTitleDirections.actionFragmentTitleToFragmentSettings()
                 )
             }
@@ -103,7 +105,8 @@ class FragmentTitle : Fragment() {
         binding.buttonSongs.setOnClickListener {
             if (checkPermissions()) {
                 safeNav(
-                        this, R.id.fragmentTitle,
+                        this,
+                        R.id.fragmentTitle,
                         FragmentTitleDirections.actionFragmentTitleToFragmentSongs()
                 )
             }

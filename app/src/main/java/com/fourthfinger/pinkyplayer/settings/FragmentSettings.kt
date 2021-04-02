@@ -23,7 +23,7 @@ class FragmentSettings : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private val viewModel: SettingsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
+    private val viewModelSettings: SettingsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -37,10 +37,27 @@ class FragmentSettings : Fragment() {
         setUpFab()
     }
 
+    private fun observeSettings() {
+        viewModelSettings.settings.observe(viewLifecycleOwner, { newSettings ->
+            binding.editTextNSongs.setText(
+                    (1.0 / newSettings.maxPercent).roundToInt().toString()
+            )
+            binding.editTextPercentChangeUp.setText(
+                    (newSettings.percentChangeUp*100.0).roundToInt().toString()
+            )
+            binding.editTextPercentChangeDown.setText(
+                    (newSettings.percentChangeDown*100.0).roundToInt().toString()
+            )
+        })
+    }
+
     private fun setUpFab() {
         binding.fabFragmentSettings.setText(R.string.save)
         binding.fabFragmentSettings.icon = ResourcesCompat.getDrawable(
-                resources, R.drawable.ic_check_black_24dp, context?.theme)
+                resources,
+                R.drawable.ic_check_black_24dp,
+                requireContext().theme
+        )
         setFabOnClickListener()
     }
 
@@ -58,13 +75,14 @@ class FragmentSettings : Fragment() {
             if (percentChangeDown == -1) {
                 return@setOnClickListener
             }
-            viewModel.settings.value?.let { it1 ->
+            viewModelSettings.settings.value?.let { it1 ->
                 Settings(
                         1.0/nSongs,
                         percentChangeUp/100.0,
                         percentChangeDown/100.0,
-                        it1.lowerProb)
-            }?.let { it2 -> viewModel.save(it2)
+                        it1.lowerProb
+                )
+            }?.let { it2 -> viewModelSettings.save(it2)
                 findNavController().popBackStack()
             }
         }
@@ -79,7 +97,7 @@ class FragmentSettings : Fragment() {
             e.printStackTrace()
         }
         if (nSongs < 1) {
-            context?.let { showToast(it, R.string.max_percent_error) }
+            showToast(requireContext(), R.string.max_percent_error)
             nSongs = -1
         }
         return nSongs
@@ -94,7 +112,7 @@ class FragmentSettings : Fragment() {
             e.printStackTrace()
         }
         if (percentChangeUp < 1 || percentChangeUp > 100) {
-            context?.let { showToast(it, R.string.percent_change_error) }
+            showToast(requireContext(), R.string.percent_change_error)
             percentChangeUp = -1
         }
         return percentChangeUp
@@ -109,18 +127,10 @@ class FragmentSettings : Fragment() {
             e.printStackTrace()
         }
         if (percentChangeDown < 1 || percentChangeDown > 100) {
-            context?.let { showToast(it, R.string.percent_change_error) }
+            showToast(requireContext(), R.string.percent_change_error)
             percentChangeDown = -1
         }
         return percentChangeDown
-    }
-
-    private fun observeSettings() {
-        viewModel.settings.observe(viewLifecycleOwner, { newSettings ->
-            binding.editTextNSongs.setText((1.0 / newSettings.maxPercent).roundToInt().toString())
-            binding.editTextPercentChangeUp.setText((newSettings.percentChangeUp*100.0).roundToInt().toString())
-            binding.editTextPercentChangeDown.setText((newSettings.percentChangeDown*100.0).roundToInt().toString())
-        })
     }
 
     override fun onDestroyView() {

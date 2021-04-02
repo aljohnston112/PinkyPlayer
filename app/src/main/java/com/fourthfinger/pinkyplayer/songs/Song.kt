@@ -11,6 +11,7 @@ data class Song constructor(
         @PrimaryKey val id: Long,
         @ColumnInfo(name = "title") val title: String,
 ) : Serializable, Comparable<Song> {
+
     @Ignore var selected: Boolean = false
 
     override fun compareTo(other: Song): Int {
@@ -22,7 +23,7 @@ data class Song constructor(
     }
 
     override fun hashCode(): Int {
-        return id.hashCode()
+        return title.hashCode()
     }
 
 }

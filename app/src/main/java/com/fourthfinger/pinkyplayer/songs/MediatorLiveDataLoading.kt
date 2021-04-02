@@ -10,7 +10,9 @@ class MediatorLiveDataLoading {
     private var playlistsLoadedValue: Boolean? = null
 
     fun isLoaded(
-            songsLoaded: LiveData<Boolean>, settingsLoaded: LiveData<Boolean>, playlistsLoaded: LiveData<Boolean>
+            songsLoaded: LiveData<Boolean>,
+            settingsLoaded: LiveData<Boolean>,
+            playlistsLoaded: LiveData<Boolean>
     ): LiveData<Boolean> = MediatorLiveData<Boolean>().also { mediator ->
         this.songsLoadedValue = songsLoaded.value
         this.settingsLoadedValue = settingsLoaded.value

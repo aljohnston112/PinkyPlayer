@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.fourthfinger.pinkyplayer.NavUtil
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.databinding.RecyclerViewSongListBinding
+import com.fourthfinger.pinkyplayer.playlists.DialogFragmentAddToPlaylist.Companion.BUNDLE_KEY_ADD_TO_PLAYLIST_SONG
 import com.fourthfinger.pinkyplayer.songs.Song
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -70,11 +71,15 @@ class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {
         )
     }
 
-    override fun onMenuItemClickAddToPlaylist(song: Song): Boolean {
-        TODO("Not yet implemented")
+    override fun onMenuItemClickAddToPlaylist(song: Song) {
+        val f = DialogFragmentAddToPlaylist()
+        val bundle = Bundle()
+        bundle.putSerializable(BUNDLE_KEY_ADD_TO_PLAYLIST_SONG, song)
+        f.arguments = bundle
+        f.show(requireActivity().supportFragmentManager, "DialogFragmentAddToPlaylist")
     }
 
-    override fun onMenuItemClickAddToQueue(song: Song): Boolean {
+    override fun onMenuItemClickAddToQueue(song: Song) {
         TODO("Not yet implemented")
     }
 

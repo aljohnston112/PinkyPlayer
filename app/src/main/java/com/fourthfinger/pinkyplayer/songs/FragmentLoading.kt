@@ -23,13 +23,13 @@ class FragmentLoading : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModelSongs: SongsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
-
     private val viewModelSettings: SettingsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
-
     private val viewModelPlaylists: PlaylistsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater,
+                              container: ViewGroup?,
+                              savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentLoadingBinding.inflate(layoutInflater)
         return binding.root
     }

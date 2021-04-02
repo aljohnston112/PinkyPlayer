@@ -24,9 +24,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-private const val MASTER_PLAYLIST_FILE = "MASTER_PLAYLIST_NAME"
-private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
-
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 @HiltAndroidTest
@@ -34,6 +31,7 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
 
     private val context = ApplicationProvider.getApplicationContext<Context>()
     private lateinit var navController: NavController
+    private val playlistRepo = PlaylistRepo()
 
     @Before
     override fun setUpActivity() {
@@ -48,7 +46,7 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
     fun verifyLayout() {
         lateinit var randomPlaylist: RandomPlaylist
         runBlocking {
-            randomPlaylist = FileUtil.load(context, MASTER_PLAYLIST_FILE, SAVE_FILE_VERIFICATION_NUMBER)!!
+            randomPlaylist = playlistRepo.loadMasterPlaylist(context)!!
         }
         onView(withId(R.id.recycler_view_song_list)).check(matches(isCompletelyDisplayed()))
         for (song in randomPlaylist.songs().withIndex()) {
@@ -73,7 +71,7 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
     fun verifyClickViewHolder() {
         lateinit var randomPlaylist: RandomPlaylist
         runBlocking {
-            randomPlaylist = FileUtil.load(context, MASTER_PLAYLIST_FILE, SAVE_FILE_VERIFICATION_NUMBER)!!
+            randomPlaylist = playlistRepo.loadMasterPlaylist(context)!!
         }
         onView(withId(R.id.recycler_view_song_list)).check(
                 matches(EspressoTestMatcher.withSongs(randomPlaylist.songs()))

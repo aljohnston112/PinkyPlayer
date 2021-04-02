@@ -9,15 +9,13 @@ import com.fourthfinger.pinkyplayer.settings.SettingsRepo
 import com.fourthfinger.pinkyplayer.songs.LoadingCallback
 import com.fourthfinger.pinkyplayer.songs.Song
 import com.fourthfinger.pinkyplayer.songs.SongRepo
+import com.fourthfinger.pinkyplayer.MIN_VALUE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
-
-private const val MASTER_PLAYLIST_FILE_NAME = "MASTER_PLAYLIST_NAME"
-private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
 
 @HiltViewModel
 class PlaylistsViewModel @Inject constructor(
@@ -38,6 +36,14 @@ class PlaylistsViewModel @Inject constructor(
 
     val masterPlaylist = masterPlaylistMLD as LiveData<RandomPlaylist>
 
+    private lateinit var _playlists: List<RandomPlaylist>
+
+    private val playlistsMLD: MutableLiveData<List<RandomPlaylist>> by lazy {
+        MutableLiveData<List<RandomPlaylist>>()
+    }
+
+    val playlists = playlistsMLD as LiveData<List<RandomPlaylist>>
+
     fun loadPlaylists(loadingCallback: LoadingCallback) {
         viewModelScope.launch(Dispatchers.IO) {
             FileUtil.mutex.withLock {
@@ -45,9 +51,8 @@ class PlaylistsViewModel @Inject constructor(
                 loadingCallback.setLoadingText(
                         getApplication<Application>().applicationContext.getString(R.string.loadingPlaylists))
                 runBlocking {
-                    masterPlaylistMLD.postValue(playlistRepo.loadPlaylist(
-                            getApplication(), MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
-                    ))
+                    masterPlaylistMLD.postValue(playlistRepo.loadMasterPlaylist(getApplication()))
+                    playlistsMLD.postValue(playlistRepo.loadPlaylists(getApplication()))
                 }
                 loadingCallback.setLoadingProgress(1.0)
                 loadingCallback.setPlaylistsLoaded(true)
@@ -55,34 +60,29 @@ class PlaylistsViewModel @Inject constructor(
         }
     }
 
-    private val lock = Any()
-
-    private val songObserver: Observer<List<Song>> = Observer<List<Song>> {
+    private val songObserver: Observer<List<Song>> = Observer {
         viewModelScope.launch(Dispatchers.IO) {
             if (it.isNotEmpty()) {
-                synchronized(lock) {
+                FileUtil.mutex.withLock {
                     if (maxPercent == -1.0) {
                         maxPercent = (1.0 - ((it.size) * MIN_VALUE))
                     }
                     if (!this@PlaylistsViewModel::_masterPlaylist.isInitialized) {
                         val comparable = true
-                        _masterPlaylist = RandomPlaylist(MASTER_PLAYLIST_FILE_NAME, it, maxPercent, comparable)
+                        _masterPlaylist = RandomPlaylist(MASTER_PLAYLIST_NAME, it, maxPercent, comparable)
                     } else {
                         _masterPlaylist.updateSongs(it)
                     }
                     masterPlaylistMLD.postValue(_masterPlaylist)
-                    playlistRepo.savePlaylist(
-                            _masterPlaylist, getApplication(),
-                            MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
-                    )
+                    playlistRepo.saveMasterPlaylist(_masterPlaylist, getApplication())
                 }
             }
         }
     }
 
-    private val settingsObserver: Observer<Settings> = Observer<Settings> {
+    private val settingsObserver: Observer<Settings> = Observer {
         viewModelScope.launch(Dispatchers.IO) {
-            synchronized(lock) {
+            FileUtil.mutex.withLock {
                 maxPercent = it.maxPercent
                 if (this@PlaylistsViewModel::_masterPlaylist.isInitialized) {
                     if (maxPercent == 1.0) {
@@ -90,13 +90,17 @@ class PlaylistsViewModel @Inject constructor(
                     }
                     this@PlaylistsViewModel._masterPlaylist.setMaxPercent(maxPercent)
                     masterPlaylistMLD.postValue(_masterPlaylist)
-                    synchronized(lock) {
-                        playlistRepo.savePlaylist(
-                                _masterPlaylist, getApplication(),
-                                MASTER_PLAYLIST_FILE_NAME, SAVE_FILE_VERIFICATION_NUMBER
-                        )
-                    }
+                    playlistRepo.saveMasterPlaylist(_masterPlaylist, getApplication())
                 }
+            }
+        }
+    }
+
+    private val playlistsObserver: Observer<List<RandomPlaylist>> = Observer {
+        viewModelScope.launch(Dispatchers.IO) {
+            FileUtil.mutex.withLock {
+                _playlists = it
+                playlistsMLD.postValue(_playlists)
             }
         }
     }
@@ -104,12 +108,18 @@ class PlaylistsViewModel @Inject constructor(
     init {
         songRepo.songs.observeForever(songObserver)
         settingsRepo.settings.observeForever(settingsObserver)
+        playlistRepo.playlists.observeForever(playlistsObserver)
     }
 
     override fun onCleared() {
         super.onCleared()
         songRepo.songs.removeObserver(songObserver)
         settingsRepo.settings.removeObserver(settingsObserver)
+        playlistRepo.playlists.removeObserver(playlistsObserver)
+    }
+
+    companion object {
+        const val MASTER_PLAYLIST_NAME = "MASTER_PLAYLIST_NAME"
     }
 
 }

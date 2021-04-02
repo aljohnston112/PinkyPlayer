@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.fourthfinger.pinkyplayer.FileUtil
-import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,7 +21,7 @@ class SettingsRepo @Inject constructor() {
 
     val settings = _settings as LiveData<Settings>
 
-    suspend fun load(
+    fun load(
             context: Context,
             fileName: String,
             saveFileVerificationNumber: Long,

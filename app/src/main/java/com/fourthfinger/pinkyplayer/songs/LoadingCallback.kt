@@ -60,9 +60,7 @@ class LoadingCallback private constructor() {
 
     companion object {
         private val loadingCallback = LoadingCallback()
-
         fun getInstance() = loadingCallback
-
     }
 
 }

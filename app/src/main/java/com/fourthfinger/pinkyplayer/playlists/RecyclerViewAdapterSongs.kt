@@ -10,8 +10,8 @@ import com.fourthfinger.pinkyplayer.songs.Song
 
 interface ListenerCallbackSongs {
     fun onClickViewHolder(song: Song)
-    fun onMenuItemClickAddToPlaylist(song: Song): Boolean
-    fun onMenuItemClickAddToQueue(song: Song): Boolean
+    fun onMenuItemClickAddToPlaylist(song: Song)
+    fun onMenuItemClickAddToQueue(song: Song)
 }
 
 class RecyclerViewAdapterSongs(
@@ -27,8 +27,11 @@ class RecyclerViewAdapterSongs(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_song, parent, false))
+        return ViewHolder(LayoutInflater.from(parent.context).inflate(
+                R.layout.item_song,
+                parent,
+                false)
+        )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -40,7 +43,7 @@ class RecyclerViewAdapterSongs(
 
         holder.songView.setOnClickListener {
             if (position != RecyclerView.NO_POSITION) {
-                listenerCallbackSongs.onClickViewHolder(holder.song!!)
+                listenerCallbackSongs.onClickViewHolder(songs[position])
             }
         }
 
@@ -49,10 +52,12 @@ class RecyclerViewAdapterSongs(
             val menuItemAddToPlaylist: MenuItem = menu.add(R.string.add_to_playlist)
             menuItemAddToPlaylist.setOnMenuItemClickListener {
                 listenerCallbackSongs.onMenuItemClickAddToPlaylist(holder.song!!)
+                true
             }
             val menuItemAddToQueue: MenuItem = menu.add(R.string.add_to_queue)
             menuItemAddToQueue.setOnMenuItemClickListener {
                 listenerCallbackSongs.onMenuItemClickAddToQueue(holder.song!!)
+                true
             }
         }
     }
@@ -75,7 +80,9 @@ class RecyclerViewAdapterSongs(
         var song: Song? = null
 
         override fun toString(): String {
-            return song!!.title
+            return song?.title?:throw IllegalStateException(
+                    "song in RecyclerViewAdapterSongs.ViewHolder must be non null"
+            )
         }
 
     }

@@ -21,6 +21,9 @@
     <string name="song_menu">Song menu</string>
     <string name="add_to_playlist">Add to playlist</string>
     <string name="add_to_queue">Add to queue</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="new_playlist">New Playlist</string>
 
     <!-- FragmentSong -->
     <string name="song_art">This is the song art</string>
