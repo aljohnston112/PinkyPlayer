@@ -13,9 +13,12 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.fourthfinger.pinkyplayer.*
+import com.fourthfinger.pinkyplayer.ActivityMain
+import com.fourthfinger.pinkyplayer.HiltExt
+import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.matchers.EspressoTestMatcher
 import com.fourthfinger.pinkyplayer.songs.FragmentTitleDirections
+import com.fourthfinger.pinkyplayer.songs.Song
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
@@ -49,23 +52,19 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
             randomPlaylist = playlistRepo.loadMasterPlaylist(context)!!
         }
         onView(withId(R.id.recycler_view_song_list)).check(matches(isCompletelyDisplayed()))
+        val rv = onView(withId(R.id.recycler_view_song_list))
         for (song in randomPlaylist.songs().withIndex()) {
-            onView(withId(R.id.recycler_view_song_list)).perform(
-                    RecyclerViewActions.scrollTo<RecyclerView.ViewHolder>(
+            rv.perform(RecyclerViewActions.scrollTo<RecyclerView.ViewHolder>(
                             hasDescendant(withText(song.value.title))
-                    )
-            )
-            val vh = onView(allOf(
+                    ))
+            onView(allOf(
                     hasDescendant(withText(song.value.title)),
                     hasDescendant(withId(R.id.song_handle)),
                     withId(R.id.constraint_layout_song_name),
                     hasDescendant(EspressoTestMatcher.withDrawable(R.drawable.ic_more_vert_white_18dp))
-            ))
-            vh.check(matches(isCompletelyDisplayed()))
+            )).check(matches(isCompletelyDisplayed()))
         }
     }
-
-    // TODO make sure to check the playlist is in order
 
     @Test
     fun verifyClickViewHolder() {
@@ -76,16 +75,17 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
         onView(withId(R.id.recycler_view_song_list)).check(
                 matches(EspressoTestMatcher.withSongs(randomPlaylist.songs()))
         )
+        val rv = onView(withId(R.id.recycler_view_song_list))
+        val songs = randomPlaylist.songs()
+        var s: Song = songs[0]
         for (pos in 0 until randomPlaylist.size()) {
-            onView(withId(R.id.recycler_view_song_list)).perform(
-                    RecyclerViewActions.scrollToPosition<RecyclerViewAdapterSongs.ViewHolder>(pos))
-            onView(withId(R.id.recycler_view_song_list)).check(matches(
-                    EspressoTestMatcher.withSongAtPosition(pos, randomPlaylist.songs()[pos])))
-            onView(withId(R.id.recycler_view_song_list)).perform(
-                    RecyclerViewActions.actionOnItemAtPosition<RecyclerViewAdapterSongs.ViewHolder>(pos, click()))
-            assertThat(navController.currentDestination?.id
-                    ?: assert(false)).isEqualTo(R.id.fragmentSong)
-            onView(withId(R.id.text_view_song_name)).check(matches(withText(randomPlaylist.songs()[pos].title)))
+            assert(songs[pos] >= s)
+            s = songs[pos]
+            rv.perform(RecyclerViewActions.scrollToPosition<RecyclerViewAdapterSongs.ViewHolder>(pos))
+            rv.check(matches(EspressoTestMatcher.withSongAtPosition(pos, songs[pos])))
+            rv.perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerViewAdapterSongs.ViewHolder>(pos, click()))
+            assertThat(navController.currentDestination?.id ?: assert(false)).isEqualTo(R.id.fragmentSong)
+            onView(withId(R.id.text_view_song_name)).check(matches(withText(songs[pos].title)))
             InstrumentationRegistry.getInstrumentation().runOnMainSync {
                 navController.popBackStack()
             }

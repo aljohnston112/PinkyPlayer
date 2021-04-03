@@ -14,19 +14,16 @@ class RecyclerViewAdapterSongsMatcher(private val songs: List<Song>): BaseMatche
             description?.appendText(songs.toString())
         }
 
-        override fun matches(item: Any?): Boolean {
-            if (item is RecyclerView) {
-                if (item.adapter is RecyclerViewAdapterSongs) {
+        override fun matches(item: Any): Boolean {
+            if (item is RecyclerView && item.adapter is RecyclerViewAdapterSongs) {
                     val recyclerViewAdapterSongs: RecyclerViewAdapterSongs = item.adapter as RecyclerViewAdapterSongs
                     var same = true
                     for ((i, song) in recyclerViewAdapterSongs.songs.listIterator().withIndex()) {
                         if (this.songs[i] != (song)) {
                             same = false
-                            throw IllegalStateException("$i")
                         }
                     }
                     return same && recyclerViewAdapterSongs.songs.size == this.songs.size
-                }
             }
             return false
         }

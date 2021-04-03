@@ -9,7 +9,6 @@ import com.fourthfinger.pinkyplayer.settings.SettingsRepo
 import com.fourthfinger.pinkyplayer.songs.LoadingCallback
 import com.fourthfinger.pinkyplayer.songs.Song
 import com.fourthfinger.pinkyplayer.songs.SongRepo
-import com.fourthfinger.pinkyplayer.MIN_VALUE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,22 +25,18 @@ class PlaylistsViewModel @Inject constructor(
         private val playlistRepo: PlaylistRepo,
 ) : AndroidViewModel(application) {
 
-    private var maxPercent: Double = -1.0
+    private var maxPercent: Double = 1.0
 
     private lateinit var _masterPlaylist: RandomPlaylist
-
     private val masterPlaylistMLD: MutableLiveData<RandomPlaylist> by lazy {
         MutableLiveData<RandomPlaylist>()
     }
-
     val masterPlaylist = masterPlaylistMLD as LiveData<RandomPlaylist>
 
-    private lateinit var _playlists: List<RandomPlaylist>
-
+    private lateinit var _playlists: MutableList<RandomPlaylist>
     private val playlistsMLD: MutableLiveData<List<RandomPlaylist>> by lazy {
         MutableLiveData<List<RandomPlaylist>>()
     }
-
     val playlists = playlistsMLD as LiveData<List<RandomPlaylist>>
 
     fun loadPlaylists(loadingCallback: LoadingCallback) {
@@ -52,10 +47,37 @@ class PlaylistsViewModel @Inject constructor(
                         getApplication<Application>().applicationContext.getString(R.string.loadingPlaylists))
                 runBlocking {
                     masterPlaylistMLD.postValue(playlistRepo.loadMasterPlaylist(getApplication()))
-                    playlistsMLD.postValue(playlistRepo.loadPlaylists(getApplication()))
+                    val ps = playlistRepo.loadPlaylists(getApplication())
+                    _playlists = mutableListOf()
+                    if (ps != null) {
+                        for(p in ps){
+                            _playlists.add(p)
+                        }
+                    }
+                    playlistsMLD.postValue(_playlists)
                 }
                 loadingCallback.setLoadingProgress(1.0)
                 loadingCallback.setPlaylistsLoaded(true)
+            }
+        }
+    }
+
+    fun savePlaylist(randomPlaylist: RandomPlaylist) {
+        _playlists.add(randomPlaylist)
+        viewModelScope.launch(Dispatchers.IO) {
+            FileUtil.mutex.withLock {
+                playlistsMLD.postValue(_playlists)
+                playlistRepo.savePlaylists(_playlists, getApplication())
+            }
+        }
+    }
+
+    fun deletePlaylist(randomPlaylist: RandomPlaylist){
+        _playlists.remove(randomPlaylist)
+        viewModelScope.launch(Dispatchers.IO) {
+            FileUtil.mutex.withLock {
+                playlistsMLD.postValue(_playlists)
+                playlistRepo.savePlaylists(_playlists, getApplication())
             }
         }
     }
@@ -64,9 +86,6 @@ class PlaylistsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (it.isNotEmpty()) {
                 FileUtil.mutex.withLock {
-                    if (maxPercent == -1.0) {
-                        maxPercent = (1.0 - ((it.size) * MIN_VALUE))
-                    }
                     if (!this@PlaylistsViewModel::_masterPlaylist.isInitialized) {
                         val comparable = true
                         _masterPlaylist = RandomPlaylist(MASTER_PLAYLIST_NAME, it, maxPercent, comparable)
@@ -85,10 +104,10 @@ class PlaylistsViewModel @Inject constructor(
             FileUtil.mutex.withLock {
                 maxPercent = it.maxPercent
                 if (this@PlaylistsViewModel::_masterPlaylist.isInitialized) {
-                    if (maxPercent == 1.0) {
-                        maxPercent = (1.0 - (_masterPlaylist.size() * MIN_VALUE))
-                    }
                     this@PlaylistsViewModel._masterPlaylist.setMaxPercent(maxPercent)
+                    for(rp in _playlists){
+                        rp.setMaxPercent(maxPercent)
+                    }
                     masterPlaylistMLD.postValue(_masterPlaylist)
                     playlistRepo.saveMasterPlaylist(_masterPlaylist, getApplication())
                 }
@@ -96,26 +115,15 @@ class PlaylistsViewModel @Inject constructor(
         }
     }
 
-    private val playlistsObserver: Observer<List<RandomPlaylist>> = Observer {
-        viewModelScope.launch(Dispatchers.IO) {
-            FileUtil.mutex.withLock {
-                _playlists = it
-                playlistsMLD.postValue(_playlists)
-            }
-        }
-    }
-
     init {
         songRepo.songs.observeForever(songObserver)
         settingsRepo.settings.observeForever(settingsObserver)
-        playlistRepo.playlists.observeForever(playlistsObserver)
     }
 
     override fun onCleared() {
         super.onCleared()
         songRepo.songs.removeObserver(songObserver)
         settingsRepo.settings.removeObserver(settingsObserver)
-        playlistRepo.playlists.removeObserver(playlistsObserver)
     }
 
     companion object {

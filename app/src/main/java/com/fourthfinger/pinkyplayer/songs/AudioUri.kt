@@ -18,15 +18,14 @@ class AudioUri(
 
     private val nestProbMap: NestedProbMap = NestedProbMap()
 
-    @delegate:Transient
-    val uri: Uri by lazy{ getUri(id) }
+    fun uri(): Uri = getUri(id)
 
     private var duration: Long = -1L
 
     fun getDuration(context: Context): Long {
         if(duration == -1L) {
             val mediaMetadataRetriever = MediaMetadataRetriever()
-            mediaMetadataRetriever.setDataSource(context, uri)
+            mediaMetadataRetriever.setDataSource(context, uri())
             var time = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
             mediaMetadataRetriever.release()
             if (time == null) {
@@ -54,15 +53,15 @@ class AudioUri(
     }
 
     override operator fun compareTo(other: AudioUri): Int {
-        return uri.compareTo(other.uri)
+        return uri().compareTo(other.uri())
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is AudioUri && uri == other.uri
+        return other is AudioUri && uri() == other.uri()
     }
 
     override fun hashCode(): Int {
-        return uri.hashCode()
+        return uri().hashCode()
     }
 
     companion object {
@@ -105,7 +104,8 @@ class AudioUri(
                         fileInputStream -> ObjectInputStream(fileInputStream).use {
                         objectInputStream ->
                         return objectInputStream.readObject() as AudioUri
-                    } }
+                    }
+                    }
                 }catch (e: InvalidClassException){
                     e.printStackTrace()
                 }

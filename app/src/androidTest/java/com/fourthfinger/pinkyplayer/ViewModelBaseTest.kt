@@ -19,9 +19,11 @@ open class ViewModelBaseTest(val fragment : DummyViewModelFragmentBase) {
                 )
         )
         ActivityScenario.launch<ActivityMain>(startActivityIntent).onActivity { activity ->
-            val navHostFragment = activity.supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+            val navHostFragment = activity.supportFragmentManager.findFragmentById(
+                    R.id.nav_host_fragment
+            ) as NavHostFragment
             val fragmentTransaction: FragmentTransaction = navHostFragment.childFragmentManager.beginTransaction()
-            fragmentTransaction.add(fragment, "")
+            fragmentTransaction.replace(R.id.nav_host_fragment, fragment)
             fragmentTransaction.commitNow()
         }
         fragment.fragmentLoaded.await()

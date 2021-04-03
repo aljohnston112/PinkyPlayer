@@ -40,12 +40,15 @@ class PlaylistsViewModelTest : ViewModelBaseTest(DummyPlaylistsViewModelFragment
         val viewLifecycleOwner = fragment.viewLifecycleOwner
         val countDownLatch = CountDownLatch(1)
         val countDownLatch2 = CountDownLatch(1)
+        val countDownLatch3 = CountDownLatch(1)
+        val countDownLatch4 = CountDownLatch(1)
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            val rp1 = RandomPlaylist("a", listOf(Song(0, "a")), 1.0, true)
             viewModelPlaylists.masterPlaylist.observe(viewLifecycleOwner) { rp ->
                 if (rp != null) {
                     val rpSongs = rp.songs()
-                    val rpld: LiveData<List<Song>> = songDao.getAll()
-                    rpld.observe(viewLifecycleOwner) { dbSongs ->
+                    val allSongs: LiveData<List<Song>> = songDao.getAll()
+                    allSongs.observe(viewLifecycleOwner) { dbSongs ->
                         if (dbSongs.isNotEmpty()) {
                             for (song in rpSongs) {
                                 assert(dbSongs.contains(song))
@@ -53,12 +56,14 @@ class PlaylistsViewModelTest : ViewModelBaseTest(DummyPlaylistsViewModelFragment
                             for (song in dbSongs) {
                                 assert(rpSongs.contains(song))
                             }
+                            viewModelPlaylists.savePlaylist(rp1)
+                            viewModelPlaylists.deletePlaylist(rp1)
                             countDownLatch.countDown()
                         }
                     }
                 }
                 viewModelSettings.settings.observe(viewLifecycleOwner) {
-                    if(it != null) {
+                    if (it != null) {
                         assert(rp.getMaxPercent() == it.maxPercent)
                         countDownLatch2.countDown()
                     }
@@ -66,6 +71,17 @@ class PlaylistsViewModelTest : ViewModelBaseTest(DummyPlaylistsViewModelFragment
                 viewModelSettings.loadSettings(LoadingCallback.getInstance())
             }
             viewModelPlaylists.loadPlaylists(LoadingCallback.getInstance())
+            viewModelPlaylists.playlists.observe(viewLifecycleOwner){
+                if(it != null && it.isNotEmpty()){
+                    if(countDownLatch3.count == 1L){
+                        assert(it.contains(rp1))
+                        countDownLatch3.countDown()
+                    } else {
+                        assert(!it.contains(rp1))
+                        countDownLatch4.countDown()
+                    }
+                }
+            }
         }
         countDownLatch.await()
         countDownLatch2.await()

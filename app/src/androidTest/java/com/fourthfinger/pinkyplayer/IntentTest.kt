@@ -25,7 +25,7 @@ class IntentTest : ActivityMainBaseTest() {
 
     @Test
     fun verifyMessageSentToActivity(){
-        // TODO test notification intent
+        // TODO test intent
     }
 
 }

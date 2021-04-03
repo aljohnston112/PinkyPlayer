@@ -18,7 +18,7 @@ class BitmapUtil {
     companion object {
 
         fun getSongBitmap(context: Context, audioUri: AudioUri?, songArtDimen: Int): Bitmap? {
-            var bitmap = audioUri?.uri?.let { getThumbnail(it, songArtDimen, songArtDimen, context) }
+            var bitmap = audioUri?.uri()?.let { getThumbnail(it, songArtDimen, songArtDimen, context) }
             if (bitmap == null) {
                 val drawable = ResourcesCompat.getDrawable(
                         context.resources,

@@ -54,11 +54,11 @@ class MediatorLiveDataBitmapTest : ActivityMainBaseTest() {
 
         val bmp1 = Bitmap.createBitmap(w, h, conf)
         val canvas1 = Canvas(bmp1)
-        canvas.drawLine(1f, 1f, 5f, 5f, paint)
+        canvas1.drawLine(1f, 1f, 5f, 5f, paint)
 
         val bmp2 = Bitmap.createBitmap(w, h, conf)
         val canvas2 = Canvas(bmp2)
-        canvas.drawLine(2f, 2f, 5f, 5f, paint)
+        canvas2.drawLine(2f, 2f, 5f, 5f, paint)
 
         ldb1.postValue(bmp)
         checkBitmap(lifecycleScope, activity, mediatorLiveDataBitmap, bmp)

@@ -37,9 +37,12 @@ class FragmentLoading : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val loadingCallback = LoadingCallback.getInstance()
+        // This order is important!------------------------------
         viewModelPlaylists.loadPlaylists(loadingCallback)
+        // Playlists are injected with the settings and the songs
         viewModelSettings.loadSettings(loadingCallback)
         viewModelSongs.loadSongs(loadingCallback)
+        // ------------------------------------------------------
         observeLoadingProgress(loadingCallback)
     }
 

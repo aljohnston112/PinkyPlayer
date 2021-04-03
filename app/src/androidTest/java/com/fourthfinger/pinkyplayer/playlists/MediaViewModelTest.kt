@@ -1,5 +1,6 @@
 package com.fourthfinger.pinkyplayer.playlists
 
+import android.graphics.Bitmap
 import androidx.lifecycle.lifecycleScope
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -55,6 +56,10 @@ class MediaViewModelTest : ViewModelBaseTest(DummyMediaViewModelFragment()) {
         LiveDataTestUtil.checkLiveDataUpdate(lifecycleScope, viewLifecycleOwner, mediaViewModel.shuffling, true)
         mediaViewModel.setShuffling(false)
         LiveDataTestUtil.checkLiveDataUpdate(lifecycleScope, viewLifecycleOwner, mediaViewModel.shuffling, false)
+
+        val bitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888)
+        mediaViewModel.setCurrentSongBitmap(bitmap)
+        LiveDataTestUtil.checkLiveDataUpdate(lifecycleScope, viewLifecycleOwner, mediaViewModel.currentSongBitmap, bitmap)
 
         mediaViewModel.setCurrentSongTime("123")
         LiveDataTestUtil.checkLiveDataUpdate(lifecycleScope, viewLifecycleOwner, mediaViewModel.currentSongTime, "123")

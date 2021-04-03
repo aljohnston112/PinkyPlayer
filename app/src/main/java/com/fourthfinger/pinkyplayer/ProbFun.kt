@@ -53,7 +53,7 @@ sealed class ProbFun<T>(
     private var _maxPercent = -1.0
     fun maxPercent() = _maxPercent
     fun setMaxPercent(maxPercent: Double) {
-        require((maxPercent > (0.0) && maxPercent < 1.0)) {
+        require((maxPercent > (0.0) && maxPercent <= 1.0)) {
             "maxPercent passed into the ProbFunTree constructor must be above 0 and under 1.0" +
                     "value was $maxPercent"
         }

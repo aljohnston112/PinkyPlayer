@@ -31,7 +31,6 @@ class RandomPlaylistTest {
         AudioUri.deleteAudioUri(context, song2.id)
     }
 
-
     @Test
     fun testConstructors(){
         val music = listOf(song, song1, song2)
@@ -67,7 +66,7 @@ class RandomPlaylistTest {
         assert(rp.contains(music[0]))
         songs = rp.songs()
         assert(rp.getMaxPercent() == maxPercent)
-        val testSetPercent = 0.3
+        val testSetPercent = 0.4
         rp.setMaxPercent(testSetPercent)
         assert(rp.getMaxPercent() == testSetPercent)
         rp.setMaxPercent(maxPercent)

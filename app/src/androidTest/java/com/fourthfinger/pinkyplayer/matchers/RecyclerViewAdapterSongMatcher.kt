@@ -14,12 +14,10 @@ class RecyclerViewAdapterSongMatcher(private val pos: Int, private val song: Son
         description?.appendText(song.toString())
     }
 
-    override fun matches(item: Any?): Boolean {
-        if (item != null && item is RecyclerView) {
-            if(item.adapter is RecyclerViewAdapterSongs) {
+    override fun matches(item: Any): Boolean {
+        if (item is RecyclerView && item.adapter is RecyclerViewAdapterSongs) {
                 val vh = item.findViewHolderForAdapterPosition(pos) as RecyclerViewAdapterSongs.ViewHolder
                 return vh.song == song
-            }
         }
         return false
     }
