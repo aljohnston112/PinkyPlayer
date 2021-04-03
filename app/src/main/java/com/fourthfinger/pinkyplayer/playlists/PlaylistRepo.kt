@@ -2,10 +2,10 @@ package com.fourthfinger.pinkyplayer.playlists
 
 import android.content.Context
 import com.fourthfinger.pinkyplayer.FileUtil
-import com.fourthfinger.pinkyplayer.playlists.PlaylistsViewModel.Companion.MASTER_PLAYLIST_NAME
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val MASTER_PLAYLIST_NAME = "MASTER_PLAYLIST_NAME"
 private const val PLAYLIST_LIST_FILE_NAME = "PLAYLIST_LIST_FILE_NAME"
 private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
 

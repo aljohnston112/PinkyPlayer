@@ -7,6 +7,8 @@ import com.fourthfinger.pinkyplayer.FileUtil
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val SETTINGS_NAME = "SETTINGS_NAME"
+private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
 private const val MAX_PERCENT = 0.1
 private const val PERCENT_CHANGE_UP = 0.5
 private const val PERCENT_CHANGE_DOWN = 0.9
@@ -23,10 +25,12 @@ class SettingsRepo @Inject constructor() {
 
     fun load(
             context: Context,
-            fileName: String,
-            saveFileVerificationNumber: Long,
     ): Settings {
-            var settings = FileUtil.load<Settings>(context, fileName, saveFileVerificationNumber)
+            var settings = FileUtil.load<Settings>(
+                    context,
+                    SETTINGS_NAME,
+                    SAVE_FILE_VERIFICATION_NUMBER
+            )
             if (settings == null) {
                 settings = Settings(MAX_PERCENT, PERCENT_CHANGE_UP, PERCENT_CHANGE_DOWN, LOWER_PROB)
             }
@@ -37,11 +41,9 @@ class SettingsRepo @Inject constructor() {
     fun save(
             settings: Settings,
             context: Context,
-            fileName: String,
-            saveFileVerificationNumber: Long,
     ){
         this._settings.postValue(settings)
-        FileUtil.save(settings, context, fileName, saveFileVerificationNumber)
+        FileUtil.save(settings, context, SETTINGS_NAME, SAVE_FILE_VERIFICATION_NUMBER)
     }
 
 }

@@ -1,8 +1,9 @@
 package com.fourthfinger.pinkyplayer.settings
 
 import android.app.Application
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.fourthfinger.pinkyplayer.FileUtil
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.songs.LoadingCallback
@@ -12,9 +13,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
-
-private const val FILE_SAVE = "settings"
-private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -32,7 +30,7 @@ class SettingsViewModel @Inject constructor(
                 loadingCallback.setLoadingText(
                         getApplication<Application>().applicationContext.getString(R.string.loadingSettings))
                 runBlocking {
-                    settingsRepo.load(getApplication(), FILE_SAVE, SAVE_FILE_VERIFICATION_NUMBER)
+                    settingsRepo.load(getApplication())
                 }
                 loadingCallback.setLoadingProgress(1.0)
                 loadingCallback.setSettingsLoaded(true)
@@ -45,8 +43,6 @@ class SettingsViewModel @Inject constructor(
             settingsRepo.save(
                     settings,
                     getApplication<Application>().applicationContext,
-                    FILE_SAVE,
-                    SAVE_FILE_VERIFICATION_NUMBER,
             )
         }
     }

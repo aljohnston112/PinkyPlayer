@@ -16,6 +16,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
+private const val MASTER_PLAYLIST_NAME = "MASTER_PLAYLIST_NAME"
+
 @HiltViewModel
 class PlaylistsViewModel @Inject constructor(
         application: Application,
@@ -124,10 +126,6 @@ class PlaylistsViewModel @Inject constructor(
         super.onCleared()
         songRepo.songs.removeObserver(songObserver)
         settingsRepo.settings.removeObserver(settingsObserver)
-    }
-
-    companion object {
-        const val MASTER_PLAYLIST_NAME = "MASTER_PLAYLIST_NAME"
     }
 
 }

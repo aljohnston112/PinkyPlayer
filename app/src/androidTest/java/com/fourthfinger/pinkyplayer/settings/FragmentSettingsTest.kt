@@ -25,9 +25,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.math.roundToInt
 
-private const val SAVE_FILE = "settings"
-private const val SAVE_FILE_VERIFICATION_NUMBER = 8479145830949658990L
-
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 @HiltAndroidTest
@@ -54,7 +51,7 @@ class FragmentSettingsTest : HiltExt<ActivityMain>(ActivityMain::class) {
         onView(withId(R.id.constraint_layout_fragment_settings)).check(matches(isDisplayed()))
         lateinit var settingsIn: Settings
         runBlocking {
-            settingsIn = settingsRepo.load(context, SAVE_FILE, SAVE_FILE_VERIFICATION_NUMBER)
+            settingsIn = settingsRepo.load(context)
         }
         onView(withId(R.id.edit_text_n_songs)).check(matches(
                 withText((1.0 / settingsIn.maxPercent).roundToInt().toString())))
@@ -108,7 +105,7 @@ class FragmentSettingsTest : HiltExt<ActivityMain>(ActivityMain::class) {
         verifyGoodData(fab, goodNSongs3, goodPC3, goodPC4)
         lateinit var settingsIn: Settings
         runBlocking {
-            settingsIn = settingsRepo.load(context, SAVE_FILE, SAVE_FILE_VERIFICATION_NUMBER)
+            settingsIn = settingsRepo.load(context)
         }
         assert(settingsIn.maxPercent == (1.0 / goodNSongs3.toInt()))
         assert(settingsIn.percentChangeUp == (goodPC3.toInt() / 100.0))
