@@ -1,7 +1,6 @@
 package com.fourthfinger.pinkyplayer.songs
 
 import android.os.Bundle
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -14,7 +13,6 @@ import androidx.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
 import com.fourthfinger.pinkyplayer.ActivityMain
 import com.fourthfinger.pinkyplayer.HiltExt
 import com.fourthfinger.pinkyplayer.R
@@ -22,7 +20,6 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
@@ -32,11 +29,10 @@ import java.util.concurrent.CountDownLatch
 @HiltAndroidTest
 class FragmentLoadingTest : HiltExt<ActivityMain>(ActivityMain::class) {
 
-    private val countDownLatchFragmentLoadingChecked: CountDownLatch = CountDownLatch(1)
-    private val countDownLatchTitleLoaded: CountDownLatch = CountDownLatch(1)
-
     @Before
     override fun setUpActivity() {
+        val countDownLatchFragmentLoadingChecked: CountDownLatch = CountDownLatch(1)
+        val countDownLatchTitleLoaded: CountDownLatch = CountDownLatch(1)
         scenario = launchFragmentInHiltContainer(R.style.Theme_PinkyPlayer, ActivityMain::class)
         scenario.onActivity {
             activity = it

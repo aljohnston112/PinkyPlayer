@@ -7,7 +7,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.File
 import javax.inject.Inject
 
 @HiltAndroidTest
@@ -47,10 +46,8 @@ class SongFileManagerTest : SongDBBaseTest() {
         }
         runBlocking {
             val songs = SongFileManager.scanSongsAndWriteAudioUris(context, loadingCallback, songDao)!!
-            var file: File
             for (song in songs) {
-                file = File(context.filesDir, song.toString())
-                assert(file.exists())
+                assert(AudioUri.audioUriExists(context, song))
                 assert(songDao.getSong(song) != null)
             }
         }

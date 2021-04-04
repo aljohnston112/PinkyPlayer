@@ -3,7 +3,6 @@ package com.fourthfinger.pinkyplayer.songs
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -12,7 +11,7 @@ class AudioUriCompanionTest{
 
     private val context = ApplicationProvider.getApplicationContext<Context>()
 
-    @Test fun testHashCodeEquals(){
+    @Test fun testHashCodeEqualsCompareTo(){
         val displayName = "a"
         val artist = "b"
         val title = "c"
@@ -28,6 +27,7 @@ class AudioUriCompanionTest{
         val audioUri3 = AudioUri(displayName, artist, title, id)
         assert(audioUri == audioUri3)
         assert(audioUri.hashCode() == audioUri3.hashCode())
+        assert(audioUri<audioUri2)
     }
 
     @Test
@@ -38,11 +38,11 @@ class AudioUriCompanionTest{
         val id = 4L
         AudioUri.deleteAudioUri(context, id)
         val audioUri = AudioUri(displayName, artist, title, id)
-        assert(!AudioUri.doesAudioUriExist(context, id))
+        assert(!AudioUri.audioUriExists(context, id))
         assert(AudioUri.saveAudioUri(context, audioUri))
-        assert(AudioUri.doesAudioUriExist(context, id))
+        assert(AudioUri.audioUriExists(context, id))
         assert(AudioUri.deleteAudioUri(context, id))
-        assert(!AudioUri.doesAudioUriExist(context, id))
+        assert(!AudioUri.audioUriExists(context, id))
     }
 
     @Test

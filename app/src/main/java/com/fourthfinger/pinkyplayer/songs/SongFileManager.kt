@@ -77,7 +77,7 @@ class SongFileManager {
                             val artist = cursor.getString(artistCol)
                             // Make a user setting
                             // TODO || songDao.getSong(id) == null
-                            if (!AudioUri.doesAudioUriExist(context, id)) {
+                            if (!AudioUri.audioUriExists(context, id)) {
                                 val audioURI = AudioUri(displayName, artist, title, id)
                                 newSongs.add(Song(id, title))
                                 AudioUri.saveAudioUri(context, audioURI)

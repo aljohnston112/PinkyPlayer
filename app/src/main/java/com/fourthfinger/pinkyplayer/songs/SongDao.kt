@@ -12,6 +12,7 @@ interface SongDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(vararg songs: Song)
 
+    @Deprecated("Different LiveData object is returned every time and can lead to Observer leaks")
     @Query("SELECT * FROM songs")
     fun getAll(): LiveData<List<Song>>
 

@@ -96,15 +96,15 @@ class RandomPlaylistTest {
     }
 
     private fun testNext(rp : RandomPlaylist) {
-        assert(!AudioUri.doesAudioUriExist(context, song.id))
+        assert(!AudioUri.audioUriExists(context, song.id))
         assert(AudioUri.saveAudioUri(context, audioUri))
-        assert(AudioUri.doesAudioUriExist(context, song.id))
-        assert(!AudioUri.doesAudioUriExist(context, song1.id))
+        assert(AudioUri.audioUriExists(context, song.id))
+        assert(!AudioUri.audioUriExists(context, song1.id))
         assert(AudioUri.saveAudioUri(context, audioUri1))
-        assert(AudioUri.doesAudioUriExist(context, song1.id))
-        assert(!AudioUri.doesAudioUriExist(context, song2.id))
+        assert(AudioUri.audioUriExists(context, song1.id))
+        assert(!AudioUri.audioUriExists(context, song2.id))
         assert(AudioUri.saveAudioUri(context, audioUri2))
-        assert(AudioUri.doesAudioUriExist(context, song2.id))
+        assert(AudioUri.audioUriExists(context, song2.id))
         val random = Random.Default
         var looping = true
         var shuffling = false
@@ -159,23 +159,23 @@ class RandomPlaylistTest {
         shuffling = false
         assert(rp.next(context, random, looping, shuffling)!!.id == song.id)
         assert(AudioUri.deleteAudioUri(context, song2.id))
-        assert(!AudioUri.doesAudioUriExist(context, song2.id))
+        assert(!AudioUri.audioUriExists(context, song2.id))
         assert(AudioUri.deleteAudioUri(context, song1.id))
-        assert(!AudioUri.doesAudioUriExist(context, song1.id))
+        assert(!AudioUri.audioUriExists(context, song1.id))
         assert(AudioUri.deleteAudioUri(context, song.id))
-        assert(!AudioUri.doesAudioUriExist(context, song.id))
+        assert(!AudioUri.audioUriExists(context, song.id))
     }
 
     private fun testPrevious(rp : RandomPlaylist){
-        assert(!AudioUri.doesAudioUriExist(context, song.id))
+        assert(!AudioUri.audioUriExists(context, song.id))
         assert(AudioUri.saveAudioUri(context, audioUri))
-        assert(AudioUri.doesAudioUriExist(context, song.id))
-        assert(!AudioUri.doesAudioUriExist(context, song1.id))
+        assert(AudioUri.audioUriExists(context, song.id))
+        assert(!AudioUri.audioUriExists(context, song1.id))
         assert(AudioUri.saveAudioUri(context, audioUri1))
-        assert(AudioUri.doesAudioUriExist(context, song1.id))
-        assert(!AudioUri.doesAudioUriExist(context, song2.id))
+        assert(AudioUri.audioUriExists(context, song1.id))
+        assert(!AudioUri.audioUriExists(context, song2.id))
         assert(AudioUri.saveAudioUri(context, audioUri2))
-        assert(AudioUri.doesAudioUriExist(context, song2.id))
+        assert(AudioUri.audioUriExists(context, song2.id))
         val random = Random.Default
         var looping = true
         var shuffling = false
@@ -230,11 +230,11 @@ class RandomPlaylistTest {
         shuffling = false
         assert(rp.previous(context, random, looping, shuffling)!!.id == song1.id)
         assert(AudioUri.deleteAudioUri(context, song2.id))
-        assert(!AudioUri.doesAudioUriExist(context, song2.id))
+        assert(!AudioUri.audioUriExists(context, song2.id))
         assert(AudioUri.deleteAudioUri(context, song1.id))
-        assert(!AudioUri.doesAudioUriExist(context, song1.id))
+        assert(!AudioUri.audioUriExists(context, song1.id))
         assert(AudioUri.deleteAudioUri(context, song.id))
-        assert(!AudioUri.doesAudioUriExist(context, song.id))
+        assert(!AudioUri.audioUriExists(context, song.id))
     }
 
 }

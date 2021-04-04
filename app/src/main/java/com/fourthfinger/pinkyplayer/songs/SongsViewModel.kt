@@ -28,13 +28,13 @@ class SongsViewModel @Inject constructor(
             FileUtil.mutex.withLock {
                 if (!loadingStarted) {
                     runBlocking {
-                        val songs = songRepo.scanSongsAndWriteAudioUris(
+                        songRepo.scanSongsAndWriteAudioUris(
                                 getApplication<Application>().applicationContext,
                                 loadingCallback,
                         )
-                        loadingCallback.setSongsLoaded(true)
+                        loadingStarted = true
                     }
-                    loadingStarted = true
+                    loadingCallback.setSongsLoaded(true)
                 }
             }
         }

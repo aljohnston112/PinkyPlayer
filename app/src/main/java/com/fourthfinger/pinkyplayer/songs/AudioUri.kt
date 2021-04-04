@@ -66,7 +66,7 @@ class AudioUri(
 
     companion object {
 
-        fun doesAudioUriExist(context: Context, songID: Long): Boolean {
+        fun audioUriExists(context: Context, songID: Long): Boolean {
             val file = File(context.filesDir, songID.toString())
             return file.exists()
         }
