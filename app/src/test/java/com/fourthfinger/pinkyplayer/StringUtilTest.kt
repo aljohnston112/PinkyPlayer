@@ -7,7 +7,8 @@ class StringUtilTest {
 
     @Test
     fun testFormatMillis() {
-        for (millis in 0..Long.MAX_VALUE) {
+        val millises = listOf(0L, Long.MAX_VALUE)
+        for (millis in millises) {
             val h = TimeUnit.MILLISECONDS.toHours(millis)
             val m = TimeUnit.MILLISECONDS.toMinutes(millis) -
                     TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis))

@@ -1,15 +1,13 @@
 package com.fourthfinger.pinkyplayer.playlists
 
 import android.os.Bundle
-import android.view.Gravity.BOTTOM
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.core.view.doOnLayout
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
-import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.fourthfinger.pinkyplayer.BitmapUtil
 import com.fourthfinger.pinkyplayer.R
@@ -28,7 +26,7 @@ class FragmentSong() : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private val mediaViewModel: MediaViewModel by hiltNavGraphViewModels(R.id.nav_graph)
+    private val mediaViewModel: MediaViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -42,6 +40,21 @@ class FragmentSong() : Fragment() {
         observeMedia()
         observeControls()
         observeDetails()
+        setUpClickListeners()
+    }
+
+    private fun setUpClickListeners() {
+        binding.apply {
+            imageButtonRepeat.setOnClickListener {
+                mediaViewModel.toggleLooping()
+            }
+            imageButtonPlayPause.setOnClickListener {
+                mediaViewModel.toggleIsPlaying()
+            }
+            imageButtonShuffle.setOnClickListener {
+                mediaViewModel.toggleShuffling()
+            }
+        }
     }
 
     private fun setUpLayout() {
@@ -111,21 +124,18 @@ class FragmentSong() : Fragment() {
     }
 
     private fun observeControls() {
-        val mediatorLiveDataLooping = MediatorLiveDataLooping()
-        mediatorLiveDataLooping.isNotLooping(
-                mediaViewModel.looping, mediaViewModel.loopingOne
-        ).observe(viewLifecycleOwner) {
+        mediaViewModel.looping.observe(viewLifecycleOwner) {
             val buttonLoop = binding.imageButtonRepeat
-            if (!it) {
-                buttonLoop.setImageResource(R.drawable.repeat_black_24dp)
-            } else {
-                buttonLoop.setImageResource(R.drawable.repeat_white_24dp)
-            }
-        }
-        mediaViewModel.loopingOne.observe(viewLifecycleOwner) {
-            val buttonLoop = binding.imageButtonRepeat
-            if (it) {
-                buttonLoop.setImageResource(R.drawable.repeat_one_black_24dp)
+            when (it) {
+                MediaController.Loop.ALL -> {
+                    buttonLoop.setImageResource(R.drawable.repeat_black_24dp)
+                }
+                MediaController.Loop.ONE -> {
+                    buttonLoop.setImageResource(R.drawable.repeat_one_black_24dp)
+                }
+                else -> {
+                    buttonLoop.setImageResource(R.drawable.repeat_white_24dp)
+                }
             }
         }
         mediaViewModel.shuffling.observe(viewLifecycleOwner) {

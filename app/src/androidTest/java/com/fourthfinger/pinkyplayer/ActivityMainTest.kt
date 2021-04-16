@@ -20,8 +20,6 @@ class ActivityMainTest : ActivityMainBaseTest() {
         onView(constraintLayoutActivityMain).check(matches(isCompletelyDisplayed()))
         onView(allOf(withId(R.id.nav_host_fragment), withParent(constraintLayoutActivityMain))).
         check(matches(isCompletelyDisplayed()))
-        // A View with height 0 is not considered completely displayed?
-        // onView(withId(R.id.fragment_song_pane)).check(matches(isCompletelyDisplayed()))
         onView(withId(R.id.fragment_song_pane)).check(matches(withHeightOfAtLeast(0)))
     }
 

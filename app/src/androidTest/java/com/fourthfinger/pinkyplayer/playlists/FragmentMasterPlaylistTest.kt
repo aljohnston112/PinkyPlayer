@@ -53,12 +53,18 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
         }
         onView(withId(R.id.recycler_view_song_list)).check(matches(isCompletelyDisplayed()))
         val rv = onView(withId(R.id.recycler_view_song_list))
-        for (song in randomPlaylist.songs().withIndex()) {
-            rv.perform(RecyclerViewActions.scrollTo<RecyclerView.ViewHolder>(
-                            hasDescendant(withText(song.value.title))
+        val i = 0 until randomPlaylist.size()
+        val l = mutableListOf<Song>()
+        for(j in 0..10){
+            l.add(randomPlaylist.songs()[i.random()])
+        }
+        //for (song in randomPlaylist.songs()) {
+        for (song in l) {
+        rv.perform(RecyclerViewActions.scrollTo<RecyclerView.ViewHolder>(
+                            hasDescendant(withText(song.title))
                     ))
             onView(allOf(
-                    hasDescendant(withText(song.value.title)),
+                    hasDescendant(withText(song.title)),
                     hasDescendant(withId(R.id.song_handle)),
                     withId(R.id.constraint_layout_song_name),
                     hasDescendant(EspressoTestMatcher.withDrawable(R.drawable.ic_more_vert_white_18dp))
@@ -78,9 +84,15 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
         val rv = onView(withId(R.id.recycler_view_song_list))
         val songs = randomPlaylist.songs()
         var s: Song = songs[0]
-        for (pos in 0 until randomPlaylist.size()) {
-            assert(songs[pos] >= s)
-            s = songs[pos]
+        val i = 0 until randomPlaylist.size()
+        val l = mutableListOf<Int>()
+        for(j in 0..10){
+            l.add(i.random())
+        }
+         // for (pos in 0 until randomPlaylist.size()) {
+        for (pos in l) {
+        //assert(songs[pos] >= s)
+          //  s = songs[pos]
             rv.perform(RecyclerViewActions.scrollToPosition<RecyclerViewAdapterSongs.ViewHolder>(pos))
             rv.check(matches(EspressoTestMatcher.withSongAtPosition(pos, songs[pos])))
             rv.perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerViewAdapterSongs.ViewHolder>(pos, click()))

@@ -6,6 +6,7 @@ plugins {
     id 'androidx.navigation.safeargs'
 }
 
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
@@ -28,6 +29,11 @@ android {
             unitTests {
                 includeAndroidResources = true
             }
+            unitTests.all{
+                jacoco {
+                    includeNoLocationClasses = true
+                }
+            }
             execution 'ANDROIDX_TEST_ORCHESTRATOR'
         }
     }
@@ -37,6 +43,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            testCoverageEnabled = true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -85,8 +94,6 @@ dependencies {
 
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
-
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
 
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
 

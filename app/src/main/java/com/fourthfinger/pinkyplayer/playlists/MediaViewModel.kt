@@ -1,60 +1,36 @@
 package com.fourthfinger.pinkyplayer.playlists
 
-import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.fourthfinger.pinkyplayer.songs.AudioUri
+import androidx.lifecycle.ViewModel
 import com.fourthfinger.pinkyplayer.songs.Song
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class MediaViewModel @Inject constructor(
-        application: Application,
         private val mediaController: MediaController,
-) : AndroidViewModel(application) {
+): ViewModel() {
 
-    private val _currentAudioUri: MutableLiveData<AudioUri> by lazy {
-        MutableLiveData<AudioUri>()
+    val looping = mediaController.looping
+    fun toggleLooping(){
+        mediaController.toggleLooping()
     }
-    val currentAudioUri = _currentAudioUri as LiveData<AudioUri>
+
+    val shuffling = mediaController.shuffling
+    fun toggleShuffling(){
+        mediaController.toggleShuffling()
+    }
+
+    val isPlaying = mediaController.isPlaying
+    fun toggleIsPlaying(){
+        mediaController.toggleIsPlaying()
+    }
+    val currentAudioUri = mediaController.currentAudioUri
     fun setCurrentSong(context: Context, song: Song){
-       _currentAudioUri.postValue(AudioUri.getAudioUri(context, song.id))
-    }
-
-    private val _isPlaying: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>(false)
-    }
-    val isPlaying = _isPlaying as LiveData<Boolean>
-    fun setIsPlaying(playing: Boolean){
-        _isPlaying.postValue(playing)
-    }
-
-    private val _looping: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>(false)
-    }
-    val looping = _looping as LiveData<Boolean>
-    fun setLooping(looping: Boolean){
-        _looping.postValue(looping)
-    }
-
-    private val _loopingOne: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>(false)
-    }
-    val loopingOne = _loopingOne as LiveData<Boolean>
-    fun setLoopingOne(loopingOne: Boolean){
-        _loopingOne.postValue(loopingOne)
-    }
-
-    private val _shuffling: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>(true)
-    }
-    val shuffling = _shuffling as LiveData<Boolean>
-    fun setShuffling(shuffling: Boolean){
-        _shuffling.postValue(shuffling)
+        mediaController.setCurrentSong(context, song)
     }
 
     private val _currentSongBitmap: MutableLiveData<Bitmap> by lazy {

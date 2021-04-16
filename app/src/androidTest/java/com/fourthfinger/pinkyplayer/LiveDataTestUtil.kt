@@ -2,8 +2,9 @@ package com.fourthfinger.pinkyplayer
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.CountDownLatch
 
@@ -24,17 +25,41 @@ class LiveDataTestUtil {
                     if (!done) {
                         if (it == data) {
                             countDownLatch.countDown()
-                            liveData.removeObservers(viewLifecycleOwner)
                         }
                         done = true
                     } else {
                         assert(it == data)
                         countDownLatch.countDown()
-                        liveData.removeObservers(viewLifecycleOwner)
                     }
                 }
             }
             countDownLatch.await()
+            liveData.removeObservers(viewLifecycleOwner)
+        }
+
+
+        fun <T> checkLiveDataUpdate(
+                liveData: LiveData<T>,
+                data: T
+        ) {
+            val countDownLatch = CountDownLatch(1)
+            var done = false
+            val obs = Observer<T> {
+                if (!done) {
+                    if (it == data) {
+                        countDownLatch.countDown()
+                    }
+                    done = true
+                } else {
+                    assert(it == data)
+                    countDownLatch.countDown()
+                }
+            }
+            InstrumentationRegistry.getInstrumentation().runOnMainSync {
+                liveData.observeForever(obs)
+                countDownLatch.await()
+                liveData.removeObserver(obs)
+            }
         }
 
         fun <T> assertLiveDataUpdateNotNull(

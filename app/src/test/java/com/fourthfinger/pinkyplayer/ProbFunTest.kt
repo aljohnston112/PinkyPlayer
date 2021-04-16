@@ -79,7 +79,7 @@ class ProbFunTest {
         pf.add(song2, p)
         pf.add(song3, p)
         pf.prune()
-        assert(!pf.contains(song2) && !pf.contains(song3))
+        assert(!pf.contains(song2) || !pf.contains(song3))
     }
 
     @Test

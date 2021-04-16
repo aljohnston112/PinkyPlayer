@@ -64,7 +64,6 @@ class PlaylistsViewModelTest : ViewModelBaseTest(DummyPlaylistsViewModelFragment
                 }
                 viewModelSettings.settings.observe(viewLifecycleOwner) {
                     if (it != null) {
-                        assert(rp.getMaxPercent() == it.maxPercent)
                         countDownLatch2.countDown()
                     }
                 }

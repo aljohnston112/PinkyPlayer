@@ -147,7 +147,7 @@ class FileUtil {
                         context.openFileInput(fileSave).use { fileInputStream ->
                             ObjectInputStream(fileInputStream).use { objectInputStream ->
                                 val n = objectInputStream.readInt()
-                                for(i in 0..n) {
+                                for(i in 0 until n) {
                                     @Suppress("UNCHECKED_CAST")
                                     t.add(objectInputStream.readObject() as T)
                                 }

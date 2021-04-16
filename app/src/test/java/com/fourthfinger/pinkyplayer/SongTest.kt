@@ -21,7 +21,7 @@ class SongTest {
 
     @Test fun equalsHashCode(){
         val song = Song(1L, "1",)
-        val song1 = Song(1L, "2",)
+        val song1 = Song(2L, "1",)
         assert(song == song1)
         assert(song.hashCode() == song1.hashCode())
         val song2 = Song(1L, "1",)

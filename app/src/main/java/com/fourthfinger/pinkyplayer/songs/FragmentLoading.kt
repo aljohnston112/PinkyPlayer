@@ -12,6 +12,7 @@ import com.fourthfinger.pinkyplayer.databinding.FragmentLoadingBinding
 import com.fourthfinger.pinkyplayer.playlists.PlaylistsViewModel
 import com.fourthfinger.pinkyplayer.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class FragmentLoading : Fragment() {
@@ -38,7 +39,9 @@ class FragmentLoading : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val loadingCallback = LoadingCallback.getInstance()
         // This order is important!------------------------------
-        viewModelPlaylists.loadPlaylists(loadingCallback)
+        runBlocking {
+            viewModelPlaylists.loadPlaylists(loadingCallback)
+        }
         // Playlists are injected with the settings and the songs
         viewModelSettings.loadSettings(loadingCallback)
         viewModelSongs.loadSongs(loadingCallback)
