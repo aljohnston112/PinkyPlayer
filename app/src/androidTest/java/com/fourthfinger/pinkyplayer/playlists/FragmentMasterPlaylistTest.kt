@@ -55,14 +55,14 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
         val rv = onView(withId(R.id.recycler_view_song_list))
         val i = 0 until randomPlaylist.size()
         val l = mutableListOf<Song>()
-        for(j in 0..10){
+        for (j in 0..10) {
             l.add(randomPlaylist.songs()[i.random()])
         }
         //for (song in randomPlaylist.songs()) {
         for (song in l) {
-        rv.perform(RecyclerViewActions.scrollTo<RecyclerView.ViewHolder>(
-                            hasDescendant(withText(song.title))
-                    ))
+            rv.perform(RecyclerViewActions.scrollTo<RecyclerView.ViewHolder>(
+                    hasDescendant(withText(song.title))
+            ))
             onView(allOf(
                     hasDescendant(withText(song.title)),
                     hasDescendant(withId(R.id.song_handle)),
@@ -86,22 +86,48 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
         var s: Song = songs[0]
         val i = 0 until randomPlaylist.size()
         val l = mutableListOf<Int>()
-        for(j in 0..10){
+        for (j in 0..10) {
             l.add(i.random())
         }
-         // for (pos in 0 until randomPlaylist.size()) {
+        // for (pos in 0 until randomPlaylist.size()) {
         for (pos in l) {
-        //assert(songs[pos] >= s)
-          //  s = songs[pos]
+            //assert(songs[pos] >= s)
+            //  s = songs[pos]
             rv.perform(RecyclerViewActions.scrollToPosition<RecyclerViewAdapterSongs.ViewHolder>(pos))
             rv.check(matches(EspressoTestMatcher.withSongAtPosition(pos, songs[pos])))
             rv.perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerViewAdapterSongs.ViewHolder>(pos, click()))
-            assertThat(navController.currentDestination?.id ?: assert(false)).isEqualTo(R.id.fragmentSong)
+            assertThat(navController.currentDestination?.id
+                    ?: assert(false)).isEqualTo(R.id.fragmentSong)
             onView(withId(R.id.text_view_song_name)).check(matches(withText(songs[pos].title)))
             InstrumentationRegistry.getInstrumentation().runOnMainSync {
                 navController.popBackStack()
             }
         }
+    }
+
+    @Test
+    fun addToPlaylist() {
+        lateinit var randomPlaylist: RandomPlaylist
+        runBlocking {
+            randomPlaylist = playlistRepo.loadMasterPlaylist(context)!!
+        }
+        val songs = randomPlaylist.songs()
+        val s: Song = songs[0]
+
+        val rv = onView(withId(R.id.recycler_view_song_list))
+        rv.perform(RecyclerViewActions.scrollToPosition<RecyclerViewAdapterSongs.ViewHolder>(0))
+        onView(allOf(
+                withParent(allOf(
+                        hasDescendant(withText(s.title)),
+                        hasDescendant(withId(R.id.song_handle)))
+                ),
+                withId(R.id.song_handle)
+        )).perform().perform(click())
+
+        onView(withText(R.string.add_to_playlist)).check(matches(isCompletelyDisplayed()))
+        onView(withText(R.string.add_to_queue)).check(matches(isCompletelyDisplayed()))
+
+
     }
 
 }
