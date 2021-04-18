@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.lifecycleScope
 import com.fourthfinger.pinkyplayer.BitmapUtil
 import com.fourthfinger.pinkyplayer.R
@@ -26,7 +26,7 @@ class FragmentSong() : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private val mediaViewModel: MediaViewModel by activityViewModels()
+    private val mediaViewModel: MediaViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {

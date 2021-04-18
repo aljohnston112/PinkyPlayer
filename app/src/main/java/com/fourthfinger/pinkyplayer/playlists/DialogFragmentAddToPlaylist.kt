@@ -1,12 +1,12 @@
 package com.fourthfinger.pinkyplayer.playlists
 
 import android.app.Dialog
-import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.navigation.findNavController
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.songs.Song
 import dagger.hilt.android.AndroidEntryPoint
@@ -17,47 +17,37 @@ import java.util.*
 class DialogFragmentAddToPlaylist : DialogFragment() {
 
     interface DialogFragmentAddToPlaylistListener {
-        fun onDialogPositiveClick(dialog: String, song: Song)
-        fun onDialogNegativeClick(dialog: DialogFragment)
+        fun onAddToPlaylist(playlistTitle: String, song: Song)
+        fun onNewPlaylist(song: Song)
     }
 
     private lateinit var callback: DialogFragmentAddToPlaylistListener
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            callback = context as DialogFragmentAddToPlaylistListener
-        } catch (e: ClassCastException) {
-            throw ClassCastException((context.toString() +
-                    " must implement DialogFragmentAddToPlaylistListener"))
-        }
-    }
 
     private val viewModelPlaylist: PlaylistsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val bundle = requireArguments()
-        lateinit var titles: Array<String>
+        lateinit var playlistTitles: Array<String>
         val value = viewModelPlaylist.playlists.value
-        titles = if (value != null) {
-            getPlaylistTitles(value)
+        playlistTitles = if (value != null) {
+            getPlaylistTitles(value.toList())
         } else {
             arrayOf()
         }
         val builder = AlertDialog.Builder(requireActivity())
         builder.setTitle(R.string.add_to_playlist)
         val selectedPlaylistIndices: MutableList<Int> = mutableListOf()
-        setUpChoices(builder, titles, selectedPlaylistIndices)
-        setUpButtons(builder, bundle, titles, selectedPlaylistIndices)
+        setUpChoices(builder, playlistTitles, selectedPlaylistIndices)
+        setUpButtons(builder, bundle, playlistTitles, selectedPlaylistIndices)
         return builder.create()
     }
 
     private fun setUpChoices(
             builder: AlertDialog.Builder,
-            titles: Array<String>,
+            playlistTitles: Array<String>,
             selectedPlaylistIndices: MutableList<Int>
     ) {
-        builder.setMultiChoiceItems(titles, null)
+        builder.setMultiChoiceItems(playlistTitles, null)
         { _: DialogInterface?, which: Int, isChecked: Boolean ->
             if (isChecked) {
                 selectedPlaylistIndices.add(which)
@@ -79,39 +69,35 @@ class DialogFragmentAddToPlaylist : DialogFragment() {
     private fun setUpButtons(
             builder: AlertDialog.Builder,
             bundle: Bundle,
-            titles: Array<String>,
+            playlistTitles: Array<String>,
             selectedPlaylistIndices: List<Int>) {
         val song = bundle.getSerializable(BUNDLE_KEY_ADD_TO_PLAYLIST_SONG) as Song?
         val randomPlaylist = bundle.getSerializable(BUNDLE_KEY_ADD_TO_PLAYLIST_PLAYLIST) as RandomPlaylist?
         builder.setPositiveButton(R.string.add) { _: DialogInterface?, _: Int ->
             if (song != null) {
                 for (index in selectedPlaylistIndices) {
-                    callback.onDialogPositiveClick(titles[index], song)
+                    callback.onAddToPlaylist(playlistTitles[index], song)
                 }
             }
             if (randomPlaylist != null) {
                 for (randomPlaylistSong in randomPlaylist.songs()) {
                     for (index in selectedPlaylistIndices) {
-                        callback.onDialogPositiveClick(titles[index], randomPlaylistSong)
+                        callback.onAddToPlaylist(playlistTitles[index], randomPlaylistSong)
                     }
                 }
             }
         }
-        builder.setNeutralButton(R.string.new_playlist) { dialog: DialogInterface?, which: Int ->
+        builder.setNeutralButton(R.string.new_playlist) { _: DialogInterface?, _: Int ->
             // UserPickedPlaylist need to be null for FragmentEditPlaylist to make a new playlist
-            /* TODO
-            activityMain.setUserPickedPlaylist(null)
-            activityMain.clearUserPickedSongs()
+            viewModelPlaylist.setUserPickedPlaylist(null)
+            viewModelPlaylist.clearUserPickedSongs()
             if (song != null) {
-                activityMain.addUserPickedSong(song)
+                viewModelPlaylist.addUserPickedSongs(song)
             }
             if (randomPlaylist != null) {
-                for (songInPlaylist in randomPlaylist.getSongs()) {
-                    activityMain.addUserPickedSong(songInPlaylist)
-                }
+                viewModelPlaylist.addUserPickedSongs(*randomPlaylist.songs().toTypedArray())
             }
-            activityMain.navigateTo(R.id.fragmentEditPlaylist)
-             */
+            requireActivity().findNavController(R.id.nav_host_fragment).navigate(R.id.fragmentEditPlaylist)
         }
     }
 

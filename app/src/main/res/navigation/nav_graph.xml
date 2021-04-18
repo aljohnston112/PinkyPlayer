@@ -43,4 +43,9 @@
         android:name="com.fourthfinger.pinkyplayer.playlists.FragmentSong"
         android:label="FragmentSong"
         tools:layout="@layout/fragment_song" />
+    <fragment
+        android:id="@+id/fragmentEditPlaylist"
+        android:name="com.fourthfinger.pinkyplayer.playlists.FragmentEditPlaylist"
+        android:label="fragment_edit_playlist"
+        tools:layout="@layout/fragment_edit_playlist" />
 </navigation>

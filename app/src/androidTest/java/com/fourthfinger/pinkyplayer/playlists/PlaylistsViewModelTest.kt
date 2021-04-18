@@ -1,10 +1,10 @@
 package com.fourthfinger.pinkyplayer.playlists
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.fourthfinger.pinkyplayer.ViewModelBaseTest
-import com.fourthfinger.pinkyplayer.settings.SettingsViewModel
 import com.fourthfinger.pinkyplayer.songs.LoadingCallback
 import com.fourthfinger.pinkyplayer.songs.Song
 import com.fourthfinger.pinkyplayer.songs.SongDao
@@ -24,6 +24,9 @@ class PlaylistsViewModelTest : ViewModelBaseTest(DummyPlaylistsViewModelFragment
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
+    @get:Rule
+    var instantExecutorRule = InstantTaskExecutorRule()
+
     @Inject
     lateinit var songDao: SongDao
 
@@ -36,20 +39,21 @@ class PlaylistsViewModelTest : ViewModelBaseTest(DummyPlaylistsViewModelFragment
     fun viewModel() {
         fragment as DummyPlaylistsViewModelFragment
         val viewModelPlaylists: PlaylistsViewModel = fragment.viewModelPlaylists
-        val viewModelSettings: SettingsViewModel = fragment.viewModelSettings
         val viewLifecycleOwner = fragment.viewLifecycleOwner
         val countDownLatch = CountDownLatch(1)
-        val countDownLatch2 = CountDownLatch(1)
         val countDownLatch3 = CountDownLatch(1)
         val countDownLatch4 = CountDownLatch(1)
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
-            val rp1 = RandomPlaylist("a", listOf(Song(0, "a")), 1.0, true)
+            val rp1 = RandomPlaylist("a", setOf(Song(0, "a")), 1.0, true)
             viewModelPlaylists.masterPlaylist.observe(viewLifecycleOwner) { rp ->
                 if (rp != null) {
                     val rpSongs = rp.songs()
                     val allSongs: LiveData<List<Song>> = songDao.getAll()
                     allSongs.observe(viewLifecycleOwner) { dbSongs ->
-                        if (dbSongs.isNotEmpty()) {
+                        val rpSongs = rpSongs.toHashSet()
+                        val dbSongs = dbSongs.toHashSet()
+                        if (dbSongs.isNotEmpty() && dbSongs.size == rpSongs.size) {
+
                             for (song in rpSongs) {
                                 assert(dbSongs.contains(song))
                             }
@@ -57,25 +61,20 @@ class PlaylistsViewModelTest : ViewModelBaseTest(DummyPlaylistsViewModelFragment
                                 assert(rpSongs.contains(song))
                             }
                             viewModelPlaylists.savePlaylist(rp1)
-                            viewModelPlaylists.deletePlaylist(rp1)
                             countDownLatch.countDown()
                         }
                     }
                 }
-                viewModelSettings.settings.observe(viewLifecycleOwner) {
-                    if (it != null) {
-                        countDownLatch2.countDown()
-                    }
-                }
-                viewModelSettings.loadSettings(LoadingCallback.getInstance())
             }
             viewModelPlaylists.loadPlaylists(LoadingCallback.getInstance())
-            viewModelPlaylists.playlists.observe(viewLifecycleOwner){
-                if(it != null && it.isNotEmpty()){
-                    if(countDownLatch3.count == 1L){
+            viewModelPlaylists.playlists.observe(viewLifecycleOwner) {
+                if (it != null && it.isNotEmpty()) {
+                    if (countDownLatch3.count == 1L && countDownLatch.count == 0L) {
                         assert(it.contains(rp1))
+                        viewModelPlaylists.deletePlaylist(rp1)
                         countDownLatch3.countDown()
-                    } else {
+                    }
+                    if (countDownLatch3.count == 0L && countDownLatch4.count == 1L) {
                         assert(!it.contains(rp1))
                         countDownLatch4.countDown()
                     }
@@ -83,7 +82,41 @@ class PlaylistsViewModelTest : ViewModelBaseTest(DummyPlaylistsViewModelFragment
             }
         }
         countDownLatch.await()
-        countDownLatch2.await()
+        countDownLatch3.await()
+        countDownLatch4.await()
+
+        val countDownLatch5 = CountDownLatch(1)
+        val countDownLatch6 = CountDownLatch(1)
+        val countDownLatch7 = CountDownLatch(1)
+
+        InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            val rp1 = RandomPlaylist("a", setOf(Song(0, "a")), 1.0, true)
+            viewModelPlaylists.userPickedPlaylist.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    assert(it == rp1)
+                    countDownLatch5.countDown()
+                }
+            }
+            viewModelPlaylists.setUserPickedPlaylist(rp1)
+            val ss = setOf(Song(0, "a"), Song(1, "b"))
+            viewModelPlaylists.userPickedSongs.observe(viewLifecycleOwner) {
+                if (countDownLatch6.count == 1L && it.isNotEmpty()) {
+                    for (s in it) {
+                        assert(ss.contains(s))
+                    }
+                    countDownLatch6.countDown()
+                } else if(countDownLatch6.count == 0L && countDownLatch7.count == 1L){
+                    assert(it.isEmpty())
+                    countDownLatch7.countDown()
+                }
+            }
+            viewModelPlaylists.clearUserPickedSongs()
+            viewModelPlaylists.addUserPickedSongs(*ss.toTypedArray())
+            viewModelPlaylists.clearUserPickedSongs()
+        }
+        countDownLatch5.await()
+        countDownLatch6.await()
+        countDownLatch7.await()
     }
 
 }

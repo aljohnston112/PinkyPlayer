@@ -55,9 +55,9 @@ class FragmentSongTest : HiltExt<ActivityMain>(ActivityMain::class) {
         runBlocking {
             randomPlaylist = FileUtil.load(context, MASTER_PLAYLIST_FILE, SAVE_FILE_VERIFICATION_NUMBER)!!
         }
-        val songs = randomPlaylist.songs()
+        val songs = randomPlaylist.songs().toList()
         val i = 0 until randomPlaylist.size()
-        val l = mutableListOf<Song>()
+        val l = mutableSetOf<Song>()
         for (j in 0..10) {
             l.add(songs[i.random()])
         }
@@ -127,7 +127,7 @@ class FragmentSongTest : HiltExt<ActivityMain>(ActivityMain::class) {
         runBlocking {
             randomPlaylist = FileUtil.load(context, MASTER_PLAYLIST_FILE, SAVE_FILE_VERIFICATION_NUMBER)!!
         }
-        val songs = randomPlaylist.songs()
+        val songs = randomPlaylist.songs().toList()
         onView(withId(R.id.recycler_view_song_list)).perform(
                 scrollTo<RecyclerView.ViewHolder>(
                         hasDescendant(withText(songs[0].title))

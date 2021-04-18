@@ -231,7 +231,7 @@ sealed class ProbFun<T>(
         return probabilityMap.containsKey(t)
     }
 
-    fun getKeys() = probabilityMap.keys.toList()
+    fun getKeys() = probabilityMap.keys
 
     /**
      * Returns the number of elements in this ProbFunTree.

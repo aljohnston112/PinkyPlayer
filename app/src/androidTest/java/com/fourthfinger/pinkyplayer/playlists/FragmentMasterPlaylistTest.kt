@@ -56,7 +56,7 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
         val i = 0 until randomPlaylist.size()
         val l = mutableListOf<Song>()
         for (j in 0..10) {
-            l.add(randomPlaylist.songs()[i.random()])
+            l.add(randomPlaylist.songs().toList()[i.random()])
         }
         //for (song in randomPlaylist.songs()) {
         for (song in l) {
@@ -79,10 +79,10 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
             randomPlaylist = playlistRepo.loadMasterPlaylist(context)!!
         }
         onView(withId(R.id.recycler_view_song_list)).check(
-                matches(EspressoTestMatcher.withSongs(randomPlaylist.songs()))
+                matches(EspressoTestMatcher.withSongs(randomPlaylist.songs().toList()))
         )
         val rv = onView(withId(R.id.recycler_view_song_list))
-        val songs = randomPlaylist.songs()
+        val songs = randomPlaylist.songs().toList()
         var s: Song = songs[0]
         val i = 0 until randomPlaylist.size()
         val l = mutableListOf<Int>()
@@ -106,12 +106,12 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
     }
 
     @Test
-    fun addToPlaylist() {
+    fun contextMenu() {
         lateinit var randomPlaylist: RandomPlaylist
         runBlocking {
             randomPlaylist = playlistRepo.loadMasterPlaylist(context)!!
         }
-        val songs = randomPlaylist.songs()
+        val songs = randomPlaylist.songs().toList()
         val s: Song = songs[0]
 
         val rv = onView(withId(R.id.recycler_view_song_list))
@@ -126,8 +126,30 @@ class FragmentMasterPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
 
         onView(withText(R.string.add_to_playlist)).check(matches(isCompletelyDisplayed()))
         onView(withText(R.string.add_to_queue)).check(matches(isCompletelyDisplayed()))
+    }
 
+    @Test
+    fun addToPlaylist(){
+        lateinit var randomPlaylist: RandomPlaylist
+        runBlocking {
+            randomPlaylist = playlistRepo.loadMasterPlaylist(context)!!
+        }
+        val songs = randomPlaylist.songs().toList()
+        val s: Song = songs[0]
 
+        val rv = onView(withId(R.id.recycler_view_song_list))
+        rv.perform(RecyclerViewActions.scrollToPosition<RecyclerViewAdapterSongs.ViewHolder>(0))
+        onView(allOf(
+                withParent(allOf(
+                        hasDescendant(withText(s.title)),
+                        hasDescendant(withId(R.id.song_handle)))
+                ),
+                withId(R.id.song_handle)
+        )).perform().perform(click())
+        onView(withText(R.string.add_to_playlist)).perform(click())
+        onView(withText(R.string.add_to_playlist)).check(matches(isCompletelyDisplayed()))
+        onView(withText(R.string.new_playlist)).check(matches(isCompletelyDisplayed()))
+        onView(withText(R.string.add)).check(matches(isCompletelyDisplayed()))
     }
 
 }

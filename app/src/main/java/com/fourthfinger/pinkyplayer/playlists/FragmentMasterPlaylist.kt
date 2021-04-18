@@ -14,6 +14,8 @@ import com.fourthfinger.pinkyplayer.playlists.DialogFragmentAddToPlaylist.Compan
 import com.fourthfinger.pinkyplayer.songs.Song
 import dagger.hilt.android.AndroidEntryPoint
 
+const val DIALOG_FRAGMENT_ADD_TO_PLAYLIST_TAG = "DialogFragmentAddToPlaylist"
+
 @AndroidEntryPoint
 class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {
 
@@ -27,10 +29,13 @@ class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {
 
     private val mediaViewModel: MediaViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
-    private lateinit var recyclerViewAdapterSongs : RecyclerViewAdapterSongs
+    private lateinit var recyclerViewAdapterSongs: RecyclerViewAdapterSongs
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View {
         _binding = RecyclerViewSongListBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -54,7 +59,7 @@ class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {
                 sortedSongs.sort()
 
              */
-            recyclerViewAdapterSongs.updateList(playlist.songs())
+            recyclerViewAdapterSongs.updateList(playlist.songs().toList())
         }
     }
 
@@ -76,7 +81,7 @@ class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {
         val bundle = Bundle()
         bundle.putSerializable(BUNDLE_KEY_ADD_TO_PLAYLIST_SONG, song)
         f.arguments = bundle
-        f.show(requireActivity().supportFragmentManager, "DialogFragmentAddToPlaylist")
+        f.show(requireActivity().supportFragmentManager, DIALOG_FRAGMENT_ADD_TO_PLAYLIST_TAG)
     }
 
     override fun onMenuItemClickAddToQueue(song: Song) {

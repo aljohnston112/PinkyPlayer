@@ -24,7 +24,7 @@ class PlaylistRepoTest {
         val opMP: RandomPlaylist?
         runBlocking { opMP = playlistRepo.loadMasterPlaylist(context) }
 
-        val randomPlaylist = RandomPlaylist(name, music, maxPercent, comparable)
+        val randomPlaylist = RandomPlaylist(name, music.toSet(), maxPercent, comparable)
         playlistRepo.saveMasterPlaylist(randomPlaylist, context)
         var randomPlaylistA: RandomPlaylist
         runBlocking { randomPlaylistA = playlistRepo.loadMasterPlaylist(context)!! }

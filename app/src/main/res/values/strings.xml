@@ -39,6 +39,10 @@
     <string name="button_repeat">This button toggles repeat</string>
     <string name="button_play_pause">This button toggles play and pause</string>
 
+    <!-- FragmentEditPlaylist -->
+    <string name="playlist_name">Playlist Name</string>
+    <string name="select_songs">Select Songs</string>
+
     <!-- FragmentSettings -->
     <string name="n_songs">Min number of songs</string>
     <string name="n_songs_desc">

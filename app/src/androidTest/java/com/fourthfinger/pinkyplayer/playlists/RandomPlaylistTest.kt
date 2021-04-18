@@ -33,14 +33,14 @@ class RandomPlaylistTest {
 
     @Test
     fun testConstructors(){
-        val music = listOf(song, song1, song2)
-        val music1 = listOf(song1, song, song2)
+        val music = setOf(song, song1, song2)
+        val music1 = setOf(song1, song, song2)
         val comparable = true
         val comparable1 = false
         val rp = RandomPlaylist(name, music, maxPercent, comparable)
         val rp1 = RandomPlaylist(name, music1, maxPercent, comparable1)
-        testConstructor(rp, music)
-        testConstructor(rp1, music1)
+        testConstructor(rp, music.toList())
+        testConstructor(rp1, music1.toList())
         val rp2 = RandomPlaylist(name, music, maxPercent, comparable)
         val rp3 = RandomPlaylist(name, music1, maxPercent, comparable1)
         testNext(rp2)
@@ -53,7 +53,7 @@ class RandomPlaylistTest {
 
     private fun testConstructor(rp: RandomPlaylist, music: List<Song>) {
         assert(rp.name == name)
-        var songs = rp.songs()
+        var songs = rp.songs().toList()
         for (s in songs) {
             assert(music.contains(s))
         }
@@ -64,7 +64,7 @@ class RandomPlaylistTest {
         assert(!rp.contains(music[0]))
         rp.add(music[0])
         assert(rp.contains(music[0]))
-        songs = rp.songs()
+        songs = rp.songs().toList()
         assert(rp.getMaxPercent() == maxPercent)
         val testSetPercent = 0.4
         rp.setMaxPercent(testSetPercent)

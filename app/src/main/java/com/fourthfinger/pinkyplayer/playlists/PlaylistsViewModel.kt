@@ -35,11 +35,35 @@ class PlaylistsViewModel @Inject constructor(
     }
     val masterPlaylist = masterPlaylistMLD as LiveData<RandomPlaylist>
 
-    private lateinit var _playlists: MutableList<RandomPlaylist>
-    private val playlistsMLD: MutableLiveData<List<RandomPlaylist>> by lazy {
-        MutableLiveData<List<RandomPlaylist>>()
+    private lateinit var _playlists: MutableSet<RandomPlaylist>
+    private val playlistsMLD: MutableLiveData<Set<RandomPlaylist>> by lazy {
+        MutableLiveData<Set<RandomPlaylist>>()
     }
-    val playlists = playlistsMLD as LiveData<List<RandomPlaylist>>
+    val playlists = playlistsMLD as LiveData<Set<RandomPlaylist>>
+
+    private val playlistsBeforeLoad = mutableSetOf<RandomPlaylist>()
+
+    private val userPickedPlaylistMLD: MutableLiveData<RandomPlaylist?> by lazy {
+        MutableLiveData<RandomPlaylist?>(null)
+    }
+    val userPickedPlaylist = userPickedPlaylistMLD as LiveData<RandomPlaylist?>
+    fun setUserPickedPlaylist(randomPlaylist: RandomPlaylist?){
+        userPickedPlaylistMLD.postValue(randomPlaylist)
+    }
+
+    private val _userPickedSongs = mutableSetOf<Song>()
+    private val userPickedSongsMLD: MutableLiveData<Set<Song>> by lazy {
+        MutableLiveData<Set<Song>>(_userPickedSongs)
+    }
+    val userPickedSongs = userPickedSongsMLD as LiveData<Set<Song>>
+    fun addUserPickedSongs(vararg songs: Song){
+        _userPickedSongs.addAll(songs)
+        userPickedSongsMLD.postValue(_userPickedSongs)
+    }
+    fun clearUserPickedSongs(){
+        _userPickedSongs.clear()
+        userPickedSongsMLD.postValue(_userPickedSongs)
+    }
 
     fun loadPlaylists(loadingCallback: LoadingCallback) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -50,11 +74,22 @@ class PlaylistsViewModel @Inject constructor(
                 runBlocking {
                     masterPlaylistMLD.postValue(playlistRepo.loadMasterPlaylist(getApplication()))
                     val ps = playlistRepo.loadPlaylists(getApplication())
-                    _playlists = mutableListOf()
+                    _playlists = mutableSetOf()
                     if (ps != null) {
                         for(p in ps){
                             _playlists.add(p)
                         }
+                    }
+                    if(playlistsBeforeLoad.isNotEmpty()) {
+                        for (rp in playlistsBeforeLoad) {
+                            _playlists.add(rp)
+                        }
+                        viewModelScope.launch(Dispatchers.IO) {
+                            FileUtil.mutex.withLock {
+                                playlistRepo.savePlaylists(_playlists.toList(), getApplication())
+                            }
+                        }
+                        playlistsBeforeLoad.clear()
                     }
                     playlistsMLD.postValue(_playlists)
                 }
@@ -65,12 +100,16 @@ class PlaylistsViewModel @Inject constructor(
     }
 
     fun savePlaylist(randomPlaylist: RandomPlaylist) {
-        _playlists.add(randomPlaylist)
-        viewModelScope.launch(Dispatchers.IO) {
-            FileUtil.mutex.withLock {
-                playlistsMLD.postValue(_playlists)
-                playlistRepo.savePlaylists(_playlists, getApplication())
+        if(this::_playlists.isInitialized) {
+            _playlists.add(randomPlaylist)
+            playlistsMLD.postValue(_playlists)
+            viewModelScope.launch(Dispatchers.IO) {
+                FileUtil.mutex.withLock {
+                    playlistRepo.savePlaylists(_playlists.toList(), getApplication())
+                }
             }
+        } else {
+            playlistsBeforeLoad.add(randomPlaylist)
         }
     }
 
@@ -79,7 +118,7 @@ class PlaylistsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             FileUtil.mutex.withLock {
                 playlistsMLD.postValue(_playlists)
-                playlistRepo.savePlaylists(_playlists, getApplication())
+                playlistRepo.savePlaylists(_playlists.toList(), getApplication())
             }
         }
     }
@@ -90,9 +129,9 @@ class PlaylistsViewModel @Inject constructor(
                 FileUtil.mutex.withLock {
                     if (!this@PlaylistsViewModel::_masterPlaylist.isInitialized) {
                         val comparable = true
-                        _masterPlaylist = RandomPlaylist(MASTER_PLAYLIST_NAME, it, maxPercent, comparable)
+                        _masterPlaylist = RandomPlaylist(MASTER_PLAYLIST_NAME, it.toSet(), maxPercent, comparable)
                     } else {
-                        _masterPlaylist.updateSongs(it)
+                        _masterPlaylist.updateSongs(it.toSet())
                     }
                     masterPlaylistMLD.postValue(_masterPlaylist)
                     playlistRepo.saveMasterPlaylist(_masterPlaylist, getApplication())
@@ -118,14 +157,18 @@ class PlaylistsViewModel @Inject constructor(
     }
 
     init {
-        songRepo.songs.observeForever(songObserver)
-        settingsRepo.settings.observeForever(settingsObserver)
+        viewModelScope.launch(Dispatchers.IO) {
+            songRepo.songs.observeForever(songObserver)
+            settingsRepo.settings.observeForever(settingsObserver)
+        }
     }
 
     override fun onCleared() {
         super.onCleared()
-        songRepo.songs.removeObserver(songObserver)
-        settingsRepo.settings.removeObserver(settingsObserver)
+        viewModelScope.launch(Dispatchers.IO) {
+            songRepo.songs.removeObserver(songObserver)
+            settingsRepo.settings.removeObserver(settingsObserver)
+        }
     }
 
 }

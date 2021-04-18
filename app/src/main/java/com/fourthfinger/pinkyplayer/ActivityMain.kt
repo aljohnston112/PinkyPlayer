@@ -2,7 +2,6 @@ package com.fourthfinger.pinkyplayer
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.DialogFragment
 import com.fourthfinger.pinkyplayer.databinding.ActivityMainBinding
 import com.fourthfinger.pinkyplayer.playlists.DialogFragmentAddToPlaylist
 import com.fourthfinger.pinkyplayer.songs.Song
@@ -19,11 +18,11 @@ class ActivityMain : AppCompatActivity(), DialogFragmentAddToPlaylist.DialogFrag
         setContentView(binding.root)
     }
 
-    override fun onDialogPositiveClick(dialog: String, song: Song) {
+    override fun onAddToPlaylist(playlistTitle: String, song: Song) {
         TODO("Not yet implemented")
     }
 
-    override fun onDialogNegativeClick(dialog: DialogFragment) {
+    override fun onNewPlaylist(song: Song) {
         TODO("Not yet implemented")
     }
 

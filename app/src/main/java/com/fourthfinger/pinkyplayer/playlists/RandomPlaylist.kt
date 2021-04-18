@@ -19,7 +19,7 @@ import kotlin.random.Random
  * @throws IllegalArgumentException if there is not at least one AudioURI in music.
  */
 class RandomPlaylist(
-        val name: String, music: List<Song>,
+        val name: String, music: Set<Song>,
         maxPercent: Double,
         val comparable: Boolean
 ) : Serializable {
@@ -27,7 +27,7 @@ class RandomPlaylist(
     // The ProbFun that randomly picks the media to play
     private var probabilityFunction: ProbFun<Song>
 
-    fun songs(): List<Song> = probabilityFunction.getKeys()
+    fun songs(): Set<Song> = probabilityFunction.getKeys()
 
     fun getMaxPercent(): Double {
         return probabilityFunction.maxPercent()
@@ -176,7 +176,7 @@ class RandomPlaylist(
         }
     }
 
-    fun updateSongs(newSongs: List<Song>) {
+    fun updateSongs(newSongs: Set<Song>) {
         for (s in newSongs) {
             if (!contains(s)) {
                 add(s)
@@ -222,7 +222,7 @@ class RandomPlaylist(
                     return false
                 }
             }
-            return (getMaxPercent() == other.getMaxPercent()) && (comparable == other.comparable)
+            return (comparable == other.comparable)
         }
         return false
     }
