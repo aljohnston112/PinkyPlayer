@@ -1,6 +1,5 @@
 package com.fourthfinger.pinkyplayer.playlists
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -24,9 +23,6 @@ class PlaylistsViewModelTest : ViewModelBaseTest(DummyPlaylistsViewModelFragment
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
-    @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
-
     @Inject
     lateinit var songDao: SongDao
 
@@ -43,8 +39,8 @@ class PlaylistsViewModelTest : ViewModelBaseTest(DummyPlaylistsViewModelFragment
         val countDownLatch = CountDownLatch(1)
         val countDownLatch3 = CountDownLatch(1)
         val countDownLatch4 = CountDownLatch(1)
+        val rp1 = RandomPlaylist("a", setOf(Song(0, "a")), 1.0, true)
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
-            val rp1 = RandomPlaylist("a", setOf(Song(0, "a")), 1.0, true)
             viewModelPlaylists.masterPlaylist.observe(viewLifecycleOwner) { rp ->
                 if (rp != null) {
                     val rpSongs = rp.songs()
@@ -60,49 +56,46 @@ class PlaylistsViewModelTest : ViewModelBaseTest(DummyPlaylistsViewModelFragment
                             for (song in dbSongs) {
                                 assert(rpSongs.contains(song))
                             }
-                            viewModelPlaylists.savePlaylist(rp1)
                             countDownLatch.countDown()
                         }
                     }
                 }
             }
-            viewModelPlaylists.loadPlaylists(LoadingCallback.getInstance())
             viewModelPlaylists.playlists.observe(viewLifecycleOwner) {
                 if (it != null && it.isNotEmpty()) {
                     if (countDownLatch3.count == 1L && countDownLatch.count == 0L) {
                         assert(it.contains(rp1))
-                        viewModelPlaylists.deletePlaylist(rp1)
                         countDownLatch3.countDown()
-                    }
-                    if (countDownLatch3.count == 0L && countDownLatch4.count == 1L) {
+                    } else if (countDownLatch3.count == 0L && countDownLatch4.count == 1L) {
                         assert(!it.contains(rp1))
                         countDownLatch4.countDown()
                     }
                 }
             }
         }
+        viewModelPlaylists.loadPlaylists(LoadingCallback.getInstance())
         countDownLatch.await()
+        viewModelPlaylists.savePlaylist(rp1)
         countDownLatch3.await()
+        viewModelPlaylists.deletePlaylist(rp1)
         countDownLatch4.await()
 
         val countDownLatch5 = CountDownLatch(1)
         val countDownLatch6 = CountDownLatch(1)
         val countDownLatch7 = CountDownLatch(1)
+        val songs = setOf(Song(0, "a"), Song(1, "b"))
 
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
-            val rp1 = RandomPlaylist("a", setOf(Song(0, "a")), 1.0, true)
             viewModelPlaylists.userPickedPlaylist.observe(viewLifecycleOwner) {
                 if (it != null) {
                     assert(it == rp1)
                     countDownLatch5.countDown()
                 }
             }
-            viewModelPlaylists.setUserPickedPlaylist(rp1)
-            val ss = setOf(Song(0, "a"), Song(1, "b"))
             viewModelPlaylists.userPickedSongs.observe(viewLifecycleOwner) {
                 if (countDownLatch6.count == 1L && it.isNotEmpty()) {
                     for (s in it) {
-                        assert(ss.contains(s))
+                        assert(songs.contains(s))
                     }
                     countDownLatch6.countDown()
                 } else if(countDownLatch6.count == 0L && countDownLatch7.count == 1L){
@@ -110,12 +103,13 @@ class PlaylistsViewModelTest : ViewModelBaseTest(DummyPlaylistsViewModelFragment
                     countDownLatch7.countDown()
                 }
             }
-            viewModelPlaylists.clearUserPickedSongs()
-            viewModelPlaylists.addUserPickedSongs(*ss.toTypedArray())
-            viewModelPlaylists.clearUserPickedSongs()
         }
+        viewModelPlaylists.setUserPickedPlaylist(rp1)
+        viewModelPlaylists.clearUserPickedSongs()
         countDownLatch5.await()
+        viewModelPlaylists.addUserPickedSongs(*songs.toTypedArray())
         countDownLatch6.await()
+        viewModelPlaylists.clearUserPickedSongs()
         countDownLatch7.await()
     }
 

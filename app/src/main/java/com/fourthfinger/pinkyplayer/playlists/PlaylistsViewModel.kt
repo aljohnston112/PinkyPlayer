@@ -47,7 +47,7 @@ class PlaylistsViewModel @Inject constructor(
         MutableLiveData<RandomPlaylist?>(null)
     }
     val userPickedPlaylist = userPickedPlaylistMLD as LiveData<RandomPlaylist?>
-    fun setUserPickedPlaylist(randomPlaylist: RandomPlaylist?){
+    fun setUserPickedPlaylist(randomPlaylist: RandomPlaylist?) {
         userPickedPlaylistMLD.postValue(randomPlaylist)
     }
 
@@ -56,11 +56,12 @@ class PlaylistsViewModel @Inject constructor(
         MutableLiveData<Set<Song>>(_userPickedSongs)
     }
     val userPickedSongs = userPickedSongsMLD as LiveData<Set<Song>>
-    fun addUserPickedSongs(vararg songs: Song){
+    fun addUserPickedSongs(vararg songs: Song) {
         _userPickedSongs.addAll(songs)
         userPickedSongsMLD.postValue(_userPickedSongs)
     }
-    fun clearUserPickedSongs(){
+
+    fun clearUserPickedSongs() {
         _userPickedSongs.clear()
         userPickedSongsMLD.postValue(_userPickedSongs)
     }
@@ -76,11 +77,11 @@ class PlaylistsViewModel @Inject constructor(
                     val ps = playlistRepo.loadPlaylists(getApplication())
                     _playlists = mutableSetOf()
                     if (ps != null) {
-                        for(p in ps){
+                        for (p in ps) {
                             _playlists.add(p)
                         }
                     }
-                    if(playlistsBeforeLoad.isNotEmpty()) {
+                    if (playlistsBeforeLoad.isNotEmpty()) {
                         for (rp in playlistsBeforeLoad) {
                             _playlists.add(rp)
                         }
@@ -100,7 +101,7 @@ class PlaylistsViewModel @Inject constructor(
     }
 
     fun savePlaylist(randomPlaylist: RandomPlaylist) {
-        if(this::_playlists.isInitialized) {
+        if (this::_playlists.isInitialized) {
             _playlists.add(randomPlaylist)
             playlistsMLD.postValue(_playlists)
             viewModelScope.launch(Dispatchers.IO) {
@@ -113,7 +114,7 @@ class PlaylistsViewModel @Inject constructor(
         }
     }
 
-    fun deletePlaylist(randomPlaylist: RandomPlaylist){
+    fun deletePlaylist(randomPlaylist: RandomPlaylist) {
         _playlists.remove(randomPlaylist)
         viewModelScope.launch(Dispatchers.IO) {
             FileUtil.mutex.withLock {
@@ -146,7 +147,7 @@ class PlaylistsViewModel @Inject constructor(
                 maxPercent = it.maxPercent
                 if (this@PlaylistsViewModel::_masterPlaylist.isInitialized) {
                     this@PlaylistsViewModel._masterPlaylist.setMaxPercent(maxPercent)
-                    for(rp in _playlists){
+                    for (rp in _playlists) {
                         rp.setMaxPercent(maxPercent)
                     }
                     masterPlaylistMLD.postValue(_masterPlaylist)
@@ -157,18 +158,14 @@ class PlaylistsViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            songRepo.songs.observeForever(songObserver)
-            settingsRepo.settings.observeForever(settingsObserver)
-        }
+        songRepo.songs.observeForever(songObserver)
+        settingsRepo.settings.observeForever(settingsObserver)
     }
 
     override fun onCleared() {
         super.onCleared()
-        viewModelScope.launch(Dispatchers.IO) {
-            songRepo.songs.removeObserver(songObserver)
-            settingsRepo.settings.removeObserver(settingsObserver)
-        }
+        songRepo.songs.removeObserver(songObserver)
+        settingsRepo.settings.removeObserver(settingsObserver)
     }
 
 }

@@ -16,13 +16,6 @@ import java.util.*
 @AndroidEntryPoint
 class DialogFragmentAddToPlaylist : DialogFragment() {
 
-    interface DialogFragmentAddToPlaylistListener {
-        fun onAddToPlaylist(playlistTitle: String, song: Song)
-        fun onNewPlaylist(song: Song)
-    }
-
-    private lateinit var callback: DialogFragmentAddToPlaylistListener
-
     private val viewModelPlaylist: PlaylistsViewModel by hiltNavGraphViewModels(R.id.nav_graph)
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -76,13 +69,13 @@ class DialogFragmentAddToPlaylist : DialogFragment() {
         builder.setPositiveButton(R.string.add) { _: DialogInterface?, _: Int ->
             if (song != null) {
                 for (index in selectedPlaylistIndices) {
-                    callback.onAddToPlaylist(playlistTitles[index], song)
+                    //callback.onAddToPlaylist(playlistTitles[index], song) TODO
                 }
             }
             if (randomPlaylist != null) {
                 for (randomPlaylistSong in randomPlaylist.songs()) {
                     for (index in selectedPlaylistIndices) {
-                        callback.onAddToPlaylist(playlistTitles[index], randomPlaylistSong)
+                        //callback.onAddToPlaylist(playlistTitles[index], randomPlaylistSong) TODO
                     }
                 }
             }
