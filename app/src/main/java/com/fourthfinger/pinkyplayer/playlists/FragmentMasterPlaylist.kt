@@ -59,7 +59,9 @@ class FragmentMasterPlaylist : Fragment(), ListenerCallbackSongs {
                 sortedSongs.sort()
 
              */
-            recyclerViewAdapterSongs.updateList(playlist.songs().toList())
+            if(playlist != null) {
+                recyclerViewAdapterSongs.updateList(playlist.songs().toList())
+            }
         }
     }
 

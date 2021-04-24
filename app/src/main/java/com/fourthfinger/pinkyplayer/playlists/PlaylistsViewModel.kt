@@ -2,6 +2,7 @@ package com.fourthfinger.pinkyplayer.playlists
 
 import android.app.Application
 import androidx.lifecycle.*
+import androidx.lifecycle.Observer
 import com.fourthfinger.pinkyplayer.FileUtil
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.settings.Settings
@@ -14,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.withLock
+import java.util.*
 import javax.inject.Inject
 
 private const val MASTER_PLAYLIST_NAME = "MASTER_PLAYLIST_NAME"
@@ -35,13 +37,47 @@ class PlaylistsViewModel @Inject constructor(
     }
     val masterPlaylist = masterPlaylistMLD as LiveData<RandomPlaylist>
 
+    private val playlistsBeforeLoad = mutableSetOf<RandomPlaylist>()
+    private val playlistsToRemove = mutableSetOf<RandomPlaylist>()
     private lateinit var _playlists: MutableSet<RandomPlaylist>
     private val playlistsMLD: MutableLiveData<Set<RandomPlaylist>> by lazy {
         MutableLiveData<Set<RandomPlaylist>>()
     }
     val playlists = playlistsMLD as LiveData<Set<RandomPlaylist>>
+    fun getPlaylistTitles(): Array<String> {
+        val titles: MutableList<String> = ArrayList(_playlists.size)
+        for (randomPlaylist in _playlists) {
+            titles.add(randomPlaylist.name)
+        }
+        return Array(titles.size) { titles[it] }
+    }
 
-    private val playlistsBeforeLoad = mutableSetOf<RandomPlaylist>()
+    fun addSongsToPlaylist(playlistTitle: String, songs: Set<Song>) {
+        for (p in _playlists) {
+            if (p.name == playlistTitle) {
+                for (s in songs) {
+                    p.add(s)
+                }
+            }
+        }
+        var changed = false
+        for (s in songs) {
+            if (!_masterPlaylist.contains(s)){
+                _masterPlaylist.add(s)
+                changed = true
+            }
+        }
+        if(changed) {
+            masterPlaylistMLD.postValue(_masterPlaylist)
+            playlistRepo.saveMasterPlaylist(_masterPlaylist, getApplication())
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            FileUtil.mutex.withLock {
+                playlistsMLD.postValue(_playlists)
+                playlistRepo.savePlaylists(_playlists.toList(), getApplication())
+            }
+        }
+    }
 
     private val userPickedPlaylistMLD: MutableLiveData<RandomPlaylist?> by lazy {
         MutableLiveData<RandomPlaylist?>(null)
@@ -81,16 +117,27 @@ class PlaylistsViewModel @Inject constructor(
                             _playlists.add(p)
                         }
                     }
+                    var save = false
                     if (playlistsBeforeLoad.isNotEmpty()) {
                         for (rp in playlistsBeforeLoad) {
                             _playlists.add(rp)
                         }
+                        playlistsBeforeLoad.clear()
+                        save = true
+                    }
+                    if(playlistsToRemove.isNotEmpty()){
+                        for(rp in playlistsToRemove){
+                            _playlists.remove(rp)
+                        }
+                        playlistsToRemove.clear()
+                        save = true
+                    }
+                    if(save){
                         viewModelScope.launch(Dispatchers.IO) {
                             FileUtil.mutex.withLock {
                                 playlistRepo.savePlaylists(_playlists.toList(), getApplication())
                             }
                         }
-                        playlistsBeforeLoad.clear()
                     }
                     playlistsMLD.postValue(_playlists)
                 }
@@ -115,12 +162,16 @@ class PlaylistsViewModel @Inject constructor(
     }
 
     fun deletePlaylist(randomPlaylist: RandomPlaylist) {
-        _playlists.remove(randomPlaylist)
-        viewModelScope.launch(Dispatchers.IO) {
-            FileUtil.mutex.withLock {
-                playlistsMLD.postValue(_playlists)
-                playlistRepo.savePlaylists(_playlists.toList(), getApplication())
+        if (this::_playlists.isInitialized) {
+            _playlists.remove(randomPlaylist)
+            viewModelScope.launch(Dispatchers.IO) {
+                FileUtil.mutex.withLock {
+                    playlistsMLD.postValue(_playlists)
+                    playlistRepo.savePlaylists(_playlists.toList(), getApplication())
+                }
             }
+        } else {
+            playlistsToRemove.add(randomPlaylist)
         }
     }
 

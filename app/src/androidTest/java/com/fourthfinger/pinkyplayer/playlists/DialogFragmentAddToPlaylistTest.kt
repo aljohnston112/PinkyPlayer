@@ -12,44 +12,55 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.fourthfinger.pinkyplayer.ActivityMain
-import com.fourthfinger.pinkyplayer.HiltExt
 import com.fourthfinger.pinkyplayer.R
-import com.fourthfinger.pinkyplayer.songs.FragmentTitleDirections
+import com.fourthfinger.pinkyplayer.ViewModelBaseTest
 import com.fourthfinger.pinkyplayer.songs.Song
 import com.google.common.truth.Truth
+import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.core.AllOf
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 @HiltAndroidTest
-class DialogFragmentAddToPlaylistTest : HiltExt<ActivityMain>(ActivityMain::class) {
+class DialogFragmentAddToPlaylistTest : ViewModelBaseTest(DummyPlaylistsViewModelFragment()) {
+
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
+
+    @Before
+    fun createDb() {
+        hiltRule.inject()
+    }
 
     private val context = ApplicationProvider.getApplicationContext<Context>()
     private lateinit var navController: NavController
     private val playlistRepo = PlaylistRepo()
 
     @Before
-    override fun setUpActivity() {
-        super.setUpActivity()
-        navController = activity.findNavController(R.id.nav_host_fragment)
+    fun setUpActivity() {
+        navController = fragment.requireActivity().findNavController(R.id.nav_host_fragment)
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
-            navController.navigate(FragmentTitleDirections.actionFragmentTitleToFragmentSongs())
+            navController.navigate(R.id.fragmentMasterPlaylist)
         }
     }
 
     @Test
     fun layout() {
-        lateinit var randomPlaylist: RandomPlaylist
+        var randomPlaylist: RandomPlaylist? = null
+        var i = 0
         runBlocking {
-            randomPlaylist = playlistRepo.loadMasterPlaylist(context)!!
+            while(randomPlaylist == null && i < 3 ) {
+                randomPlaylist = playlistRepo.loadMasterPlaylist(context)
+                i++
+            }
         }
-        val songs = randomPlaylist.songs().toList()
+        val songs = randomPlaylist!!.songs().toList()
         val s: Song = songs[0]
         val rv = onView(withId(R.id.recycler_view_song_list))
         rv.perform(RecyclerViewActions.scrollToPosition<RecyclerViewAdapterSongs.ViewHolder>(0))
@@ -64,7 +75,7 @@ class DialogFragmentAddToPlaylistTest : HiltExt<ActivityMain>(ActivityMain::clas
         onView(withText(R.string.add_to_playlist)).check(matches(isCompletelyDisplayed()))
         onView(withText(R.string.new_playlist)).check(matches(isCompletelyDisplayed()))
         onView(withText(R.string.add)).check(matches(isCompletelyDisplayed()))
-        val dialog = activity.supportFragmentManager.findFragmentByTag(
+        val dialog = fragment.requireActivity().supportFragmentManager.findFragmentByTag(
                 DIALOG_FRAGMENT_ADD_TO_PLAYLIST_TAG
         ) as DialogFragmentAddToPlaylist
         assert(dialog.dialog?.isShowing ?: false)
@@ -72,11 +83,15 @@ class DialogFragmentAddToPlaylistTest : HiltExt<ActivityMain>(ActivityMain::clas
 
     @Test
     fun newPlaylist() {
-        lateinit var randomPlaylist: RandomPlaylist
+        var randomPlaylist: RandomPlaylist? = null
+        var i = 0
         runBlocking {
-            randomPlaylist = playlistRepo.loadMasterPlaylist(context)!!
+            while(randomPlaylist == null && i < 3 ) {
+                randomPlaylist = playlistRepo.loadMasterPlaylist(context)
+                i++
+            }
         }
-        val songs = randomPlaylist.songs().toList()
+        val songs = randomPlaylist!!.songs().toList()
         val s: Song = songs[0]
         val rv = onView(withId(R.id.recycler_view_song_list))
         rv.perform(RecyclerViewActions.scrollToPosition<RecyclerViewAdapterSongs.ViewHolder>(0))
@@ -92,6 +107,52 @@ class DialogFragmentAddToPlaylistTest : HiltExt<ActivityMain>(ActivityMain::clas
         Truth.assertThat(navController.currentDestination?.id
                 ?: assert(false)).isEqualTo(R.id.fragmentEditPlaylist)
         onView(withId(R.id.edit_text_playlist_name)).check(matches(withText("")))
+    }
+
+    @Test
+    fun addSongToPlaylist(){
+        fragment as DummyPlaylistsViewModelFragment
+        val viewModelPlaylists: PlaylistsViewModel = fragment.viewModelPlaylists
+
+        var i = 0
+        var rps: MutableList<RandomPlaylist>? = null
+        runBlocking {
+            while(rps == null && i < 3){
+                rps = playlistRepo.loadPlaylists(context) as MutableList<RandomPlaylist>?
+            }
+        }
+        val rp1 = RandomPlaylist("a", setOf(Song(0, "a")), 1.0, true)
+        viewModelPlaylists.savePlaylist(rp1)
+        var randomPlaylist: RandomPlaylist? = null
+        i = 0
+        runBlocking {
+            while(randomPlaylist == null && i < 3 ) {
+                randomPlaylist = playlistRepo.loadMasterPlaylist(context)
+                i++
+            }
+        }
+        val songs = randomPlaylist!!.songs().toList()
+        val s: Song = songs[0]
+        val rv = onView(withId(R.id.recycler_view_song_list))
+        rv.perform(RecyclerViewActions.scrollToPosition<RecyclerViewAdapterSongs.ViewHolder>(0))
+        onView(AllOf.allOf(
+                withParent(AllOf.allOf(
+                        hasDescendant(withText(s.title)),
+                        hasDescendant(withId(R.id.song_handle)))
+                ),
+                withId(R.id.song_handle)
+        )).perform().perform(click())
+        onView(withText(R.string.add_to_playlist)).perform(click())
+        onView(withText(rp1.name)).perform(click())
+        onView(withText(R.string.add)).perform(click())
+        rp1.add(s)
+        runBlocking {
+            while((rps?.contains(rp1) == false || rps == null) && i < 3){
+                rps = playlistRepo.loadPlaylists(context) as MutableList<RandomPlaylist>?
+                i++
+            }
+        }
+        assert(rps!!.contains(rp1))
     }
 
 }

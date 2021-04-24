@@ -111,7 +111,7 @@ class ProbFunTest {
         pf.add(song2, p)
         pf.add(song3, p)
         pf.swapTwoPositions(0, 3)
-        val keys = pf.getKeys()
+        val keys = pf.getKeys().toList()
         assert(keys[0] == song3 && keys[3] == song0)
     }
 
@@ -128,7 +128,7 @@ class ProbFunTest {
         pf.add(song2, p)
         pf.add(song3, p)
         pf.switchOnesPosition(0, 3)
-        val keys = pf.getKeys()
+        val keys = pf.getKeys().toList()
         assert(keys[0] == song1 && keys[3] == song0)
     }
 

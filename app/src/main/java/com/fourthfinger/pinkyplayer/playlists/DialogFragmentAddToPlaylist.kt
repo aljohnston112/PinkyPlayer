@@ -10,7 +10,6 @@ import androidx.navigation.findNavController
 import com.fourthfinger.pinkyplayer.R
 import com.fourthfinger.pinkyplayer.songs.Song
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
 
 // TODO add a cancel button
 @AndroidEntryPoint
@@ -20,13 +19,7 @@ class DialogFragmentAddToPlaylist : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val bundle = requireArguments()
-        lateinit var playlistTitles: Array<String>
-        val value = viewModelPlaylist.playlists.value
-        playlistTitles = if (value != null) {
-            getPlaylistTitles(value.toList())
-        } else {
-            arrayOf()
-        }
+        val playlistTitles = viewModelPlaylist.getPlaylistTitles()
         val builder = AlertDialog.Builder(requireActivity())
         builder.setTitle(R.string.add_to_playlist)
         val selectedPlaylistIndices: MutableList<Int> = mutableListOf()
@@ -50,15 +43,6 @@ class DialogFragmentAddToPlaylist : DialogFragment() {
         }
     }
 
-    // TODO put in MediaData at some point...
-    private fun getPlaylistTitles(randomPlaylists: List<RandomPlaylist>): Array<String> {
-        val titles: MutableList<String> = ArrayList(randomPlaylists.size)
-        for (randomPlaylist in randomPlaylists) {
-            titles.add(randomPlaylist.name)
-        }
-        return Array(titles.size) { titles[it] }
-    }
-
     private fun setUpButtons(
             builder: AlertDialog.Builder,
             bundle: Bundle,
@@ -69,29 +53,31 @@ class DialogFragmentAddToPlaylist : DialogFragment() {
         builder.setPositiveButton(R.string.add) { _: DialogInterface?, _: Int ->
             if (song != null) {
                 for (index in selectedPlaylistIndices) {
-                    //callback.onAddToPlaylist(playlistTitles[index], song) TODO
+                    viewModelPlaylist.addSongsToPlaylist(playlistTitles[index], setOf(song))
                 }
             }
             if (randomPlaylist != null) {
-                for (randomPlaylistSong in randomPlaylist.songs()) {
-                    for (index in selectedPlaylistIndices) {
-                        //callback.onAddToPlaylist(playlistTitles[index], randomPlaylistSong) TODO
-                    }
+                for (index in selectedPlaylistIndices) {
+                    viewModelPlaylist.addSongsToPlaylist(playlistTitles[index], randomPlaylist.songs())
                 }
             }
         }
         builder.setNeutralButton(R.string.new_playlist) { _: DialogInterface?, _: Int ->
-            // UserPickedPlaylist need to be null for FragmentEditPlaylist to make a new playlist
-            viewModelPlaylist.setUserPickedPlaylist(null)
-            viewModelPlaylist.clearUserPickedSongs()
-            if (song != null) {
-                viewModelPlaylist.addUserPickedSongs(song)
-            }
-            if (randomPlaylist != null) {
-                viewModelPlaylist.addUserPickedSongs(*randomPlaylist.songs().toTypedArray())
-            }
-            requireActivity().findNavController(R.id.nav_host_fragment).navigate(R.id.fragmentEditPlaylist)
+            startCreateNewPlaylist(randomPlaylist, song)
         }
+    }
+
+    private fun startCreateNewPlaylist(randomPlaylist: RandomPlaylist?, song: Song?) {
+        // UserPickedPlaylist need to be null for FragmentEditPlaylist to make a new playlist
+        viewModelPlaylist.setUserPickedPlaylist(null)
+        viewModelPlaylist.clearUserPickedSongs()
+        if (song != null) {
+            viewModelPlaylist.addUserPickedSongs(song)
+        }
+        if (randomPlaylist != null) {
+            viewModelPlaylist.addUserPickedSongs(*randomPlaylist.songs().toTypedArray())
+        }
+        requireActivity().findNavController(R.id.nav_host_fragment).navigate(R.id.fragmentEditPlaylist)
     }
 
     companion object {

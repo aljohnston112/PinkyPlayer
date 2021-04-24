@@ -36,81 +36,104 @@ class PlaylistsViewModelTest : ViewModelBaseTest(DummyPlaylistsViewModelFragment
         fragment as DummyPlaylistsViewModelFragment
         val viewModelPlaylists: PlaylistsViewModel = fragment.viewModelPlaylists
         val viewLifecycleOwner = fragment.viewLifecycleOwner
-        val countDownLatch = CountDownLatch(1)
-        val countDownLatch3 = CountDownLatch(1)
-        val countDownLatch4 = CountDownLatch(1)
+        val countDownLatchMasterPlaylist = CountDownLatch(1)
+        val countDownLatchAddPlaylist = CountDownLatch(1)
+        val countDownLatchDeletePlaylist = CountDownLatch(1)
+        val countDownLatchAddSongToPlaylist = CountDownLatch(1)
         val rp1 = RandomPlaylist("a", setOf(Song(0, "a")), 1.0, true)
+        val song = Song(2, "b")
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
             viewModelPlaylists.masterPlaylist.observe(viewLifecycleOwner) { rp ->
                 if (rp != null) {
                     val rpSongs = rp.songs()
                     val allSongs: LiveData<List<Song>> = songDao.getAll()
                     allSongs.observe(viewLifecycleOwner) { dbSongs ->
-                        val rpSongs = rpSongs.toHashSet()
-                        val dbSongs = dbSongs.toHashSet()
-                        if (dbSongs.isNotEmpty() && dbSongs.size == rpSongs.size) {
-
-                            for (song in rpSongs) {
-                                assert(dbSongs.contains(song))
+                        val rpSongsC = rpSongs.toHashSet()
+                        val dbSongsC = dbSongs.toHashSet()
+                        if (dbSongsC.isNotEmpty() && dbSongsC.size == rpSongsC.size) {
+                            for (song in rpSongsC) {
+                                assert(dbSongsC.contains(song))
                             }
-                            for (song in dbSongs) {
-                                assert(rpSongs.contains(song))
+                            for (song in dbSongsC) {
+                                assert(rpSongsC.contains(song))
                             }
-                            countDownLatch.countDown()
+                            countDownLatchMasterPlaylist.countDown()
                         }
                     }
                 }
             }
             viewModelPlaylists.playlists.observe(viewLifecycleOwner) {
-                if (it != null && it.isNotEmpty()) {
-                    if (countDownLatch3.count == 1L && countDownLatch.count == 0L) {
+                if (it != null) {
+                    if (it.isNotEmpty() && countDownLatchAddPlaylist.count == 1L && countDownLatchMasterPlaylist.count == 0L) {
                         assert(it.contains(rp1))
-                        countDownLatch3.countDown()
-                    } else if (countDownLatch3.count == 0L && countDownLatch4.count == 1L) {
+                        val names = viewModelPlaylists.getPlaylistTitles()
+                        for (n in names) {
+                            var found = false
+                            for (p in it) {
+                                if (p.name == n) {
+                                    found = true
+                                }
+                            }
+                            assert(found)
+                        }
+                        countDownLatchAddPlaylist.countDown()
+                    } else if (countDownLatchAddPlaylist.count == 0L && countDownLatchDeletePlaylist.count == 1L &&
+                            countDownLatchAddSongToPlaylist.count == 0L) {
                         assert(!it.contains(rp1))
-                        countDownLatch4.countDown()
+                        countDownLatchDeletePlaylist.countDown()
+                    } else if (countDownLatchAddPlaylist.count == 0L && countDownLatchAddSongToPlaylist.count == 1L) {
+                        var contained = false
+                        for (p in it) {
+                            if(p.name == rp1.name){
+                                contained = p.contains(song)
+                            }
+                        }
+                        assert(contained)
+                        countDownLatchAddSongToPlaylist.countDown()
                     }
                 }
             }
         }
         viewModelPlaylists.loadPlaylists(LoadingCallback.getInstance())
-        countDownLatch.await()
+        countDownLatchMasterPlaylist.await()
         viewModelPlaylists.savePlaylist(rp1)
-        countDownLatch3.await()
+        countDownLatchAddPlaylist.await()
+        viewModelPlaylists.addSongsToPlaylist(rp1.name, setOf(song))
+        countDownLatchAddSongToPlaylist.await()
         viewModelPlaylists.deletePlaylist(rp1)
-        countDownLatch4.await()
+        countDownLatchDeletePlaylist.await()
 
-        val countDownLatch5 = CountDownLatch(1)
-        val countDownLatch6 = CountDownLatch(1)
-        val countDownLatch7 = CountDownLatch(1)
+        val countDownLatchUserPickedPlaylist = CountDownLatch(1)
+        val countDownLatchUserPickedSongs = CountDownLatch(1)
+        val countDownLatchClearUserPickedSongs = CountDownLatch(1)
         val songs = setOf(Song(0, "a"), Song(1, "b"))
 
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
             viewModelPlaylists.userPickedPlaylist.observe(viewLifecycleOwner) {
                 if (it != null) {
                     assert(it == rp1)
-                    countDownLatch5.countDown()
+                    countDownLatchUserPickedPlaylist.countDown()
                 }
             }
             viewModelPlaylists.userPickedSongs.observe(viewLifecycleOwner) {
-                if (countDownLatch6.count == 1L && it.isNotEmpty()) {
+                if (countDownLatchUserPickedSongs.count == 1L && it.isNotEmpty()) {
                     for (s in it) {
                         assert(songs.contains(s))
                     }
-                    countDownLatch6.countDown()
-                } else if(countDownLatch6.count == 0L && countDownLatch7.count == 1L){
+                    countDownLatchUserPickedSongs.countDown()
+                } else if (countDownLatchUserPickedSongs.count == 0L && countDownLatchClearUserPickedSongs.count == 1L) {
                     assert(it.isEmpty())
-                    countDownLatch7.countDown()
+                    countDownLatchClearUserPickedSongs.countDown()
                 }
             }
         }
         viewModelPlaylists.setUserPickedPlaylist(rp1)
         viewModelPlaylists.clearUserPickedSongs()
-        countDownLatch5.await()
+        countDownLatchUserPickedPlaylist.await()
         viewModelPlaylists.addUserPickedSongs(*songs.toTypedArray())
-        countDownLatch6.await()
+        countDownLatchUserPickedSongs.await()
         viewModelPlaylists.clearUserPickedSongs()
-        countDownLatch7.await()
+        countDownLatchClearUserPickedSongs.await()
     }
 
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.CountDownLatch
 
@@ -20,7 +21,7 @@ class LiveDataTestUtil {
         ) {
             val countDownLatch = CountDownLatch(1)
             var done = false
-            coroutineScope.launch {
+            coroutineScope.launch(Dispatchers.Main) {
                 liveData.observe(viewLifecycleOwner) {
                     if (!done) {
                         if (it == data) {
@@ -34,7 +35,9 @@ class LiveDataTestUtil {
                 }
             }
             countDownLatch.await()
-            liveData.removeObservers(viewLifecycleOwner)
+            coroutineScope.launch(Dispatchers.Main) {
+                liveData.removeObservers(viewLifecycleOwner)
+            }
         }
 
 

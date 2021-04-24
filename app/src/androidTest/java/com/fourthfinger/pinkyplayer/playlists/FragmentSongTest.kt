@@ -98,8 +98,9 @@ class FragmentSongTest : HiltExt<ActivityMain>(ActivityMain::class) {
             onView(withId(R.id.edit_text_current_time)).check(matches(allOf(
                     isCompletelyDisplayed(), withText(StringUtil.formatMillis(0)))))
             onView(withId(R.id.edit_text_end_time)).check(matches(allOf(
-                    isCompletelyDisplayed(), withText(StringUtil.formatMillis(audioUri.getDuration(context))))))
-
+                    isCompletelyDisplayed(),
+                    withText(StringUtil.formatMillis(audioUri.getDuration(context)))
+            )))
             onView(withId(R.id.linear_layout_buttons_fragment_song)).check(matches(isCompletelyDisplayed()))
             onView(withId(R.id.image_button_shuffle)).check(matches(allOf(
                     isCompletelyDisplayed(), withDrawable(R.drawable.ic_shuffle_black_24dp))))
