@@ -2,4 +2,6 @@
     <string name="app_name">Pinky Player</string>
 
     <string name="permission_needed">Access to storage is needed to access audio</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

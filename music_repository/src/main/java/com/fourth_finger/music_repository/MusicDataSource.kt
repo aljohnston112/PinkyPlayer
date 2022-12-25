@@ -1,34 +1,33 @@
-package com.fourth_finger.pinky_player
+package com.fourth_finger.music_repository
 
 import android.content.ContentResolver
 import android.content.ContentUris
-import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
 
-class DataSourceMedia {
+/**
+ * A container for a music file.
+ * The file came from the MediaStore and is considered music by the MediaStore.
+ *
+ * @param id the id the MediaStore gave this music file.
+ * @param displayName the display name of the music file.
+ * @param contentUri the uri pointing to the music file.
+ */
+data class MusicFile(val id: Long, val displayName: String, val contentUri: Uri)
 
-    /**
-     * A container for a music file.
-     * The file came from the MediaStore and is considered music by the MediaStore.
-     *
-     * @param id the id the MediaStore gave this music file.
-     * @param displayName the display name of the music file.
-     * @param contentUri the uri pointing to the music file.
-     */
-    data class MusicFile(val id: Long, val displayName: String, val contentUri: Uri)
+internal class MusicDataSource {
 
     companion object {
 
         /**
-         * Gets a list of music file that represent files
+         * Gets a list of music files that represent files
          * that the MediaStore considers music.
          *
          * @param contentResolver the ContentResolver to query the MediaStore.
          */
         @JvmStatic
-        fun getMusicFromMediaStore(contentResolver: ContentResolver): List<MusicFile> {
+        internal fun getMusicFromMediaStore(contentResolver: ContentResolver): List<MusicFile> {
             var music = listOf<MusicFile>()
 
             // The query parameters

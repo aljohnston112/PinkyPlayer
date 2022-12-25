@@ -1,28 +1,20 @@
 package com.fourth_finger.pinky_player
 
-import android.Manifest
-import android.app.Activity
 import android.content.ContentResolver
-import android.content.Context
-import android.content.pm.PackageManager
-import android.view.View
-import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResultCaller
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import com.fourth_finger.music_repository.MusicRepository
+import kotlinx.coroutines.*
 
 /**
  * The ViewModel for ActivityMain
  */
-class ActivityMainViewModel: ViewModel() {
+class ActivityMainViewModel : ViewModel() {
 
 //    private val _uiState = MutableStateFlow(ActivityMainState())
 //    val uiState: StateFlow<ActivityMainState> = _uiState
+
+    private val scope = CoroutineScope(Job() + Dispatchers.Main)
+    private val musicRepository = MusicRepository()
 
     /**
      * Call when there is permission to search for music files.
@@ -30,7 +22,9 @@ class ActivityMainViewModel: ViewModel() {
      * @param contentResolver the ContentResolver for loading music files.
      */
     fun permissionGranted(contentResolver: ContentResolver) {
-        DataSourceMedia.getMusicFromMediaStore(contentResolver)
+        scope.launch(Dispatchers.IO) {
+            musicRepository.getMusicFiles(contentResolver)
+        }
     }
 
 }
