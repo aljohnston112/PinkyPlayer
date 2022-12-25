@@ -2,38 +2,33 @@ package com.fourth_finger.music_repository
 
 import android.content.ContentResolver
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import android.provider.MediaStore
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 
 /**
  * A repository for the music on an Android device.
  */
-class MusicRepository {
+class MusicRepository private constructor() {
 
-    private val latestMusicMutex = Mutex()
-    private var latestMusic = emptyList<MusicFile>()
-
-    /**
-     * Gets [MusicFile]s loaded via the overloaded [getCurrentMusicFiles] function.
-     * The returned list will be empty if the files have not been loaded.
-     *
-     * @return A list of [MusicFile]s that represent music files on the device.
-     */
-    fun getCurrentMusicFiles(): List<MusicFile>{
-        return latestMusic
-    }
+    private val _latestMusic = MutableLiveData(
+        emptyList<MusicFile>()
+    )
+    val musicFiles: LiveData<List<MusicFile>> = _latestMusic
 
     /**
      * Loads [MusicFile]s that can be used to access music.
      *
      * @param contentResolver The [ContentResolver] used to query the [MediaStore].
-     * @return A list of [MusicFile]s representing files loaded from the [MediaStore].
      */
-    suspend fun updateMusicFiles(
+    fun loadMusicFiles(
         contentResolver: ContentResolver
-    ): List<MusicFile> {
-        return latestMusicMutex.withLock{ getMusicFromMediaStore(contentResolver) }
+    ) {
+        _latestMusic.postValue(getMusicFromMediaStore(contentResolver))
     }
 
     /**
@@ -45,10 +40,17 @@ class MusicRepository {
     private fun getMusicFromMediaStore(
         contentResolver: ContentResolver
     ): List<MusicFile> {
-            if (latestMusic.isEmpty()) {
-                latestMusic = MusicDataSource.getMusicFromMediaStore(contentResolver)
-            }
-        return latestMusic
+        return MusicDataSource.getMusicFromMediaStore(contentResolver)
+    }
+
+    companion object {
+
+        private val INSTANCE: MusicRepository by lazy { MusicRepository() }
+
+        fun getInstance(): MusicRepository {
+            return INSTANCE
+        }
+
     }
 
 }

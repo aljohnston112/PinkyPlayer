@@ -6,7 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import com.fourth_finger.music_repository.MusicFile
@@ -39,13 +42,14 @@ class FragmentMusicList : Fragment() {
         val adapter = MusicFileAdapter(emptyList())
         val rv = view.findViewById<RecyclerView>(R.id.recycler_view)
         rv.adapter = adapter
+        val linearLayoutManager = LinearLayoutManager(context)
+        linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
+        rv.layoutManager = linearLayoutManager
 
         // Set up updates
-        lifecycleScope.launch {
-            viewModel.uiState.collect { uiState ->
-                adapter.updateMusicList(uiState.musicFiles)
-            }
+        viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
+            adapter.updateMusicList(uiState.musicFiles)
         }
-    }
 
+    }
 }
