@@ -15,14 +15,15 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 
 /**
- * The main [Activity]
+ * The main [Activity].
  */
 class ActivityMain : AppCompatActivity() {
 
     private val viewModel: ActivityMainViewModel by viewModels()
 
     /**
-     * Makes sure there is permission and then loads music files from the MediaStore.
+     *  Makes sure the proper permissions are granted and
+     *  then loads music files from the MediaStore.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

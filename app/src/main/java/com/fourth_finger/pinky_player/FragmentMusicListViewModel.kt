@@ -14,14 +14,14 @@ import kotlinx.coroutines.flow.StateFlow
 data class FragmentMusicListState(val musicFiles: List<MusicFile>)
 
 /**
- * The [ViewModel] for [FragmentMusicList]
+ * The [ViewModel] for [FragmentMusicList].
  */
 class FragmentMusicListViewModel: ViewModel() {
 
     private val musicRepository = MusicRepository()
 
     private val _uiState = MutableStateFlow(
-        FragmentMusicListState(musicRepository.getMusicFiles())
+        FragmentMusicListState(musicRepository.getCurrentMusicFiles())
     )
     val uiState: StateFlow<FragmentMusicListState> = _uiState
 

@@ -6,7 +6,7 @@ import com.fourth_finger.music_repository.MusicRepository
 import kotlinx.coroutines.*
 
 /**
- * The ViewModel for ActivityMain
+ * The ViewModel for ActivityMain.
  */
 class ActivityMainViewModel : ViewModel() {
 
@@ -17,13 +17,13 @@ class ActivityMainViewModel : ViewModel() {
     private val musicRepository = MusicRepository()
 
     /**
-     * Call when there is permission to search for music files.
+     * Called when there is permission to search for music files.
      *
      * @param contentResolver the ContentResolver for loading music files.
      */
     fun permissionGranted(contentResolver: ContentResolver) {
         scope.launch(Dispatchers.IO) {
-            musicRepository.getMusicFiles(contentResolver)
+            musicRepository.updateMusicFiles(contentResolver)
         }
     }
 
