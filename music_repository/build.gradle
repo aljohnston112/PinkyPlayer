@@ -5,11 +5,11 @@ plugins {
 
 android {
     namespace 'com.fourth_finger.music_repository'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         minSdk 21
-        targetSdk 32
+        targetSdk 33
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -37,11 +37,16 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
 
     implementation 'com.google.android.material:material:1.7.0'
-    
+    implementation 'androidx.test:core-ktx:1.5.0'
+
 
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.9'
+    testImplementation "org.mockito.kotlin:mockito-kotlin:4.1.0"
 
-
+    androidTestImplementation "androidx.test:core:1.5.0"
+    androidTestImplementation "androidx.test:runner:1.5.1"
+    androidTestImplementation "androidx.test:rules:1.5.0"
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
 }
