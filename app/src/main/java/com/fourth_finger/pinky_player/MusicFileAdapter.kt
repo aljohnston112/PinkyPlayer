@@ -27,13 +27,6 @@ class MusicFileAdapter(
         diff.dispatchUpdatesTo(this)
     }
 
-    /**
-     * The [RecyclerView.ViewHolder] for [MusicFile]s.
-     */
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val textView: TextView = view.findViewById(R.id.textView)
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             LayoutInflater.from(parent.context).inflate(
@@ -55,5 +48,12 @@ class MusicFileAdapter(
      * Gets the number of items in this [MusicFileAdapter].
      */
     override fun getItemCount() = dataSet.size
+
+    /**
+     * The [RecyclerView.ViewHolder] for [MusicFile]s.
+     */
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val textView: TextView = view.findViewById(R.id.textView)
+    }
 
 }
