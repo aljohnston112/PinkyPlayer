@@ -1,6 +1,9 @@
 package com.fourth_finger.music_repository
 
+import android.R.attr.path
+import android.content.ContentUris
 import android.content.ContentValues
+import android.content.Intent
 import android.os.Looper
 import android.provider.MediaStore
 import org.junit.Test
@@ -9,6 +12,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows
 import java.util.*
+
 
 /**
  * Tests the [MusicDataSource].
@@ -34,14 +38,15 @@ class MusicDataSourceTest {
 
         // Test the returned MusicFile objects represent the correct MediaStore rows
         val app = RuntimeEnvironment.getApplication()
-        val musicFiles = MusicDataSource.getMusicFromMediaStore(app.contentResolver)
+        val contentResolver = app.contentResolver
+        val musicFiles = MusicDataSource.getMusicFromMediaStore(contentResolver)
         Shadows.shadowOf(Looper.getMainLooper()).idle()
-            assert(musicFiles.size == halfNumRows)
-            for ((i, key) in validIdToDisplayNameMap.keys.withIndex()) {
-                assert(musicFiles[i].id == key)
-                assert(musicFiles[i].displayName == validIdToDisplayNameMap[key])
-            }
+        assert(musicFiles.size == halfNumRows)
+        for ((i, key) in validIdToDisplayNameMap.keys.withIndex()) {
+            assert(musicFiles[i].id == key)
+            assert(musicFiles[i].displayName == validIdToDisplayNameMap[key])
         }
+    }
 
     /**
      * Inserts music into the ContentResolver;
@@ -53,7 +58,8 @@ class MusicDataSourceTest {
         isMusic: Int
     ) {
         for (i in 0 until halfNumRows) {
-            idToDisplayNameMap[UUID.randomUUID()!!.hashCode().toLong()] = UUID.randomUUID()!!.toString()
+            idToDisplayNameMap[UUID.randomUUID()!!.hashCode().toLong()] =
+                UUID.randomUUID()!!.toString()
         }
         for (pair in idToDisplayNameMap) {
             insert(pair.key, pair.value, isMusic)
@@ -74,9 +80,14 @@ class MusicDataSourceTest {
         contentValues.put(MediaStore.Audio.Media.DISPLAY_NAME, displayName)
         contentValues.put(MediaStore.Audio.Media.IS_MUSIC, isMusic)
         val app = RuntimeEnvironment.getApplication()
-        app.contentResolver.insert(
+        val uri = app.contentResolver.insert(
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
             contentValues
+        )
+        app.contentResolver.refresh(
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+            null,
+            null
         )
     }
 
