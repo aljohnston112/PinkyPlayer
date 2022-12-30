@@ -18,6 +18,11 @@ class MusicRepository private constructor() {
     private val _latestMusic = MutableLiveData(
         emptyList<MusicFile>()
     )
+
+    /**
+     * Holds a list of [MusicFile]s which represent
+     * the files the [MediaStore] considers music and are on the device.
+     */
     val musicFiles: LiveData<List<MusicFile>> = _latestMusic
 
     /**
@@ -47,6 +52,11 @@ class MusicRepository private constructor() {
 
         private val INSTANCE: MusicRepository by lazy { MusicRepository() }
 
+        /**
+         * Gets the only instance of the MusicRepository.
+         * It holds a list of [MusicFile] which represents
+         * the files the [MediaStore] considers music and are on the device.
+         */
         fun getInstance(): MusicRepository {
             return INSTANCE
         }

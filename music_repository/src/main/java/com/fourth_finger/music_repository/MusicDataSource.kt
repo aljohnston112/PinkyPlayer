@@ -12,9 +12,8 @@ import android.provider.MediaStore
  *
  * @param id The id the MediaStore gave this music file.
  * @param displayName The display name of the music file.
- * @param contentUri The uri pointing to the music file.
  */
-data class MusicFile(val id: Long, val displayName: String, val contentUri: Uri){
+data class MusicFile(val id: Long, val displayName: String){
 
     override fun equals(other: Any?): Boolean {
         return other is MusicFile && id == other.id && displayName == other.displayName
@@ -34,6 +33,8 @@ data class MusicFile(val id: Long, val displayName: String, val contentUri: Uri)
 internal class MusicDataSource {
 
     companion object {
+
+        private lateinit var idToUriMap: Map<MusicFile, Uri>
 
         /**
          * Gets a list of [MusicFile]s that represent files
@@ -74,7 +75,7 @@ internal class MusicDataSource {
          * @param cursor The cursor containing a query for [MediaStore] music.
          */
         private fun convertQueryToMusicFiles(cursor: Cursor): List<MusicFile> {
-            val music = mutableListOf<MusicFile>()
+            val mutableIdToUriMap = mutableMapOf<MusicFile, Uri>()
 
             // The database columns
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
@@ -90,10 +91,11 @@ internal class MusicDataSource {
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     id
                 )
-                music.add(MusicFile(id, displayName, contentUri))
+                val musicFile = MusicFile(id, displayName)
+                mutableIdToUriMap[musicFile] = contentUri
             }
-
-            return music
+            idToUriMap = mutableIdToUriMap
+            return mutableIdToUriMap.keys.toList()
         }
 
     }

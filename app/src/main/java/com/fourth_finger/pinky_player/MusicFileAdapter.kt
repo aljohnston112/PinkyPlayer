@@ -12,6 +12,7 @@ import com.fourth_finger.music_repository.MusicFile
  * The [RecyclerView.Adapter] for [MusicFile]s.
  */
 class MusicFileAdapter(
+    private val layoutResourceID: Int,
     private var dataSet: List<MusicFile>
 ) : RecyclerView.Adapter<MusicFileAdapter.ViewHolder>() {
 
@@ -30,7 +31,7 @@ class MusicFileAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             LayoutInflater.from(parent.context).inflate(
-                R.layout.music_file_holder,
+                layoutResourceID,
                 parent,
                 false
             )

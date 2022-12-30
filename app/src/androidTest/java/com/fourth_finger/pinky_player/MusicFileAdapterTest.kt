@@ -1,25 +1,22 @@
 package com.fourth_finger.pinky_player
 
-import android.net.Uri
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
 import com.fourth_finger.music_repository.MusicFile
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import com.fourth_finger.pinky_player.R
 
-@RunWith(RobolectricTestRunner::class)
 class MusicFileAdapterTest {
 
-    private val urlStub = Uri.fromParts("", "", "")
     private val emptyList = emptyList<MusicFile>()
     private val singletonList = listOf(
-        MusicFile(0, "A", urlStub)
+        MusicFile(0, "A")
     )
 
     private val context = InstrumentationRegistry.getInstrumentation().context
+    private val layoutId = R.layout.music_file_holder
     private val viewStub = LinearLayout(context)
 
     @Before
@@ -33,6 +30,7 @@ class MusicFileAdapterTest {
     @Test
     fun updateMusicList_NewList_UpdatesCount() {
         val adapter = MusicFileAdapter(
+            layoutId,
             emptyList
         )
         assert(adapter.itemCount == 0)
@@ -43,6 +41,7 @@ class MusicFileAdapterTest {
     @Test
     fun onCreateViewHolder_InflatesCorrectLayout() {
         val adapter = MusicFileAdapter(
+            layoutId,
             singletonList
         )
         val viewHolder = adapter.createViewHolder(viewStub, 0)
@@ -52,9 +51,10 @@ class MusicFileAdapterTest {
     @Test
     fun onBindViewHolder_ValidPositions_BindCorrectly() {
         val adapter = MusicFileAdapter(
+            layoutId,
             listOf(
-                MusicFile(0, "A", urlStub),
-                MusicFile(1, "B", urlStub)
+                MusicFile(0, "A"),
+                MusicFile(1, "B")
             )
         )
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub)
@@ -69,6 +69,7 @@ class MusicFileAdapterTest {
     @Test(expected = IndexOutOfBoundsException::class)
     fun onBindViewHolder_InValidPositions_Throws() {
         val adapter = MusicFileAdapter(
+            layoutId,
             singletonList
         )
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub)
@@ -78,13 +79,13 @@ class MusicFileAdapterTest {
 
     @Test
     fun getItemCount_EmptyList_ReturnsZero() {
-        val adapter = MusicFileAdapter(emptyList)
+        val adapter = MusicFileAdapter(layoutId, emptyList)
         assert(adapter.itemCount == 0)
     }
 
     @Test
     fun getItemCount_ListWithOne_ReturnsOne() {
-        val adapter = MusicFileAdapter(singletonList)
+        val adapter = MusicFileAdapter(layoutId, singletonList)
         assert(adapter.itemCount == 1)
     }
 

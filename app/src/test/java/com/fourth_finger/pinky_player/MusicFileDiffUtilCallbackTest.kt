@@ -3,16 +3,12 @@ package com.fourth_finger.pinky_player
 import android.net.Uri
 import com.fourth_finger.music_repository.MusicFile
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
 class MusicFileDiffUtilCallbackTest {
 
-    private val urlStub = Uri.fromParts("", "", "")
     private val emptyList = emptyList<MusicFile>()
     private val singletonList = listOf(
-        MusicFile(0, "A", urlStub)
+        MusicFile(0, "A")
     )
 
     @Test
@@ -79,10 +75,10 @@ class MusicFileDiffUtilCallbackTest {
     fun areItemsTheSame_DifferentIDs_ReturnsFalse(){
         val musicFileDiffUtilCallback = MusicFileDiffUtilCallback(
             listOf(
-                MusicFile(0, "A", urlStub)
+                MusicFile(0, "A")
             ),
             listOf(
-                MusicFile(1, "A", urlStub)
+                MusicFile(1, "A")
             )
         )
         assert(!musicFileDiffUtilCallback.areItemsTheSame(0, 0))
@@ -137,10 +133,10 @@ class MusicFileDiffUtilCallbackTest {
     fun areContentsTheSame_DifferentIDs_ReturnsFalse(){
         val musicFileDiffUtilCallback = MusicFileDiffUtilCallback(
             listOf(
-                MusicFile(0, "A", urlStub)
+                MusicFile(0, "A")
             ),
             listOf(
-                MusicFile(1, "A", urlStub)
+                MusicFile(1, "A")
             )
         )
         assert(!musicFileDiffUtilCallback.areContentsTheSame(0, 0))
@@ -150,10 +146,10 @@ class MusicFileDiffUtilCallbackTest {
     fun areContentsTheSame_DifferentDisplayName_ReturnsFalse(){
         val musicFileDiffUtilCallback = MusicFileDiffUtilCallback(
             listOf(
-                MusicFile(0, "A", urlStub)
+                MusicFile(0, "A")
             ),
             listOf(
-                MusicFile(0, "B", urlStub)
+                MusicFile(0, "B")
             )
         )
         assert(!musicFileDiffUtilCallback.areContentsTheSame(0, 0))
@@ -167,5 +163,5 @@ class MusicFileDiffUtilCallbackTest {
         )
         assert(musicFileDiffUtilCallback.areContentsTheSame(0, 0))
     }
-    
+
 }
