@@ -6,7 +6,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.fourth_finger.music_repository.MusicFile
 import org.junit.Before
 import org.junit.Test
-import com.fourth_finger.pinky_player.R
 
 class MusicFileAdapterTest {
 
@@ -15,7 +14,7 @@ class MusicFileAdapterTest {
         MusicFile(0, "A")
     )
 
-    private val context = InstrumentationRegistry.getInstrumentation().context
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val layoutId = R.layout.music_file_holder
     private val viewStub = LinearLayout(context)
 
@@ -28,7 +27,7 @@ class MusicFileAdapterTest {
     }
 
     @Test
-    fun updateMusicList_NewList_UpdatesCount() {
+    fun updateMusicList_NewList_UpdatesItemCountAndViewHolders() {
         val adapter = MusicFileAdapter(
             layoutId,
             emptyList
@@ -36,6 +35,10 @@ class MusicFileAdapterTest {
         assert(adapter.itemCount == 0)
         adapter.updateMusicList(singletonList)
         assert(adapter.itemCount == 1)
+
+        val viewHolder = adapter.createViewHolder(viewStub, 0)
+        adapter.onBindViewHolder(viewHolder, 0)
+        assert(viewHolder.textView.text == singletonList[0].displayName)
     }
 
     @Test
@@ -67,7 +70,7 @@ class MusicFileAdapterTest {
     }
 
     @Test(expected = IndexOutOfBoundsException::class)
-    fun onBindViewHolder_InValidPositions_Throws() {
+    fun onBindViewHolder_InValidPosition_Throws() {
         val adapter = MusicFileAdapter(
             layoutId,
             singletonList
