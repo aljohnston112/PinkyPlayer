@@ -1,16 +1,11 @@
 package com.fourth_finger.pinky_player
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.fourth_finger.music_repository.MusicFile
 import com.fourth_finger.music_repository.MusicRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 /**
  * The state holder for [FragmentMusicList].
@@ -22,9 +17,10 @@ data class FragmentMusicListState(val musicFiles: List<MusicFile>)
 /**
  * The [ViewModel] for [FragmentMusicList].
  */
-class FragmentMusicListViewModel : ViewModel() {
-
-    private val musicRepository = MusicRepository.getInstance()
+class FragmentMusicListViewModel(
+    savedStateHandle: SavedStateHandle,
+    private val musicRepository: MusicRepository
+) : ViewModel() {
 
     private val _uiState = MutableLiveData(
         FragmentMusicListState(emptyList())
@@ -43,6 +39,16 @@ class FragmentMusicListViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         musicRepository.musicFiles.removeObserver(observer)
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val savedStateHandle = createSavedStateHandle()
+                val musicRepository = MusicRepository.getInstance()
+                FragmentMusicListViewModel(savedStateHandle, musicRepository)
+            }
+        }
     }
 
 }

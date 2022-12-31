@@ -2,12 +2,9 @@ package com.fourth_finger.pinky_player
 
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
-import androidx.lifecycle.viewModelScope
-import com.fourth_finger.music_repository.MusicFile
 import com.fourth_finger.music_repository.MusicRepository
+import androidx.lifecycle.*
 import kotlinx.coroutines.cancel
-import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 
@@ -18,9 +15,15 @@ class FragmentMusicListViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
+
     @Test
     fun getUiState() {
-
+        val musicRepository = MusicRepository.getInstance()
+        val viewModel = FragmentMusicListViewModel(SavedStateHandle(), musicRepository)
+        val uiState = musicRepository.musicFiles
+        assert(uiState.hasActiveObservers())
+        viewModel.viewModelScope.cancel()
+        assert(!uiState.hasActiveObservers())
     }
 
     @Test

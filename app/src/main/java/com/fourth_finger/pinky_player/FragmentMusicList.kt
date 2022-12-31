@@ -15,7 +15,9 @@ import com.fourth_finger.music_repository.MusicFile
  */
 class FragmentMusicList : Fragment() {
 
-    private val viewModel: FragmentMusicListViewModel by viewModels()
+    private val viewModel: FragmentMusicListViewModel by viewModels{
+        FragmentMusicListViewModel.Factory
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
