@@ -13,24 +13,22 @@ class MusicRepositoryTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
-
     /**
-     * Test the [MusicFile]s that getMusicFromMediaStore returns
-     * represent audio files that are in the MediaStore's audio store and
-     * are considered music.
-     *
-     * It is assumed there is one music file on the device,
-     * and it display name is "01 .mp3"
+     * Test the [MusicFile]s that loadMusicFiles loads into the musicFiles [LiveData]
+     * of the [MusicRepository]
+     * matches the [MusicFile]s returned by getMusicFromMediaStore
+     * of the [MusicDataSource].
      */
     @Test
     fun loadMusicFiles_ContentResolver_LiveDataReturnsCorrectSongs() {
-
-        // Test the returned MusicFile objects represent the correct MediaStore rows
         val context = InstrumentationRegistry.getInstrumentation().context
+        val musicFiles = MusicDataSource.getMusicFromMediaStore(context.contentResolver)
+
         MusicRepository.getInstance().loadMusicFiles(context.contentResolver)
-        MusicRepository.getInstance().musicFiles.observeForever {
-            assert(it.size == 1)
-            assert(it[0].displayName == "01 .mp3")
+        val music = MusicRepository.getInstance().musicFiles.getOrAwaitValue()
+        assert(music.size == musicFiles.size)
+        for((i, song) in music.withIndex()) {
+            assert(song.displayName == musicFiles[i].displayName)
         }
 
     }

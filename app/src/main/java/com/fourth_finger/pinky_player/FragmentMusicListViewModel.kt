@@ -19,26 +19,11 @@ data class FragmentMusicListState(val musicFiles: List<MusicFile>)
  */
 class FragmentMusicListViewModel(
     savedStateHandle: SavedStateHandle,
-    private val musicRepository: MusicRepository
+    musicRepository: MusicRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableLiveData(
-        FragmentMusicListState(emptyList())
-    )
-    val uiState: LiveData<FragmentMusicListState> = _uiState
-
-    private val observer = { musicFiles: List<MusicFile> ->
-            _uiState.postValue(FragmentMusicListState(musicFiles))
-        }
-
-    init {
-        musicRepository.musicFiles.observeForever(observer)
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    public override fun onCleared() {
-        super.onCleared()
-        musicRepository.musicFiles.removeObserver(observer)
+    val uiState: LiveData<FragmentMusicListState> = Transformations.map(musicRepository.musicFiles){
+        FragmentMusicListState(it)
     }
 
     companion object {
