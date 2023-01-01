@@ -1,11 +1,11 @@
 package com.fourth_finger.pinky_player
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.fourth_finger.music_repository.MusicFile
 import com.fourth_finger.music_repository.MusicRepository
-import kotlinx.coroutines.flow.*
 
 /**
  * The state holder for [FragmentMusicList].
@@ -27,8 +27,7 @@ class FragmentMusicListViewModel(
     )
     val uiState: LiveData<FragmentMusicListState> = _uiState
 
-    private val observer: (List<MusicFile>) -> Unit =
-        { musicFiles: List<MusicFile> ->
+    private val observer = { musicFiles: List<MusicFile> ->
             _uiState.postValue(FragmentMusicListState(musicFiles))
         }
 
@@ -36,7 +35,8 @@ class FragmentMusicListViewModel(
         musicRepository.musicFiles.observeForever(observer)
     }
 
-    override fun onCleared() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    public override fun onCleared() {
         super.onCleared()
         musicRepository.musicFiles.removeObserver(observer)
     }
