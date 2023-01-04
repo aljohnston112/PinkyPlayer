@@ -15,9 +15,7 @@ import com.fourth_finger.music_repository.MusicFile
  */
 class FragmentMusicList : Fragment() {
 
-    private val viewModel: FragmentMusicListViewModel by viewModels{
-        FragmentMusicListViewModel.Factory
-    }
+    private val viewModel: FragmentMusicListViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,7 +36,14 @@ class FragmentMusicList : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Set up the RecyclerView
-        val adapter = MusicFileAdapter(R.layout.music_file_holder, emptyList())
+        val adapter = MusicFileAdapter(
+            emptyList(),
+            object: MusicFileAdapterCallback{
+                override fun onClicked(id: Long) {
+                    viewModel.songClicked(id)
+                }
+            }
+        )
         val rv = view.findViewById<RecyclerView>(R.id.recycler_view)
         rv.adapter = adapter
         val linearLayoutManager = LinearLayoutManager(context)
@@ -51,4 +56,5 @@ class FragmentMusicList : Fragment() {
         }
 
     }
+
 }

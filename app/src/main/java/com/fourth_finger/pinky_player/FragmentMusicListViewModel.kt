@@ -10,30 +10,25 @@ import com.fourth_finger.music_repository.MusicRepository
 /**
  * The state holder for [FragmentMusicList].
  *
- * @param musicFiles The list of [MusicFile]s representing the music files on the device.
+ * @param musicFiles The list of [MusicFile]s representing the music files to display.
  */
 data class FragmentMusicListState(val musicFiles: List<MusicFile>)
 
 /**
  * The [ViewModel] for [FragmentMusicList].
  */
-class FragmentMusicListViewModel(
-    savedStateHandle: SavedStateHandle,
-    musicRepository: MusicRepository
-) : ViewModel() {
+class FragmentMusicListViewModel() : ViewModel() {
 
-    val uiState: LiveData<FragmentMusicListState> = Transformations.map(musicRepository.musicFiles){
+    private val musicRepository = MusicRepository.getInstance()
+
+    val uiState: LiveData<FragmentMusicListState> = Transformations.map(
+        musicRepository.musicFiles
+    ){
         FragmentMusicListState(it)
     }
 
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val savedStateHandle = createSavedStateHandle()
-                val musicRepository = MusicRepository.getInstance()
-                FragmentMusicListViewModel(savedStateHandle, musicRepository)
-            }
-        }
+    fun songClicked(id: Long) {
+
     }
 
 }

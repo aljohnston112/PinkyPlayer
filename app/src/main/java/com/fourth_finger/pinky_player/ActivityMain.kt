@@ -47,7 +47,7 @@ class ActivityMain : AppCompatActivity() {
     /**
      * Requests a permission.
      *
-     * @param permission the [Manifest.permission] to request.
+     * @param permission The [Manifest.permission] to request.
      */
     private fun requestPermission(permission: String) {
 

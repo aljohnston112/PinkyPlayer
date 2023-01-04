@@ -34,7 +34,16 @@ internal class MusicDataSource {
 
     companion object {
 
-        private lateinit var idToUriMap: Map<MusicFile, Uri>
+        private lateinit var idToUriMap: Map<Long, Uri>
+
+        /**
+         * Gets the Uri of a music file.
+         *
+         * @param id The id of the music file given by the [MediaStore]
+         */
+        internal fun getUri(id: Long): Uri? {
+            return idToUriMap[id]
+        }
 
         /**
          * Gets a list of [MusicFile]s that represent files
@@ -75,8 +84,8 @@ internal class MusicDataSource {
          * @param cursor The cursor containing a query for [MediaStore] music.
          */
         private fun convertQueryToMusicFiles(cursor: Cursor): List<MusicFile> {
-            val mutableIdToUriMap = mutableMapOf<MusicFile, Uri>()
-
+            val mutableIdToUriMap = mutableMapOf<Long, Uri>()
+            val musicFiles = mutableListOf<MusicFile>()
             // The database columns
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
             val displayNameColumn = cursor.getColumnIndexOrThrow(
@@ -92,10 +101,11 @@ internal class MusicDataSource {
                     id
                 )
                 val musicFile = MusicFile(id, displayName)
-                mutableIdToUriMap[musicFile] = contentUri
+                musicFiles.add(musicFile)
+                mutableIdToUriMap[id] = contentUri
             }
             idToUriMap = mutableIdToUriMap
-            return mutableIdToUriMap.keys.toList()
+            return musicFiles
         }
 
     }

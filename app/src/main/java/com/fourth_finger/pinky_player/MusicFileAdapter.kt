@@ -7,17 +7,24 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.fourth_finger.music_repository.MusicFile
+import kotlin.properties.Delegates
+
+interface MusicFileAdapterCallback {
+    fun onClicked(id: Long)
+}
 
 /**
  * The [RecyclerView.Adapter] for [MusicFile]s.
+ *
+ * @param dataSet The list of [MusicFile]s to display.
  */
 class MusicFileAdapter(
-    private val layoutResourceID: Int,
-    private var dataSet: List<MusicFile>
+    private var dataSet: List<MusicFile>,
+    private val callback: MusicFileAdapterCallback
 ) : RecyclerView.Adapter<MusicFileAdapter.ViewHolder>() {
 
     /**
-     * Updates the adapter with a new [List<MusicFile>].
+     * Updates the adapter with a new list of [MusicFile]s.
      *
      * @param music The new list of [MusicFile]s.
      */
@@ -31,10 +38,11 @@ class MusicFileAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             LayoutInflater.from(parent.context).inflate(
-                layoutResourceID,
+                R.layout.music_file_holder,
                 parent,
                 false
-            )
+            ),
+            callback
         )
     }
 
@@ -43,6 +51,7 @@ class MusicFileAdapter(
      */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.textView.text = dataSet[position].displayName
+        holder.id = dataSet[position].id
     }
 
     /**
@@ -53,8 +62,21 @@ class MusicFileAdapter(
     /**
      * The [RecyclerView.ViewHolder] for [MusicFile]s.
      */
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(
+        view: View,
+        private val callback: MusicFileAdapterCallback
+    ) : RecyclerView.ViewHolder(view) {
+
+        var id by Delegates.notNull<Long>()
+
         val textView: TextView = view.findViewById(R.id.textView)
+
+        init {
+            textView.setOnClickListener {
+                callback.onClicked(id)
+            }
+        }
+
     }
 
 }

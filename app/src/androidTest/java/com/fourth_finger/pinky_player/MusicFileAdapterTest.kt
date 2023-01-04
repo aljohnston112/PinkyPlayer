@@ -15,7 +15,6 @@ class MusicFileAdapterTest {
     )
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val layoutId = R.layout.music_file_holder
     private val viewStub = LinearLayout(context)
 
     @Before
@@ -26,10 +25,13 @@ class MusicFileAdapterTest {
         viewStub.addView(textView)
     }
 
+    /**
+     * Tests that providing a new list of music to the adapter
+     * updates the backing list.
+     */
     @Test
     fun updateMusicList_NewList_UpdatesItemCountAndViewHolders() {
         val adapter = MusicFileAdapter(
-            layoutId,
             emptyList
         )
         assert(adapter.itemCount == 0)
@@ -41,20 +43,26 @@ class MusicFileAdapterTest {
         assert(viewHolder.textView.text == singletonList[0].displayName)
     }
 
+    /**
+     * Tests that the ViewHolder created by the adapter
+     * contains the correct view for data binding.
+     */
     @Test
-    fun onCreateViewHolder_InflatesCorrectLayout() {
+    fun onCreateViewHolder_CorrectLayout() {
         val adapter = MusicFileAdapter(
-            layoutId,
             singletonList
         )
         val viewHolder = adapter.createViewHolder(viewStub, 0)
         assert(viewHolder.textView.id == R.id.textView)
     }
 
+    /**
+     * Tests that the adapter binds the data
+     * to the layout correctly.
+     */
     @Test
     fun onBindViewHolder_ValidPositions_BindCorrectly() {
         val adapter = MusicFileAdapter(
-            layoutId,
             listOf(
                 MusicFile(0, "A"),
                 MusicFile(1, "B")
@@ -69,10 +77,13 @@ class MusicFileAdapterTest {
         assert(viewHolder.textView.text == "B")
     }
 
+    /**
+     * Tests that onBindViewHolder will not
+     * take an index greater than the size of the list.
+     */
     @Test(expected = IndexOutOfBoundsException::class)
     fun onBindViewHolder_InValidPosition_Throws() {
         val adapter = MusicFileAdapter(
-            layoutId,
             singletonList
         )
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub)
@@ -80,15 +91,35 @@ class MusicFileAdapterTest {
         adapter.onBindViewHolder(viewHolder, 1)
     }
 
+    /**
+     * Tests that onBindViewHolder will not
+     * take an index less than 0.
+     */
+    @Test(expected = IndexOutOfBoundsException::class)
+    fun onBindViewHolder_NegativePosition_Throws() {
+        val adapter = MusicFileAdapter(
+            singletonList
+        )
+        val viewHolder = MusicFileAdapter.ViewHolder(viewStub)
+
+        adapter.onBindViewHolder(viewHolder, -1)
+    }
+
+    /**
+     * Tests that getItemCount works with an empty list.
+     */
     @Test
     fun getItemCount_EmptyList_ReturnsZero() {
-        val adapter = MusicFileAdapter(layoutId, emptyList)
+        val adapter = MusicFileAdapter(emptyList)
         assert(adapter.itemCount == 0)
     }
 
+    /**
+     * Tests that getItemCount works with an non-empty list.
+     */
     @Test
     fun getItemCount_ListWithOne_ReturnsOne() {
-        val adapter = MusicFileAdapter(layoutId, singletonList)
+        val adapter = MusicFileAdapter(singletonList)
         assert(adapter.itemCount == 1)
     }
 
