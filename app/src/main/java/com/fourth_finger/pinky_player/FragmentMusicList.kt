@@ -36,14 +36,10 @@ class FragmentMusicList : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Set up the RecyclerView
-        val adapter = MusicFileAdapter(
-            emptyList(),
-            object: MusicFileAdapterCallback{
-                override fun onClicked(id: Long) {
-                    viewModel.songClicked(id)
-                }
-            }
-        )
+        val adapter = MusicFileAdapter(emptyList())
+        adapter.setOnSongClickListener {
+            viewModel.songClicked(requireContext(), it)
+        }
         val rv = view.findViewById<RecyclerView>(R.id.recycler_view)
         rv.adapter = adapter
         val linearLayoutManager = LinearLayoutManager(context)

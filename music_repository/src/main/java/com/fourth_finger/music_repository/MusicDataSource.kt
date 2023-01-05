@@ -86,6 +86,7 @@ internal class MusicDataSource {
         private fun convertQueryToMusicFiles(cursor: Cursor): List<MusicFile> {
             val mutableIdToUriMap = mutableMapOf<Long, Uri>()
             val musicFiles = mutableListOf<MusicFile>()
+
             // The database columns
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
             val displayNameColumn = cursor.getColumnIndexOrThrow(

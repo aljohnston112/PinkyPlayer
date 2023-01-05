@@ -87,7 +87,7 @@ class ActivityMain : AppCompatActivity() {
         Snackbar.make(
             thisView,
             R.string.permission_needed,
-            Snackbar.LENGTH_LONG
+            16000
         ).show()
     }
 

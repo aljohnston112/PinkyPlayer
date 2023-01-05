@@ -86,7 +86,7 @@ class MusicFileAdapterTest {
         val adapter = MusicFileAdapter(
             singletonList
         )
-        val viewHolder = MusicFileAdapter.ViewHolder(viewStub)
+        val viewHolder = MusicFileAdapter.ViewHolder(viewStub){ }
 
         adapter.onBindViewHolder(viewHolder, 1)
     }
@@ -100,7 +100,7 @@ class MusicFileAdapterTest {
         val adapter = MusicFileAdapter(
             singletonList
         )
-        val viewHolder = MusicFileAdapter.ViewHolder(viewStub)
+        val viewHolder = MusicFileAdapter.ViewHolder(viewStub){ }
 
         adapter.onBindViewHolder(viewHolder, -1)
     }

@@ -9,10 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.fourth_finger.music_repository.MusicFile
 import kotlin.properties.Delegates
 
-interface MusicFileAdapterCallback {
-    fun onClicked(id: Long)
-}
-
 /**
  * The [RecyclerView.Adapter] for [MusicFile]s.
  *
@@ -20,19 +16,24 @@ interface MusicFileAdapterCallback {
  */
 class MusicFileAdapter(
     private var dataSet: List<MusicFile>,
-    private val callback: MusicFileAdapterCallback
 ) : RecyclerView.Adapter<MusicFileAdapter.ViewHolder>() {
+
+    private var onSongClickListener: ((Long) -> Unit) = {}
 
     /**
      * Updates the adapter with a new list of [MusicFile]s.
      *
      * @param music The new list of [MusicFile]s.
      */
-    fun updateMusicList(music: List<MusicFile>){
+    fun updateMusicList(music: List<MusicFile>) {
         val diffUtilCallback = MusicFileDiffUtilCallback(dataSet, music)
         val diff = DiffUtil.calculateDiff(diffUtilCallback)
         dataSet = music
         diff.dispatchUpdatesTo(this)
+    }
+
+    fun setOnSongClickListener(function: (Long) -> Unit) {
+        onSongClickListener = function
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -42,8 +43,8 @@ class MusicFileAdapter(
                 parent,
                 false
             ),
-            callback
-        )
+            onSongClickListener
+            )
     }
 
     /**
@@ -64,7 +65,7 @@ class MusicFileAdapter(
      */
     class ViewHolder(
         view: View,
-        private val callback: MusicFileAdapterCallback
+        private val callback: (Long) -> Unit = { }
     ) : RecyclerView.ViewHolder(view) {
 
         var id by Delegates.notNull<Long>()
@@ -73,7 +74,7 @@ class MusicFileAdapter(
 
         init {
             textView.setOnClickListener {
-                callback.onClicked(id)
+                callback(id)
             }
         }
 

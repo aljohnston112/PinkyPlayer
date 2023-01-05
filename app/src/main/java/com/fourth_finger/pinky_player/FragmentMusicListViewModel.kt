@@ -1,5 +1,6 @@
 package com.fourth_finger.pinky_player
 
+import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.initializer
@@ -17,8 +18,9 @@ data class FragmentMusicListState(val musicFiles: List<MusicFile>)
 /**
  * The [ViewModel] for [FragmentMusicList].
  */
-class FragmentMusicListViewModel() : ViewModel() {
+class FragmentMusicListViewModel : ViewModel() {
 
+    private val mediaPlayerRepository = MediaPlayerRepository.getInstance()
     private val musicRepository = MusicRepository.getInstance()
 
     val uiState: LiveData<FragmentMusicListState> = Transformations.map(
@@ -27,8 +29,8 @@ class FragmentMusicListViewModel() : ViewModel() {
         FragmentMusicListState(it)
     }
 
-    fun songClicked(id: Long) {
-
+    fun songClicked(context: Context, id: Long) {
+        mediaPlayerRepository.play(context, id)
     }
 
 }

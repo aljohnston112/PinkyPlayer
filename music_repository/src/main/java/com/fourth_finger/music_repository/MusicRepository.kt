@@ -2,13 +2,9 @@ package com.fourth_finger.music_repository
 
 import android.content.ContentResolver
 import android.net.Uri
-import kotlinx.coroutines.sync.Mutex
 import android.provider.MediaStore
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 
 /**
@@ -19,15 +15,6 @@ class MusicRepository private constructor() {
     private val _latestMusic = MutableLiveData(
         emptyList<MusicFile>()
     )
-
-    /**
-     * Gets the Uri of a music file.
-     *
-     * @param id The id of the music file given by the [MediaStore]
-     */
-    fun getUri(id: Long): Uri? {
-        return MusicDataSource.getUri(id)
-    }
 
     /**
      * Holds a list of [MusicFile]s which represent
@@ -69,6 +56,15 @@ class MusicRepository private constructor() {
          */
         fun getInstance(): MusicRepository {
             return INSTANCE
+        }
+
+        /**
+         * Gets the Uri of a music file.
+         *
+         * @param id The id of the music file given by the [MediaStore]
+         */
+        fun getUri(id: Long): Uri? {
+            return MusicDataSource.getUri(id)
         }
 
     }
