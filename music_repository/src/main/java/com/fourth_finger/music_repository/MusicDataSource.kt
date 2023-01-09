@@ -35,6 +35,7 @@ internal class MusicDataSource {
     companion object {
 
         private lateinit var idToUriMap: Map<Long, Uri>
+        private lateinit var idToMusicFileMap: Map<Long, MusicFile>
 
         /**
          * Gets the Uri of a music file.
@@ -46,14 +47,23 @@ internal class MusicDataSource {
         }
 
         /**
+         * Gets a [MusicFile] by its id.
+         *
+         * @param id The [MusicFile]'s id.
+         */
+        fun getMusicFile(id: Long): MusicFile? {
+            return idToMusicFileMap[id]
+        }
+
+        /**
          * Gets a list of [MusicFile]s that represent files
          * that the MediaStore considers music.
          *
          * @param contentResolver The [ContentResolver] used to query the MediaStore.
          */
         @JvmStatic
-        internal fun getMusicFromMediaStore(contentResolver: ContentResolver): List<MusicFile> {
-            var music = listOf<MusicFile>()
+        internal fun getMusicFromMediaStore(contentResolver: ContentResolver): Collection<MusicFile> {
+            var music: Collection<MusicFile> = emptyList()
 
             // The query parameters
             val projection = arrayOf(
@@ -83,9 +93,9 @@ internal class MusicDataSource {
          *
          * @param cursor The cursor containing a query for [MediaStore] music.
          */
-        private fun convertQueryToMusicFiles(cursor: Cursor): List<MusicFile> {
+        private fun convertQueryToMusicFiles(cursor: Cursor): Collection<MusicFile> {
             val mutableIdToUriMap = mutableMapOf<Long, Uri>()
-            val musicFiles = mutableListOf<MusicFile>()
+            val mutableIdToMusicFile = mutableMapOf<Long, MusicFile>()
 
             // The database columns
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
@@ -102,11 +112,12 @@ internal class MusicDataSource {
                     id
                 )
                 val musicFile = MusicFile(id, displayName)
-                musicFiles.add(musicFile)
                 mutableIdToUriMap[id] = contentUri
+                mutableIdToMusicFile[id] = musicFile
             }
             idToUriMap = mutableIdToUriMap
-            return musicFiles
+            idToMusicFileMap = mutableIdToMusicFile
+            return idToMusicFileMap.values
         }
 
     }

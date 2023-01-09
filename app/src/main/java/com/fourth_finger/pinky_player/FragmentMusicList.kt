@@ -37,8 +37,10 @@ class FragmentMusicList : Fragment() {
 
         // Set up the RecyclerView
         val adapter = MusicFileAdapter(emptyList())
-        adapter.setOnSongClickListener {
-            viewModel.songClicked(requireContext(), it)
+        adapter.setOnSongClickListener {id ->
+            activity?.mediaController?.transportControls?.let { controls ->
+                viewModel.songClicked(id, controls)
+            }
         }
         val rv = view.findViewById<RecyclerView>(R.id.recycler_view)
         rv.adapter = adapter
@@ -47,8 +49,8 @@ class FragmentMusicList : Fragment() {
         rv.layoutManager = linearLayoutManager
 
         // Set up updates
-        viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
-            adapter.updateMusicList(uiState.musicFiles)
+        viewModel.musicFiles.observe(viewLifecycleOwner) { musicFiles ->
+            adapter.updateMusicList(musicFiles.toList())
         }
 
     }

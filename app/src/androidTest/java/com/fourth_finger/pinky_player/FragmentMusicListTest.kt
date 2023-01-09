@@ -66,7 +66,7 @@ class FragmentMusicListTest {
     fun onViewCreated_LoadsMusicIntoRecyclerView() {
         val musicRepository = MusicRepository.getInstance()
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        musicRepository.loadMusicFiles(context.contentResolver)
+        musicRepository.loadMusicFiles(context.contentResolver, ioDispatcher)
         val music = musicRepository.musicFiles.getOrAwaitValue()
 
         launchFragmentInContainer<FragmentMusicList>()

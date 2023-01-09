@@ -28,11 +28,11 @@ class FragmentMusicListViewModelTest {
     fun getUiState_AfterConstructor_ReturnsAllLoadedMusic() {
         val musicRepository = MusicRepository.getInstance()
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        musicRepository.loadMusicFiles(context.contentResolver)
+        musicRepository.loadMusicFiles(context.contentResolver, ioDispatcher)
         val musicFiles = musicRepository.musicFiles.getOrAwaitValue()
         val viewModel = FragmentMusicListViewModel()
 
-        val music = viewModel.uiState.getOrAwaitValue().musicFiles
+        val music = viewModel.musicFiles.getOrAwaitValue().musicFiles
         assert(music.size == musicFiles.size)
         for((i, song) in music.withIndex()) {
             assert(song.displayName == musicFiles[i].displayName)

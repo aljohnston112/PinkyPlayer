@@ -5,7 +5,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import com.fourth_finger.music_repository.MusicRepository
-import org.junit.Assert.*
 import org.junit.Rule
 
 import org.junit.Test
@@ -28,7 +27,7 @@ class MediaPlayerRepositoryTest {
     fun play_validSong_playsToCompletion() {
         val musicRepository = MusicRepository.getInstance()
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        musicRepository.loadMusicFiles(context.contentResolver)
+        musicRepository.loadMusicFiles(context.contentResolver, ioDispatcher)
 
         val countDownLatchOnPrepared = CountDownLatch(1)
         val countDownLatchOnCompletion = CountDownLatch(1)
@@ -36,7 +35,7 @@ class MediaPlayerRepositoryTest {
         // LiveData update must be on main thread
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
             val music = musicRepository.musicFiles.getOrAwaitValue()
-            MediaPlayerRepository.getInstance().play(
+            MediaPlayerRepository.getInstance().start(
                 context,
                 music[0].id,
                 onPrepared = {countDownLatchOnPrepared.countDown()},

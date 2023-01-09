@@ -11,23 +11,19 @@ import kotlinx.coroutines.*
  */
 class ActivityMainViewModel : ViewModel() {
 
-//    private val _uiState = MutableStateFlow(ActivityMainState())
-//    val uiState: StateFlow<ActivityMainState> = _uiState
-
     private val musicRepository = MusicRepository.getInstance()
 
     /**
      * Called when there is permission to search for music files.
      *
      * @param contentResolver The ContentResolver to query for music files.
+     * @param dispatcher The dispatcher to load the music file with.
      */
     fun permissionGranted(
         contentResolver: ContentResolver,
-        ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ) {
-        viewModelScope.launch(ioDispatcher) {
-            musicRepository.loadMusicFiles(contentResolver)
-        }
+            musicRepository.loadMusicFiles(contentResolver, dispatcher, viewModelScope)
     }
 
 }

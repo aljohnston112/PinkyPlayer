@@ -5,6 +5,9 @@ import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 
 /**
@@ -12,15 +15,15 @@ import androidx.lifecycle.MutableLiveData
  */
 class MusicRepository private constructor() {
 
-    private val _latestMusic = MutableLiveData(
-        emptyList<MusicFile>()
+    private val _latestMusic: MutableLiveData<Collection<MusicFile>> = MutableLiveData(
+        emptyList()
     )
 
     /**
      * Holds a list of [MusicFile]s which represent
      * the files the [MediaStore] considers music and are on the device.
      */
-    val musicFiles: LiveData<List<MusicFile>> = _latestMusic
+    val musicFiles: LiveData<Collection<MusicFile>> = _latestMusic
 
     /**
      * Loads [MusicFile]s that can be used to access music.
@@ -28,9 +31,13 @@ class MusicRepository private constructor() {
      * @param contentResolver The [ContentResolver] used to query the [MediaStore].
      */
     fun loadMusicFiles(
-        contentResolver: ContentResolver
+        contentResolver: ContentResolver,
+        ioDispatcher: CoroutineDispatcher,
+        coroutineScope: CoroutineScope
     ) {
-        _latestMusic.postValue(getMusicFromMediaStore(contentResolver))
+        coroutineScope.launch(ioDispatcher) {
+            _latestMusic.postValue(getMusicFromMediaStore(contentResolver))
+        }
     }
 
     /**
@@ -40,8 +47,8 @@ class MusicRepository private constructor() {
      * @return A list of [MusicFile]s representing files loaded from the [MediaStore].
      */
     private fun getMusicFromMediaStore(
-        contentResolver: ContentResolver
-    ): List<MusicFile> {
+        contentResolver: ContentResolver,
+    ): Collection<MusicFile> {
         return MusicDataSource.getMusicFromMediaStore(contentResolver)
     }
 
@@ -65,6 +72,15 @@ class MusicRepository private constructor() {
          */
         fun getUri(id: Long): Uri? {
             return MusicDataSource.getUri(id)
+        }
+
+        /**
+         * Gets a [MusicFile] by its id.
+         *
+         * @param id The [MusicFile]'s id.
+         */
+        fun getMusicFile(id: Long): MusicFile? {
+            return MusicDataSource.getMusicFile(id)
         }
 
     }

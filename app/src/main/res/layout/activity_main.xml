@@ -15,9 +15,20 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/fragment_controls"
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_controls"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:name="com.fourth_finger.pinky_player.FragmentControls"
+        tools:layout="@layout/fragment_controls"
+        android:visibility="gone"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

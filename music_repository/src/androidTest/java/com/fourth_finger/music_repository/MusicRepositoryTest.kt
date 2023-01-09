@@ -24,7 +24,7 @@ class MusicRepositoryTest {
         val context = InstrumentationRegistry.getInstrumentation().context
         val musicFiles = MusicDataSource.getMusicFromMediaStore(context.contentResolver)
 
-        MusicRepository.getInstance().loadMusicFiles(context.contentResolver)
+        MusicRepository.getInstance().loadMusicFiles(context.contentResolver, ioDispatcher)
         val music = MusicRepository.getInstance().musicFiles.getOrAwaitValue()
         assert(music.size == musicFiles.size)
         for((i, song) in music.withIndex()) {

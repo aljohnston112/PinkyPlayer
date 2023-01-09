@@ -1,5 +1,7 @@
 package com.fourth_finger.pinky_player
 
+import android.view.Gravity
+import android.view.View.TEXT_ALIGNMENT_CENTER
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
@@ -75,6 +77,21 @@ class MusicFileAdapterTest {
 
         adapter.onBindViewHolder(viewHolder, 1)
         assert(viewHolder.textView.text == "B")
+    }
+
+    /**
+     * Tests that the adapter centers text
+     * in the layout correctly.
+     */
+    @Test
+    fun onBindViewHolder_ValidPositions_CentersText() {
+        val adapter = MusicFileAdapter(
+            singletonList
+        )
+        val viewHolder = MusicFileAdapter.ViewHolder(viewStub)
+
+        adapter.onBindViewHolder(viewHolder, 0)
+        assert(viewHolder.textView.gravity == Gravity.CENTER)
     }
 
     /**
