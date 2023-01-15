@@ -1,29 +1,47 @@
 package com.fourth_finger.pinky_player
 
 import android.content.ContentResolver
+import android.support.v4.media.session.MediaControllerCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fourth_finger.music_repository.MusicRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 /**
  * The [ViewModel] for [ActivityMain].
  */
-class ActivityMainViewModel : ViewModel() {
+@HiltViewModel
+class ActivityMainViewModel @Inject constructor(
+    private val musicRepository: MusicRepository
+) : ViewModel() {
 
-    private val musicRepository = MusicRepository.getInstance()
+    /**
+     * Pauses or plays the current song.
+     */
+    fun playPause(
+        isPlaying: Boolean,
+        controls: MediaControllerCompat.TransportControls
+    ) {
+        if (isPlaying) {
+            controls.pause()
+        } else {
+            controls.play()
+        }
+    }
 
     /**
      * Called when there is permission to search for music files.
      *
      * @param contentResolver The ContentResolver to query for music files.
-     * @param dispatcher The dispatcher to load the music file with.
      */
     fun permissionGranted(
         contentResolver: ContentResolver,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ) {
-            musicRepository.loadMusicFiles(contentResolver, dispatcher, viewModelScope)
+        viewModelScope.launch {
+            musicRepository.loadMusicFiles(contentResolver)
+        }
     }
 
 }

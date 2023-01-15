@@ -9,10 +9,12 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fourth_finger.music_repository.MusicFile
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * A [Fragment] that displays a list of [MusicFile]s.
  */
+@AndroidEntryPoint
 class FragmentMusicList : Fragment() {
 
     private val viewModel: FragmentMusicListViewModel by viewModels()
@@ -49,6 +51,7 @@ class FragmentMusicList : Fragment() {
         rv.layoutManager = linearLayoutManager
 
         // Set up updates
+        viewModel.fetchMusicFiles(requireContext().contentResolver)
         viewModel.musicFiles.observe(viewLifecycleOwner) { musicFiles ->
             adapter.updateMusicList(musicFiles.toList())
         }

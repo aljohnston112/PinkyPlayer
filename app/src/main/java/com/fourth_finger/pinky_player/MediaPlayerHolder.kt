@@ -3,20 +3,22 @@ package com.fourth_finger.pinky_player
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
-import android.media.MediaPlayer.OnErrorListener
 import com.fourth_finger.music_repository.MusicRepository
 import android.provider.MediaStore
-import java.util.concurrent.Executors
+import dagger.hilt.EntryPoint
+import dagger.hilt.android.EntryPointAccessors
+import javax.inject.Inject
 
 /**
  * Holds a [MediaPlayer].
  * It can play a music file by its [MediaStore.Audio.Media] id (at least).
  */
-class MediaPlayerRepository {
+class MediaPlayerHolder constructor(private val musicRepository: MusicRepository) {
 
     private var mediaPlayer: MediaPlayer? = null
     private var isPrepared = false
     private var isPlaying = false
+
 
     /**
      * Starts playing a music file by its [MediaStore.Audio.Media] id.
@@ -41,7 +43,7 @@ class MediaPlayerRepository {
                     .setUsage(AudioAttributes.USAGE_MEDIA)
                     .build()
             )
-            setDataSource(context, MusicRepository.getUri(id)!!)
+            setDataSource(context, musicRepository.getUri(id)!!)
 
             setOnErrorListener { _, _, _ ->
                 isPrepared = false
@@ -52,7 +54,7 @@ class MediaPlayerRepository {
                 onPrepared(player)
                 isPrepared = true
                 player.start()
-                this@MediaPlayerRepository.isPlaying = true
+                this@MediaPlayerHolder.isPlaying = true
             }
 
             setOnCompletionListener { player ->

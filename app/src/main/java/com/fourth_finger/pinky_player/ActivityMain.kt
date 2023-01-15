@@ -14,17 +14,20 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import android.view.View
+import android.widget.ImageButton
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentContainerView
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * The main [Activity].
  */
+@AndroidEntryPoint
 class ActivityMain : AppCompatActivity() {
 
     private val viewModel: ActivityMainViewModel by viewModels()
@@ -41,20 +44,21 @@ class ActivityMain : AppCompatActivity() {
         override fun onMetadataChanged(metadata: MediaMetadataCompat) {}
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
+            val controls = findViewById<ConstraintLayout>(R.id.controls)
+            val playPauseButton = findViewById<ImageButton>(R.id.button_play_pause)
+
             when(state.state){
+                PlaybackStateCompat.STATE_PAUSED -> {
+                    playPauseButton.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                }
                 PlaybackStateCompat.STATE_PLAYING -> {
-                    findViewById<FragmentContainerView>(
-                        R.id.fragment_controls
-                    ).visibility = View.VISIBLE
+                    playPauseButton.setImageResource(R.drawable.ic_baseline_pause_24)
+                    controls.visibility = View.VISIBLE
                 }
                 PlaybackStateCompat.STATE_STOPPED -> {
-                    findViewById<FragmentContainerView>(
-                        R.id.fragment_controls
-                    ).visibility = View.GONE
+                    controls.visibility = View.GONE
                 }
-
             }
-
         }
 
         override fun onSessionDestroyed() {
@@ -80,8 +84,7 @@ class ActivityMain : AppCompatActivity() {
                     mediaController
                 )
 
-                val view = findViewById<FragmentContainerView>(R.id.fragment_controls)
-                view.getFragment<FragmentControls>().onMediaControllerSet()
+                setUpOnClickListeners()
 
             }
 
@@ -109,6 +112,17 @@ class ActivityMain : AppCompatActivity() {
         requestPermissionAndLoadMusicFiles()
     }
 
+    /**
+     * Sets up the onClickListeners
+     */
+    private fun setUpOnClickListeners() {
+        val playPauseButton = findViewById<ImageButton>(R.id.button_play_pause)
+        playPauseButton.setOnClickListener {
+            val isPlaying = mediaController.playbackState.state == PlaybackStateCompat.STATE_PLAYING
+            viewModel.playPause(isPlaying, mediaController.transportControls)
+        }
+    }
+
     override fun onStart() {
         super.onStart()
         mediaBrowser = MediaBrowserCompat(
@@ -122,10 +136,12 @@ class ActivityMain : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        mediaController.unregisterCallback(controllerCallback)
-        val view = findViewById<FragmentContainerView>(R.id.fragment_controls)
-        view.getFragment<FragmentControls>().onActivityStop()
-        mediaBrowser.disconnect()
+        if(this::mediaBrowser.isInitialized) {
+            if (this::mediaController.isInitialized) {
+                mediaController.unregisterCallback(controllerCallback)
+            }
+            mediaBrowser.disconnect()
+        }
     }
 
     /**

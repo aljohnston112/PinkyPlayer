@@ -12,10 +12,19 @@ import android.service.media.MediaBrowserService
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import com.fourth_finger.music_repository.MusicRepository
+import dagger.BindsInstance
+import dagger.Component
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.HiltAndroidApp
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Inject
 
 /**
  * The main [Application].
  */
+@HiltAndroidApp
 class MainApplication: Application() {
 
     /**

@@ -91,7 +91,7 @@ class MusicFileAdapterTest {
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub)
 
         adapter.onBindViewHolder(viewHolder, 0)
-        assert(viewHolder.textView.gravity == Gravity.CENTER)
+        assert(viewHolder.textView.gravity.and(Gravity.CENTER) == Gravity.CENTER)
     }
 
     /**

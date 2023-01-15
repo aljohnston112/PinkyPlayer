@@ -5,39 +5,51 @@ import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * A repository for the music on an Android device.
  */
-class MusicRepository private constructor() {
+@Singleton
+class MusicRepository @Inject constructor() {
 
-    private val _latestMusic: MutableLiveData<Collection<MusicFile>> = MutableLiveData(
-        emptyList()
-    )
+    @Inject
+    internal lateinit var musicDataSource: MusicDataSource
 
-    /**
-     * Holds a list of [MusicFile]s which represent
-     * the files the [MediaStore] considers music and are on the device.
-     */
-    val musicFiles: LiveData<Collection<MusicFile>> = _latestMusic
+    private val latestMusicMutex = Mutex()
+
+    private var latestMusic = listOf<MusicFile>()
 
     /**
      * Loads [MusicFile]s that can be used to access music.
      *
      * @param contentResolver The [ContentResolver] used to query the [MediaStore].
      */
-    fun loadMusicFiles(
+    suspend fun loadMusicFiles(
         contentResolver: ContentResolver,
-        ioDispatcher: CoroutineDispatcher,
-        coroutineScope: CoroutineScope
-    ) {
-        coroutineScope.launch(ioDispatcher) {
-            _latestMusic.postValue(getMusicFromMediaStore(contentResolver))
+        refresh: Boolean = false
+    ): List<MusicFile> {
+        if (refresh || latestMusic.isEmpty()) {
+            val latestMusicResult = withContext(Dispatchers.IO) {
+                getMusicFromMediaStore(contentResolver)
+            }
+            latestMusicMutex.withLock {
+                latestMusic = latestMusicResult
+            }
         }
+        return latestMusicMutex.withLock { latestMusic }
     }
 
     /**
@@ -48,41 +60,26 @@ class MusicRepository private constructor() {
      */
     private fun getMusicFromMediaStore(
         contentResolver: ContentResolver,
-    ): Collection<MusicFile> {
-        return MusicDataSource.getMusicFromMediaStore(contentResolver)
+    ): List<MusicFile> {
+        return musicDataSource.getMusicFromMediaStore(contentResolver)
     }
 
-    companion object {
+    /**
+     * Gets the Uri of a music file.
+     *
+     * @param id The id of the music file given by the [MediaStore]
+     */
+    fun getUri(id: Long): Uri? {
+        return musicDataSource.getUri(id)
+    }
 
-        private val INSTANCE: MusicRepository by lazy { MusicRepository() }
-
-        /**
-         * Gets the only instance of the MusicRepository.
-         * It holds a list of [MusicFile] which represents
-         * the files the [MediaStore] considers music and are on the device.
-         */
-        fun getInstance(): MusicRepository {
-            return INSTANCE
-        }
-
-        /**
-         * Gets the Uri of a music file.
-         *
-         * @param id The id of the music file given by the [MediaStore]
-         */
-        fun getUri(id: Long): Uri? {
-            return MusicDataSource.getUri(id)
-        }
-
-        /**
-         * Gets a [MusicFile] by its id.
-         *
-         * @param id The [MusicFile]'s id.
-         */
-        fun getMusicFile(id: Long): MusicFile? {
-            return MusicDataSource.getMusicFile(id)
-        }
-
+    /**
+     * Gets a [MusicFile] by its id.
+     *
+     * @param id The [MusicFile]'s id.
+     */
+    fun getMusicFile(id: Long): MusicFile? {
+        return musicDataSource.getMusicFile(id)
     }
 
 }

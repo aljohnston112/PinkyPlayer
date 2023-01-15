@@ -25,16 +25,25 @@ import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import androidx.media.session.MediaButtonReceiver
 import com.fourth_finger.music_repository.MusicRepository
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * The [MediaBrowserService] used to play music in the background.
  */
+@AndroidEntryPoint
 class MainMediaBrowserService : MediaBrowserServiceCompat() {
 
     private val notificationChannelId = "MainMediaBrowserServiceChannelId"
     private val notificationId = "MainMediaBrowserServiceNotificationId".hashCode()
     private lateinit var notificationChannel: NotificationChannel
-    private val mediaPlayerQueue = MediaPlayerQueue.getInstance()
+
+    @Inject
+    lateinit var musicRepository: MusicRepository
+
+    @Inject
+    lateinit var mediaPlayerQueue: MediaPlayerQueue
+
     private var mediaSession: MediaSessionCompat? = null
     private lateinit var stateBuilder: PlaybackStateCompat.Builder
     private lateinit var metaDataBuilder: MediaMetadataCompat.Builder
@@ -100,10 +109,10 @@ class MainMediaBrowserService : MediaBrowserServiceCompat() {
 
             metaDataBuilder.putString(
                 METADATA_KEY_TITLE,
-                MusicRepository.getMusicFile(mediaId.toLong())?.displayName
+                musicRepository.getMusicFile(mediaId.toLong())?.displayName
             )
 
-            val inputStream = MusicRepository.getUri(mediaId.toLong())?.let {uri ->
+            val inputStream = musicRepository.getUri(mediaId.toLong())?.let {uri ->
                 contentResolver.openInputStream(uri)
             }
             metaDataBuilder.putBitmap(

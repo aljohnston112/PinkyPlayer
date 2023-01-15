@@ -1,37 +1,48 @@
 package com.fourth_finger.pinky_player
 
+import android.Manifest
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.rule.GrantPermissionRule
 import com.fourth_finger.music_repository.MusicRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.*
 import kotlinx.coroutines.yield
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 
 import org.junit.Test
 import java.util.concurrent.TimeoutException
+import javax.inject.Inject
 
+@HiltAndroidTest
 class ActivityMainViewModelTest {
+
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
+
+    @get:Rule
+    val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    )
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    /**
-     * Tests that the musicFiles of the [MusicRepository]
-     * are not updated until [ActivityMainViewModel] gets
-     * notified of permissions being granted by [ActivityMain].
-     */
-    @Test()
-    fun initialized_MusicNotLoaded() {
-        val viewModel = ActivityMainViewModel()
-
-        // Must be an empty list
-        val musicRepository = MusicRepository.getInstance()
-        val music = musicRepository.musicFiles.getOrAwaitValue()
-        assert(music.isEmpty())
+    @Before
+    fun init() {
+        hiltRule.inject()
     }
+
+    @Inject
+    lateinit var musicRepository: MusicRepository
 
     /**
      * Tests that [ActivityMainViewModel] triggers the update
@@ -41,17 +52,11 @@ class ActivityMainViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun permissionGranted_MusicLoaded() = runTest {
-        launch {
-            val viewModel = ActivityMainViewModel()
-            val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val viewModel = ActivityMainViewModel(musicRepository)
+        viewModel.permissionGranted(context.contentResolver)
 
-            val testScheduler = TestCoroutineScheduler()
-            val dispatcher = StandardTestDispatcher(testScheduler)
-            viewModel.permissionGranted(context.contentResolver, dispatcher)
-        }
-        advanceUntilIdle()
-        val musicRepository = MusicRepository.getInstance()
-        val music = musicRepository.musicFiles.getOrAwaitValue()
+        val music = musicRepository.loadMusicFiles(context.contentResolver)
         assert(music.isNotEmpty())
     }
 

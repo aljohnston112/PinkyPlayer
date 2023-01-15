@@ -2,14 +2,20 @@ package com.fourth_finger.pinky_player
 
 import android.content.Context
 import android.media.MediaPlayer
-import android.net.Uri
+import com.fourth_finger.music_repository.MusicRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Holds a queue of [MediaPlayer]s so they are ready for playback.
  */
-class MediaPlayerQueue private constructor() {
+@Singleton
+class MediaPlayerQueue @Inject constructor() {
 
-    private val mediaPlayerRepositories = ArrayDeque<MediaPlayerRepository>(2)
+    private val mediaPlayerHolders = ArrayDeque<MediaPlayerHolder>(2)
+
+    @Inject
+    lateinit var musicRepository: MusicRepository
 
     /**
      * Clears the queue before preparing a [MediaPlayer].
@@ -18,27 +24,27 @@ class MediaPlayerQueue private constructor() {
      */
     fun start(context: Context, id: Long) {
         releaseAll()
-        val mediaPlayerRepository = MediaPlayerRepository()
-        mediaPlayerRepository.start(context, id)
-        mediaPlayerRepositories.add(mediaPlayerRepository)
+        val mediaPlayerHolder = MediaPlayerHolder(musicRepository)
+        mediaPlayerHolder.start(context, id)
+        mediaPlayerHolders.add(mediaPlayerHolder)
     }
 
     /**
      * Releases all [MediaPlayer]s.
      */
     private fun releaseAll() {
-        for (mediaPlayerRepository in mediaPlayerRepositories){
+        for (mediaPlayerRepository in mediaPlayerHolders){
             mediaPlayerRepository.release()
         }
-        mediaPlayerRepositories.clear()
+        mediaPlayerHolders.clear()
     }
 
     /**
      * Plays the current [MediaPlayer].
      */
     fun play() {
-        if(mediaPlayerRepositories.size > 0) {
-            mediaPlayerRepositories.first().play()
+        if(mediaPlayerHolders.size > 0) {
+            mediaPlayerHolders.first().play()
         }
     }
 
@@ -46,8 +52,8 @@ class MediaPlayerQueue private constructor() {
      * Pauses the current [MediaPlayer].
      */
     fun pause(){
-        if(mediaPlayerRepositories.size > 0) {
-            mediaPlayerRepositories.first().pause()
+        if(mediaPlayerHolders.size > 0) {
+            mediaPlayerHolders.first().pause()
         }
     }
 
@@ -56,19 +62,6 @@ class MediaPlayerQueue private constructor() {
      */
     fun stop() {
         releaseAll()
-    }
-
-    companion object{
-
-        private val INSTANCE: MediaPlayerQueue by lazy { MediaPlayerQueue() }
-
-        /**
-         * Gets the only instance of the MediaPlayerQueue.
-         */
-        fun getInstance(): MediaPlayerQueue {
-            return INSTANCE
-        }
-
     }
 
 }

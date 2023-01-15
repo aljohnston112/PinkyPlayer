@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'jacoco'
+    id 'com.google.dagger.hilt.android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -16,18 +18,21 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.fourth_finger.pinky_player.CustomTestRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     buildTypes {
+
         debug {
             testCoverageEnabled true
         }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        
     }
 
     compileOptions {
@@ -46,35 +51,47 @@ dependencies {
 
     implementation project(':music_repository')
 
+    implementation "androidx.activity:activity-ktx:1.6.1"
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.media:media:1.6.0'
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation "androidx.activity:activity-ktx:1.6.1"
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
     def nav_version = "2.5.3"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
+    implementation 'com.google.dagger:hilt-android:2.44'
+    kapt 'com.google.dagger:hilt-compiler:2.44'
     implementation 'com.google.android.material:material:1.7.0'
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
 
 
     debugImplementation "androidx.fragment:fragment-testing:1.5.5"
     debugImplementation "androidx.test:monitor:1.6.1"
 
-    testImplementation "androidx.test:core:1.5.0"
+
     testImplementation 'junit:junit:4.13.2'
 
 
     androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
-    androidTestImplementation 'androidx.test.ext:junit-ktx:1.1.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
-    androidTestImplementation 'androidx.test:runner:1.5.1'
-    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
+    androidTestImplementation 'androidx.test:core-ktx:1.5.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.ext:junit-ktx:1.1.5'
     androidTestImplementation 'androidx.test:rules:1.5.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.0'
-
-    androidTestUtil 'androidx.test:orchestrator:1.4.2'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
 
+    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.44'
+    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.44'
+
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
+
+    androidTestUtil 'androidx.test:orchestrator:1.4.2'
+
+}
+
+kapt {
+    correctErrorTypes true
 }
