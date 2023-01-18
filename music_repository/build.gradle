@@ -13,7 +13,7 @@ android {
         minSdk 21
         targetSdk 33
 
-        testInstrumentationRunner "com.fourth_finger.pinky_player.CustomTestRunner"
+        testInstrumentationRunner "com.fourth_finger.music_repository.CustomTestRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
 

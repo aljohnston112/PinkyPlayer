@@ -31,15 +31,9 @@ class MusicRepositoryTest {
         hiltRule.inject()
     }
 
-    /**
-     * Test the [MusicFile]s that loadMusicFiles loads into the musicFiles [LiveData]
-     * of the [MusicRepository]
-     * matches the [MusicFile]s returned by getMusicFromMediaStore
-     * of the [MusicDataSource].
-     */
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun loadMusicFiles_ContentResolver_LiveDataReturnsCorrectSongs() = runTest {
+    fun loadMusicFiles_ContentResolver_ReturnsCorrectSongs() = runTest {
         val context = InstrumentationRegistry.getInstrumentation().context
         val musicFiles = MusicDataSource().getMusicFromMediaStore(context.contentResolver)
 
