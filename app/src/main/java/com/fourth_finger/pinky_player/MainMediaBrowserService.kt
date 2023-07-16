@@ -35,7 +35,8 @@ import javax.inject.Inject
 class MainMediaBrowserService : MediaBrowserServiceCompat() {
 
     private val notificationChannelId = "MainMediaBrowserServiceChannelId"
-    private val notificationId = "MainMediaBrowserServiceNotificationId".hashCode()
+    private val notificationId =
+        "MainMediaBrowserServiceNotificationId".hashCode()
     private lateinit var notificationChannel: NotificationChannel
 
     @Inject
@@ -117,7 +118,7 @@ class MainMediaBrowserService : MediaBrowserServiceCompat() {
                 musicRepository.getMusicFile(mediaId.toLong())?.displayName
             )
 
-            val inputStream = musicRepository.getUri(mediaId.toLong())?.let {uri ->
+            val inputStream = musicRepository.getUri(mediaId.toLong())?.let { uri ->
                 contentResolver.openInputStream(uri)
             }
             metaDataBuilder.putBitmap(
@@ -166,7 +167,7 @@ class MainMediaBrowserService : MediaBrowserServiceCompat() {
             NotificationManagerCompat.from(this@MainMediaBrowserService).apply {
                 notify(notificationId, notification)
             }
-        } catch (e: SecurityException){
+        } catch (e: SecurityException) {
             throw e
         }
     }
