@@ -54,8 +54,7 @@ class MediaPlayerHolderTest {
             context,
             music[0].id,
             onPrepared = { },
-            onCompletion = { countDownLatchOnCompletion.countDown() },
-        )
+        ) { countDownLatchOnCompletion.countDown() }
         countDownLatchOnCompletion.await()
     }
 

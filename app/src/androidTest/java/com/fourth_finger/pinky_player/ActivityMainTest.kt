@@ -44,7 +44,7 @@ class ActivityMainTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun statePlaying_controlsVisible() = runTest {
+    fun playFromMediaId_controlsVisible() = runTest {
         val allowPermissions = getPermissionUI()
         allowPermissions.click()
 

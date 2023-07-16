@@ -21,6 +21,7 @@ import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentContainerView
+import com.fourth_finger.pinky_player.databinding.ActivityMainBinding
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -30,6 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ActivityMain : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
     private val viewModel: ActivityMainViewModel by viewModels()
 
     private lateinit var mediaBrowser: MediaBrowserCompat
@@ -44,19 +46,19 @@ class ActivityMain : AppCompatActivity() {
         override fun onMetadataChanged(metadata: MediaMetadataCompat) {}
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
-            val controls = findViewById<ConstraintLayout>(R.id.controls)
-            val playPauseButton = findViewById<ImageButton>(R.id.button_play_pause)
-
             when(state.state){
                 PlaybackStateCompat.STATE_PAUSED -> {
-                    playPauseButton.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                    binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
                 }
                 PlaybackStateCompat.STATE_PLAYING -> {
-                    playPauseButton.setImageResource(R.drawable.ic_baseline_pause_24)
-                    controls.visibility = View.VISIBLE
+                    binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
+                    binding.controls.visibility = View.VISIBLE
                 }
                 PlaybackStateCompat.STATE_STOPPED -> {
-                    controls.visibility = View.GONE
+                    binding.controls.visibility = View.GONE
+                }
+                PlaybackStateCompat.STATE_NONE -> {
+                    binding.controls.visibility = View.GONE
                 }
             }
         }
@@ -108,7 +110,8 @@ class ActivityMain : AppCompatActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         requestPermissionAndLoadMusicFiles()
     }
 
@@ -116,8 +119,7 @@ class ActivityMain : AppCompatActivity() {
      * Sets up the onClickListeners
      */
     private fun setUpOnClickListeners() {
-        val playPauseButton = findViewById<ImageButton>(R.id.button_play_pause)
-        playPauseButton.setOnClickListener {
+        binding.buttonPlayPause.setOnClickListener {
             val isPlaying = mediaController.playbackState.state == PlaybackStateCompat.STATE_PLAYING
             viewModel.playPause(isPlaying, mediaController.transportControls)
         }
@@ -198,9 +200,8 @@ class ActivityMain : AppCompatActivity() {
      * Lets the user know that permission is needed to access the music files.
      */
     private fun displayPermissionNeeded() {
-        val thisView = findViewById<View>(R.id.activity_main)
         Snackbar.make(
-            thisView,
+            binding.root,
             R.string.permission_needed,
             16000
         ).show()

@@ -3,11 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/fragmentMusicList">
+    app:startDestination="@id/fragmentTitle">
 
     <fragment
         android:id="@+id/fragmentMusicList"
         android:name="com.fourth_finger.pinky_player.FragmentMusicList"
         android:label="fragment_music_list"
         tools:layout="@layout/fragment_music_list" />
+    <fragment
+        android:id="@+id/fragmentTitle"
+        android:name="com.fourth_finger.pinky_player.FragmentTitle"
+        android:label="fragment_title"
+        tools:layout="@layout/fragment_title" >
+        <action
+            android:id="@+id/action_fragmentTitle_to_fragmentMusicList"
+            app:destination="@id/fragmentMusicList" />
+    </fragment>
 </navigation>

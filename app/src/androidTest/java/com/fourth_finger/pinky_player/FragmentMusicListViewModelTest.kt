@@ -47,13 +47,14 @@ class FragmentMusicListViewModelTest {
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun getUiState_AfterConstructor_ReturnsAllLoadedMusic() = runTest {
+    fun getUiState_AfterFetchMusicFiles_ReturnsAllLoadedMusic() = runTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val musicFiles = musicRepository.loadMusicFiles(context.contentResolver)
         val viewModel = FragmentMusicListViewModel(musicRepository)
         viewModel.fetchMusicFiles(context.contentResolver)
         val music = viewModel.musicFiles.getOrAwaitValue()
         assert(music.size == musicFiles.size)
+        // Do these really need to be in the same order?
         for ((i, song) in music.withIndex()) {
             assert(song.displayName == musicFiles[i].displayName)
         }

@@ -100,6 +100,11 @@ class MainMediaBrowserService : MediaBrowserServiceCompat() {
         override fun onPlayFromMediaId(mediaId: String, extras: Bundle) {
             super.onPlayFromMediaId(mediaId, extras)
 
+            stateBuilder.setActions(
+                    PlaybackStateCompat.ACTION_PLAY or
+                            PlaybackStateCompat.ACTION_PAUSE
+                )
+
             stateBuilder.setState(
                 PlaybackStateCompat.STATE_PLAYING,
                 PLAYBACK_POSITION_UNKNOWN,
@@ -126,7 +131,21 @@ class MainMediaBrowserService : MediaBrowserServiceCompat() {
 
             updateNotification(createPauseNotification(notificationChannelId))
 
-            mediaPlayerQueue.start(this@MainMediaBrowserService, mediaId.toLong())
+            mediaPlayerQueue.start(
+                this@MainMediaBrowserService,
+                mediaId.toLong(),
+                onPrepared = {},
+                onCompletion = {
+                    // TODO if queue has stuff; play that
+                    stateBuilder.setState(
+                        PlaybackStateCompat.STATE_NONE,
+                        PLAYBACK_POSITION_UNKNOWN,
+                        1F
+                    )
+                    mediaSession?.setPlaybackState(stateBuilder.build())
+                    updateNotification(createEmptyNotification(notificationChannelId))
+                }
+            )
         }
 
         override fun onStop() {
@@ -160,10 +179,6 @@ class MainMediaBrowserService : MediaBrowserServiceCompat() {
         mediaSession = MediaSessionCompat(baseContext, LOG_TAG).apply {
             isActive = true
             stateBuilder = PlaybackStateCompat.Builder()
-                .setActions(
-                    PlaybackStateCompat.ACTION_PLAY or
-                            PlaybackStateCompat.ACTION_PAUSE
-                )
             setPlaybackState(stateBuilder.build())
 
             metaDataBuilder = MediaMetadataCompat.Builder()
@@ -192,6 +207,43 @@ class MainMediaBrowserService : MediaBrowserServiceCompat() {
         notificationChannel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         service.createNotificationChannel(notificationChannel)
+    }
+
+    private fun createEmptyNotification(channelId: String): Notification {
+        val controller = mediaSession?.controller
+        val builder = NotificationCompat.Builder(this, channelId).apply {
+
+            setContentIntent(controller?.sessionActivity)
+
+            setDeleteIntent(
+                MediaButtonReceiver.buildMediaButtonPendingIntent(
+                    this@MainMediaBrowserService,
+                    PlaybackStateCompat.ACTION_STOP
+                )
+            )
+
+            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+
+            setSmallIcon(R.drawable.ic_launcher_foreground)
+            color = ContextCompat.getColor(
+                this@MainMediaBrowserService,
+                R.color.md_theme_dark_primary
+            )
+
+            setStyle(
+                androidx.media.app.NotificationCompat.MediaStyle()
+                    .setMediaSession(mediaSession?.sessionToken)
+                    .setShowActionsInCompactView(0)
+                    .setShowCancelButton(true)
+                    .setCancelButtonIntent(
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(
+                            this@MainMediaBrowserService,
+                            PlaybackStateCompat.ACTION_STOP
+                        )
+                    )
+            )
+        }
+        return builder.build()
     }
 
     /**

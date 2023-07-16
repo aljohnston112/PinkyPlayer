@@ -22,10 +22,15 @@ class MediaPlayerQueue @Inject constructor() {
      * When prepared, the [MediaPlayer] is started.
      *
      */
-    fun start(context: Context, id: Long) {
+    fun start(
+        context: Context,
+        id: Long,
+        onPrepared: (MediaPlayer) -> Unit = { },
+        onCompletion: (MediaPlayer) -> Unit = { }
+    ) {
         releaseAll()
         val mediaPlayerHolder = MediaPlayerHolder(musicRepository)
-        mediaPlayerHolder.start(context, id)
+        mediaPlayerHolder.start(context, id, onPrepared, onCompletion)
         mediaPlayerHolders.add(mediaPlayerHolder)
     }
 
