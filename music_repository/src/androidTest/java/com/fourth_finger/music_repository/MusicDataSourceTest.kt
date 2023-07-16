@@ -16,25 +16,23 @@ import org.junit.Test
 class MusicDataSourceTest {
 
     @get:Rule
-    var mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule
-        .grant(Manifest.permission.READ_EXTERNAL_STORAGE)
-
+    var mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    )
 
     private val context = InstrumentationRegistry.getInstrumentation().context
 
     /**
-     * Test the [MusicFile]s that getMusicFromMediaStore returns
-     * represent audio files that are in the MediaStore's audio store and
+     * Test the [MusicFile]s that getMusicFromMediaStore returns.
+     * They must represent audio files that are in the MediaStore's audio store and
      * are considered music.
      *
-     * It is assumed there is one music file on the device,
-     * and it display name is "01 .mp3"
      */
     @Test
     fun getMusicFromMediaStore_ContentResolver_ReturnsCorrectSongs() {
 
         // Test the returned MusicFile objects represent the correct MediaStore rows
-        val musicFiles = MusicDataSource().getMusicFromMediaStore(context.contentResolver).toList()
+        val musicFiles = MusicDataSource().getMusicFromMediaStore(context.contentResolver)!!.toList()
         val actualMusicFiles = getAllMusicFiles().toList()
 
         assert(actualMusicFiles.isNotEmpty())
@@ -52,11 +50,12 @@ class MusicDataSourceTest {
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.DISPLAY_NAME,
-            MediaStore.Audio.Media.IS_MUSIC
-        )
+            MediaStore.Audio.Media.IS_MUSIC,
+            MediaStore.Audio.Media.RELATIVE_PATH,
+            )
         val selection = "${MediaStore.Audio.Media.IS_MUSIC} != ?"
         val selectionArgs = arrayOf("0")
-        val sortOrder = "${MediaStore.Audio.Media.DISPLAY_NAME} ASC"
+        val sortOrder = "${MediaStore.Audio.Media.RELATIVE_PATH} ASC"
 
         // The query and conversion to MusicFiles
         context.contentResolver.query(
@@ -70,16 +69,17 @@ class MusicDataSourceTest {
             val displayNameColumn = cursor.getColumnIndexOrThrow(
                 MediaStore.Audio.Media.DISPLAY_NAME
             )
+            val relativePathColumn = cursor.getColumnIndexOrThrow(
+                MediaStore.Audio.Media.RELATIVE_PATH
+            )
 
             // Convert the database entries to MusicFiles
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
                 val displayName = cursor.getString(displayNameColumn)
-                val contentUri = ContentUris.withAppendedId(
-                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    id
-                )
-                val musicFile = MusicFile(id, displayName)
+                val relativePath = cursor.getString(relativePathColumn)
+
+                val musicFile = MusicFile(id, relativePath, displayName)
                 music.add(musicFile)
             }
         }

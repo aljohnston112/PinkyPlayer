@@ -46,7 +46,9 @@ class MusicRepository @Inject constructor() {
                 getMusicFromMediaStore(contentResolver)
             }
             latestMusicMutex.withLock {
-                latestMusic = latestMusicResult
+                if (latestMusicResult != null) {
+                    latestMusic = latestMusicResult
+                }
             }
         }
         return latestMusicMutex.withLock { latestMusic }
@@ -60,7 +62,7 @@ class MusicRepository @Inject constructor() {
      */
     private fun getMusicFromMediaStore(
         contentResolver: ContentResolver,
-    ): List<MusicFile> {
+    ): List<MusicFile>? {
         return musicDataSource.getMusicFromMediaStore(contentResolver)
     }
 

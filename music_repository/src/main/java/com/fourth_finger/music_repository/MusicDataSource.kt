@@ -5,29 +5,28 @@ import android.content.ContentUris
 import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * A container for a music file.
- * The file must have came from the MediaStore and be considered music by the MediaStore.
+ * A container for music file data.
+ * The file data must have came from the MediaStore and be considered music by the MediaStore.
  *
  * @param id The id the MediaStore gave this music file.
  * @param displayName The display name of the music file.
  */
-@Singleton
-data class MusicFile(val id: Long, val displayName: String) {
+data class MusicFile(val id: Long, val relativePath: String, val displayName: String) {
 
     override fun equals(other: Any?): Boolean {
-        return other is MusicFile && id == other.id && displayName == other.displayName
+        return other is MusicFile &&
+                id == other.id &&
+                relativePath == other.relativePath &&
+                displayName == other.displayName
     }
 
     override fun hashCode(): Int {
         var result = id.hashCode()
+        result = 31 * result + relativePath.hashCode()
         result = 31 * result + displayName.hashCode()
         return result
     }
@@ -36,16 +35,18 @@ data class MusicFile(val id: Long, val displayName: String) {
 
 /**
  * A datasource for music on the device.
+ * This class acts as the adapter between the [MediaStore] music and [MusicFile]s.
  */
+@Singleton
 internal class MusicDataSource @Inject constructor() {
 
     private lateinit var idToUriMap: Map<Long, Uri>
     private lateinit var idToMusicFileMap: Map<Long, MusicFile>
 
     /**
-     * Gets the Uri of a music file.
+     * Gets the [Uri] of a music file given its id.
      *
-     * @param id The id of the music file given by the [MediaStore]
+     * @param id The id of the music file given by the [MediaStore].
      */
     internal fun getUri(id: Long): Uri? {
         return idToUriMap[id]
@@ -62,22 +63,25 @@ internal class MusicDataSource @Inject constructor() {
 
     /**
      * Gets a list of [MusicFile]s that represent files
-     * that the MediaStore considers music.
+     * that the [MediaStore] considers music.
      *
-     * @param contentResolver The [ContentResolver] used to query the MediaStore.
+     * @param contentResolver The [ContentResolver] used to query the [MediaStore].
+     * @return A [List] of [MusicFile]s that represent files that the [MediaStore] considers music
+     *         or null if the query did not succeed.
      */
-    internal fun getMusicFromMediaStore(contentResolver: ContentResolver): List<MusicFile> {
-        var music: List<MusicFile> = emptyList()
+    internal fun getMusicFromMediaStore(contentResolver: ContentResolver): List<MusicFile>? {
+        var music: List<MusicFile>? = null
 
         // The query parameters
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.DISPLAY_NAME,
-            MediaStore.Audio.Media.IS_MUSIC
+            MediaStore.Audio.Media.IS_MUSIC,
+            MediaStore.Audio.Media.RELATIVE_PATH,
         )
         val selection = "${MediaStore.Audio.Media.IS_MUSIC} != ?"
         val selectionArgs = arrayOf("0")
-        val sortOrder = "${MediaStore.Audio.Media.DISPLAY_NAME} ASC"
+        val sortOrder = "${MediaStore.Audio.Media.RELATIVE_PATH} ASC"
 
         // The query and conversion to MusicFiles
         contentResolver.query(
@@ -87,7 +91,7 @@ internal class MusicDataSource @Inject constructor() {
             selectionArgs,
             sortOrder
         )?.use { cursor ->
-            music = convertQueryToMusicFiles(cursor)
+            music = convertDatabaseQueryCursorToMusicFileList(cursor)
         }
         return music
     }
@@ -97,7 +101,7 @@ internal class MusicDataSource @Inject constructor() {
      *
      * @param cursor The cursor containing a query for [MediaStore] music.
      */
-    private fun convertQueryToMusicFiles(cursor: Cursor): List<MusicFile> {
+    private fun convertDatabaseQueryCursorToMusicFileList(cursor: Cursor): List<MusicFile> {
         val mutableIdToUriMap = mutableMapOf<Long, Uri>()
         val mutableIdToMusicFile = mutableMapOf<Long, MusicFile>()
 
@@ -106,16 +110,25 @@ internal class MusicDataSource @Inject constructor() {
         val displayNameColumn = cursor.getColumnIndexOrThrow(
             MediaStore.Audio.Media.DISPLAY_NAME
         )
+        val relativePathColumn = cursor.getColumnIndexOrThrow(
+            MediaStore.Audio.Media.RELATIVE_PATH
+        )
 
         // Convert the database entries to MusicFiles
         while (cursor.moveToNext()) {
+
+            // Extract data from columns
             val id = cursor.getLong(idColumn)
             val displayName = cursor.getString(displayNameColumn)
+            val relativePath = cursor.getString(relativePathColumn)
+
             val contentUri = ContentUris.withAppendedId(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 id
             )
-            val musicFile = MusicFile(id, displayName)
+
+            // Create the MusicFile and populate cache
+            val musicFile = MusicFile(id, relativePath, displayName)
             mutableIdToUriMap[id] = contentUri
             mutableIdToMusicFile[id] = musicFile
         }

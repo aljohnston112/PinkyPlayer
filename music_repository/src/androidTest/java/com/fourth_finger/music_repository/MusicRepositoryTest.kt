@@ -40,7 +40,7 @@ class MusicRepositoryTest {
         val music = musicRepository.loadMusicFiles(context.contentResolver)
 
         assert(music.isNotEmpty())
-        assert(music.size == musicFiles.size)
+        assert(music.size == musicFiles!!.size)
         for ((i, song) in music.withIndex()) {
             assert(song.id == musicFiles[i].id)
             assert(song.displayName == musicFiles[i].displayName)

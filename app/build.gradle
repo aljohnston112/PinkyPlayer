@@ -56,30 +56,30 @@ dependencies {
 
     implementation project(':music_repository')
 
-    implementation "androidx.activity:activity-ktx:1.6.1"
-    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation "androidx.activity:activity-ktx:1.7.2"
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.media:media:1.6.0'
-    def nav_version = "2.5.3"
+    def nav_version = "2.6.0"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
-    implementation 'com.google.dagger:hilt-android:2.44'
+    implementation 'com.google.dagger:hilt-android:2.44.2'
     kapt 'com.google.dagger:hilt-compiler:2.44'
-    implementation 'com.google.android.material:material:1.7.0'
+    implementation 'com.google.android.material:material:1.9.0'
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
 
 
-    debugImplementation "androidx.fragment:fragment-testing:1.5.5"
+    debugImplementation "androidx.fragment:fragment-testing:1.6.0"
     debugImplementation "androidx.test:monitor:1.6.1"
 
 
     testImplementation 'junit:junit:4.13.2'
 
 
-    androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
+    androidTestImplementation "androidx.arch.core:core-testing:2.2.0"
     androidTestImplementation 'androidx.test:core-ktx:1.5.0'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
