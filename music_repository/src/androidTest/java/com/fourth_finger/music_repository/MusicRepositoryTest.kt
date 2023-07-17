@@ -2,13 +2,21 @@ package com.fourth_finger.music_repository
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
+import dagger.Binds
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.UninstallModules
+import dagger.hilt.components.SingletonComponent
+import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Tests the [MusicRepository].
@@ -52,6 +60,21 @@ class MusicRepositoryTest {
 
     }
 
-    // TODO test that the cache works
+    @Test
+    fun loadMusicFiles_ContentResolver_CachesCorrectSongs() = runTest {
+        val contentResolver = InstrumentationRegistry.getInstrumentation().context.contentResolver
+        val actualMusicFiles = MusicDataSource().getMusicFromMediaStore(contentResolver)!!
+        musicRepository.loadMusicFiles(contentResolver)!!
+        val musicFiles = musicRepository.getCachedMusicFiles()!!
+
+        // Assert there are music files
+        assert(musicFiles.isNotEmpty())
+
+        // Assert the music repository cached all of them
+        assert(musicFiles.size == actualMusicFiles.size)
+        for (musicFile in actualMusicFiles) {
+            assert(musicFile in musicFiles)
+        }
+    }
 
 }

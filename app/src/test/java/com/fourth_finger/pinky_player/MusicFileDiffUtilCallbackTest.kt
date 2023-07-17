@@ -7,7 +7,7 @@ class MusicFileDiffUtilCallbackTest {
 
     private val emptyList = emptyList<MusicFile>()
     private val singletonList = listOf(
-        MusicFile(0, "A")
+        MusicFile(0, "B/", "A")
     )
 
     @Test
@@ -74,10 +74,10 @@ class MusicFileDiffUtilCallbackTest {
     fun areItemsTheSame_DifferentIDs_ReturnsFalse(){
         val musicFileDiffUtilCallback = MusicFileDiffUtilCallback(
             listOf(
-                MusicFile(0, "A")
+                MusicFile(0, "B/", "A")
             ),
             listOf(
-                MusicFile(1, "A")
+                MusicFile(1, "B/","A")
             )
         )
         assert(!musicFileDiffUtilCallback.areItemsTheSame(0, 0))
@@ -132,10 +132,10 @@ class MusicFileDiffUtilCallbackTest {
     fun areContentsTheSame_DifferentIDs_ReturnsFalse(){
         val musicFileDiffUtilCallback = MusicFileDiffUtilCallback(
             listOf(
-                MusicFile(0, "A")
+                MusicFile(0, "B/", "A")
             ),
             listOf(
-                MusicFile(1, "A")
+                MusicFile(1, "B/", "A")
             )
         )
         assert(!musicFileDiffUtilCallback.areContentsTheSame(0, 0))
@@ -145,10 +145,10 @@ class MusicFileDiffUtilCallbackTest {
     fun areContentsTheSame_DifferentDisplayName_ReturnsFalse(){
         val musicFileDiffUtilCallback = MusicFileDiffUtilCallback(
             listOf(
-                MusicFile(0, "A")
+                MusicFile(0, "B/", "A")
             ),
             listOf(
-                MusicFile(0, "B")
+                MusicFile(0, "B/", "B")
             )
         )
         assert(!musicFileDiffUtilCallback.areContentsTheSame(0, 0))
