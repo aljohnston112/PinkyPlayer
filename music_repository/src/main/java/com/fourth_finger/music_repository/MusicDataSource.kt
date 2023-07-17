@@ -45,8 +45,11 @@ internal class MusicDataSource @Inject constructor() {
 
     /**
      * Gets the [Uri] of a music file given its id.
+     * This method will return null if [getMusicFromMediaStore] has not been called or
+     * has not finished.
      *
      * @param id The id of the music file given by the [MediaStore].
+     * @return The [Uri] with the given id or null if it was not found.
      */
     internal fun getUri(id: Long): Uri? {
         return idToUriMap[id]
@@ -54,8 +57,11 @@ internal class MusicDataSource @Inject constructor() {
 
     /**
      * Gets a [MusicFile] by its id.
+     * This method will return null if [getMusicFromMediaStore] has not been called or
+     * has not finished.
      *
      * @param id The [MusicFile]'s id.
+     * @return The [MusicFile] with the given id or null if it does not exist.
      */
     internal fun getMusicFile(id: Long): MusicFile? {
         return idToMusicFileMap[id]
@@ -100,6 +106,7 @@ internal class MusicDataSource @Inject constructor() {
      * Converts a music query into a list of [MusicFile]s.
      *
      * @param cursor The cursor containing a query for [MediaStore] music.
+     * @return A [List] of [MusicFile]s representing music files in the [MediaStore] query cursor.
      */
     private fun convertDatabaseQueryCursorToMusicFileList(cursor: Cursor): List<MusicFile> {
         val mutableIdToUriMap = mutableMapOf<Long, Uri>()
@@ -127,7 +134,7 @@ internal class MusicDataSource @Inject constructor() {
                 id
             )
 
-            // Create the MusicFile and populate cache
+            // Create the MusicFile and populate caches
             val musicFile = MusicFile(id, relativePath, displayName)
             mutableIdToUriMap[id] = contentUri
             mutableIdToMusicFile[id] = musicFile

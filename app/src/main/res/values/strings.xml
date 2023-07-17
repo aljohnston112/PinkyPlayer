@@ -3,5 +3,6 @@
 
     <string name="permission_needed">Access to storage is needed to access music files and access to posting notifications are needed for the notification to work correctly</string>
     <string name="play_pause">Play/Pause</string>
+    <string name="songs">Songs</string>
 
 </resources>

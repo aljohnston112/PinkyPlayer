@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -31,20 +30,28 @@ class MusicRepositoryTest {
         hiltRule.inject()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    /**
+     * Tests that the [MusicFile]s returned by [MusicRepository.loadMusicFiles] match those
+     * loaded by the [MusicDataSource].
+     * This test will fail if there are no music files on the test device.
+     */
     @Test
     fun loadMusicFiles_ContentResolver_ReturnsCorrectSongs() = runTest {
-        val context = InstrumentationRegistry.getInstrumentation().context
-        val musicFiles = MusicDataSource().getMusicFromMediaStore(context.contentResolver)
+        val contentResolver = InstrumentationRegistry.getInstrumentation().context.contentResolver
+        val actualMusicFiles = MusicDataSource().getMusicFromMediaStore(contentResolver)!!
+        val musicFiles = musicRepository.loadMusicFiles(contentResolver)!!
 
-        val music = musicRepository.loadMusicFiles(context.contentResolver)
+        // Assert there are music files
+        assert(musicFiles.isNotEmpty())
 
-        assert(music.isNotEmpty())
-        assert(music.size == musicFiles!!.size)
-        for ((i, song) in music.withIndex()) {
-            assert(song.id == musicFiles[i].id)
-            assert(song.displayName == musicFiles[i].displayName)
+        // Assert the music repository loads all of them
+        assert(musicFiles.size == actualMusicFiles.size)
+        for (musicFile in actualMusicFiles) {
+            assert(musicFile in musicFiles)
         }
+
     }
+
+    // TODO test that the cache works
 
 }

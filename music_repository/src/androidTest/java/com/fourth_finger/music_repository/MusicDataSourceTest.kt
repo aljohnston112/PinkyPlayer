@@ -1,6 +1,7 @@
 package com.fourth_finger.music_repository
 
 import android.Manifest
+import android.content.ContentResolver
 import android.content.ContentUris
 import android.database.Cursor
 import android.provider.MediaStore
@@ -26,25 +27,34 @@ class MusicDataSourceTest {
      * Test the [MusicFile]s that getMusicFromMediaStore returns.
      * They must represent audio files that are in the MediaStore's audio store and
      * are considered music.
-     *
+     * This test will fail if there is no music on the device being tested or
+     * the query to the [MediaStore] fails.
      */
     @Test
     fun getMusicFromMediaStore_ContentResolver_ReturnsCorrectSongs() {
 
-        // Test the returned MusicFile objects represent the correct MediaStore rows
-        val musicFiles = MusicDataSource().getMusicFromMediaStore(context.contentResolver)!!.toList()
+        // Assert there are music files
         val actualMusicFiles = getAllMusicFiles().toList()
-
         assert(actualMusicFiles.isNotEmpty())
+
+        // Assert the data source gets all of them
+        val musicFiles = MusicDataSource().getMusicFromMediaStore(context.contentResolver)!!.toList()
         assert(musicFiles.size == actualMusicFiles.size)
-        for((i, music) in musicFiles.withIndex()) {
-            assert(music.id == actualMusicFiles[i].id)
-            assert(music.displayName == actualMusicFiles[i].displayName)
+        for(musicFile in actualMusicFiles) {
+            assert(musicFile in musicFiles)
         }
+
     }
 
-    private fun getAllMusicFiles(): Collection<MusicFile> {
-        val music: MutableCollection<MusicFile> = mutableListOf()
+    /**
+     * Gets a list of [MusicFile]s that represent files
+     * that the [MediaStore] considers music.
+     *
+     * @return A [List] of [MusicFile]s that represent files
+     *         that the [MediaStore] considers music.
+     */
+    private fun getAllMusicFiles(): List<MusicFile> {
+        val music: MutableList<MusicFile> = mutableListOf()
 
         // The query parameters
         val projection = arrayOf(
@@ -85,6 +95,5 @@ class MusicDataSourceTest {
         }
         return music
     }
-
 
 }
