@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fourth_finger.music_repository.MusicFile
@@ -17,7 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class FragmentMusicList : Fragment() {
 
-    private val viewModel: FragmentMusicListViewModel by viewModels()
+    private val viewModel: ActivityMainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,15 +31,16 @@ class FragmentMusicList : Fragment() {
         )
     }
 
-    /**
-     * Sets up the RecyclerView and updates to it.
-     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpRecyclerView(view)
+    }
 
-        // Set up the RecyclerView
-        val adapter = MusicFileAdapter(emptyList())
-        adapter.setOnSongClickListener {id ->
+    /**
+     * Sets up the RecyclerView.
+     */
+    private fun setUpRecyclerView(view: View) {
+        val adapter = MusicFileAdapter(emptyList()) { id ->
             activity?.mediaController?.transportControls?.let { controls ->
                 viewModel.songClicked(id, controls)
             }
@@ -55,7 +56,6 @@ class FragmentMusicList : Fragment() {
         viewModel.musicFiles.observe(viewLifecycleOwner) { musicFiles ->
             adapter.updateMusicList(musicFiles.toList())
         }
-
     }
 
 }

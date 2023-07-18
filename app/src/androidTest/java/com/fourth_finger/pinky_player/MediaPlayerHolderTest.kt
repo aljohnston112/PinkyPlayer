@@ -50,7 +50,7 @@ class MediaPlayerHolderTest {
 
         val music = musicRepository.loadMusicFiles(context.contentResolver)
         val mediaPlayerHolder = MediaPlayerHolder(musicRepository)
-        mediaPlayerHolder.start(
+        mediaPlayerHolder.prepareAndPlay(
             context,
             music[0].id,
             onPrepared = { },

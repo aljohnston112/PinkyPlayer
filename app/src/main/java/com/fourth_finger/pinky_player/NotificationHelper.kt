@@ -12,6 +12,12 @@ import androidx.core.content.ContextCompat
 import androidx.media.session.MediaButtonReceiver
 import javax.inject.Inject
 
+/**
+ * The class creates a [NotificationChannel] for a given channel ID and
+ * can post updates to it.
+ *
+ * There are static methods that help with creating [Notification]s.
+ */
 class NotificationHelper @Inject constructor() {
 
     private lateinit var notificationChannel: NotificationChannel
@@ -37,6 +43,13 @@ class NotificationHelper @Inject constructor() {
         service.createNotificationChannel(notificationChannel)
     }
 
+    /**
+     * Updates a notification.
+     *
+     * @param context
+     * @param notificationId The id of the notification to update.
+     * @param notification The new [Notification].
+     */
     fun updateNotification(context: Context, notificationId: Int, notification: Notification) {
         try {
             NotificationManagerCompat.from(context).apply {
@@ -51,7 +64,12 @@ class NotificationHelper @Inject constructor() {
     companion object {
 
         /**
-         * Creates a Notification and adds it to a notification channel.
+         * Creates a [Notification] showing the music is paused.
+         *
+         * @param context
+         * @param channelId The notification channel to create the [Notification] for.
+         * @param mediaSession The [MediaSessionCompat] containing the meta data for the [Notification].
+         * @return The [Notification] showing the music is paused.
          */
         fun createPauseNotification(
             context: Context,
@@ -116,7 +134,12 @@ class NotificationHelper @Inject constructor() {
         }
 
         /**
-         * Creates a Notification and adds it to a notification channel.
+         * Creates a [Notification] showing the music is playing.
+         *
+         * @param context
+         * @param channelId The notification channel to create the [Notification] for.
+         * @param mediaSession The [MediaSessionCompat] containing the meta data for the [Notification].
+         * @return The [Notification] showing the music is playing.
          */
         fun createPlayNotification(
             context: Context,
@@ -180,6 +203,14 @@ class NotificationHelper @Inject constructor() {
             return builder.build()
         }
 
+        /**
+         * Creates a [Notification] showing that no music has been started.
+         *
+         * @param context
+         * @param channelId The notification channel to create the [Notification] for.
+         * @param mediaSession The [MediaSessionCompat] containing the meta data for the [Notification].
+         * @return The [Notification] showing that no music has been started.
+         */
         fun createEmptyNotification(
             context: Context,
             channelId: String,

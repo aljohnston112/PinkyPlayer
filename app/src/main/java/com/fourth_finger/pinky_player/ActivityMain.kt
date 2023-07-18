@@ -34,13 +34,11 @@ class ActivityMain : AppCompatActivity() {
     private lateinit var mediaBrowser: MediaBrowserCompat
     private lateinit var mediaController: MediaControllerCompat
 
-    /**
-     * For getting media session updates and state changes.
-     *
-     */
-    private val controllerCallback = object : MediaControllerCompat.Callback() {
+    private val mediaControllerCallback = object : MediaControllerCompat.Callback() {
 
-        override fun onMetadataChanged(metadata: MediaMetadataCompat) {}
+        override fun onMetadataChanged(metadata: MediaMetadataCompat) {
+
+        }
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
             when(state.state){
@@ -69,28 +67,24 @@ class ActivityMain : AppCompatActivity() {
 
     }
 
-    private val connectionCallback = object : MediaBrowserCompat.ConnectionCallback() {
+    private val mediaBrowserConnectionCallback = object : MediaBrowserCompat.ConnectionCallback() {
+
         override fun onConnected() {
             super.onConnected()
-
             mediaBrowser.sessionToken.also { token ->
-
                 mediaController = MediaControllerCompat(
                     this@ActivityMain,
                     token
                 )
-
                 MediaControllerCompat.setMediaController(
                     this@ActivityMain,
                     mediaController
                 )
 
                 setUpOnClickListeners()
-
             }
 
-            mediaController.registerCallback(this@ActivityMain.controllerCallback)
-
+            mediaController.registerCallback(this@ActivityMain.mediaControllerCallback)
         }
 
         override fun onConnectionSuspended() {
@@ -104,6 +98,15 @@ class ActivityMain : AppCompatActivity() {
     }
 
     /**
+     * Sets up the onClickListeners
+     */
+    private fun setUpOnClickListeners() {
+        binding.buttonPlayPause.setOnClickListener {
+            viewModel.onPlayPauseClicked(mediaController)
+        }
+    }
+
+    /**
      *  Makes sure the proper permissions are granted and
      *  then loads music files from the MediaStore.
      */
@@ -111,44 +114,14 @@ class ActivityMain : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        requestPermissionAndLoadMusicFiles()
-    }
-
-    /**
-     * Sets up the onClickListeners
-     */
-    private fun setUpOnClickListeners() {
-        binding.buttonPlayPause.setOnClickListener {
-            viewModel.playPause(mediaController)
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        mediaBrowser = MediaBrowserCompat(
-            this,
-            ComponentName(this, MainMediaBrowserService::class.java),
-            connectionCallback,
-            null
-        )
-        mediaBrowser.connect()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        if(this::mediaBrowser.isInitialized) {
-            if (this::mediaController.isInitialized) {
-                mediaController.unregisterCallback(controllerCallback)
-            }
-            mediaBrowser.disconnect()
-        }
+        requestPermissionsAndLoadMusicFiles()
     }
 
     /**
      *  Makes sure the proper permissions are granted and
      *  then loads music files from the MediaStore.
      */
-    private fun requestPermissionAndLoadMusicFiles() {
+    private fun requestPermissionsAndLoadMusicFiles() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermission(READ_MEDIA_AUDIO)
         } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
@@ -203,6 +176,28 @@ class ActivityMain : AppCompatActivity() {
             R.string.permission_needed,
             16000
         ).show()
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+        mediaBrowser = MediaBrowserCompat(
+            this,
+            ComponentName(this, MainMediaBrowserService::class.java),
+            mediaBrowserConnectionCallback,
+            null
+        )
+        mediaBrowser.connect()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if(this::mediaBrowser.isInitialized) {
+            if (this::mediaController.isInitialized) {
+                mediaController.unregisterCallback(mediaControllerCallback)
+            }
+            mediaBrowser.disconnect()
+        }
     }
 
 }

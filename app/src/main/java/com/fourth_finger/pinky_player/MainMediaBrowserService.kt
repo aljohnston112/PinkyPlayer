@@ -19,9 +19,6 @@ class MainMediaBrowserService : MediaBrowserServiceCompat() {
     @Inject
     lateinit var mediaSessionHelper: MediaSessionHelper
 
-    /**
-     * Sets up the [MediaSessionCompat].
-     */
     override fun onCreate() {
         super.onCreate()
         sessionToken = mediaSessionHelper.setUpMediaSession(this, mediaSessionCallback)

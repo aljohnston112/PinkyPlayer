@@ -2,7 +2,6 @@ package com.fourth_finger.pinky_player
 
 import android.content.Context
 import android.media.MediaPlayer
-import com.fourth_finger.music_repository.MusicRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,23 +13,20 @@ class MediaPlayerQueue @Inject constructor() {
 
     private val mediaPlayerHolders = ArrayDeque<MediaPlayerHolder>(2)
 
-    @Inject
-    lateinit var musicRepository: MusicRepository
-
     /**
      * Clears the queue before preparing a [MediaPlayer].
      * When prepared, the [MediaPlayer] is started.
      *
      */
-    fun start(
+    fun clearPrepareAndPlay(
         context: Context,
         id: Long,
         onPrepared: (MediaPlayer) -> Unit = { },
         onCompletion: (MediaPlayer) -> Unit = { }
     ) {
         releaseAll()
-        val mediaPlayerHolder = MediaPlayerHolder(musicRepository)
-        mediaPlayerHolder.start(context, id, onPrepared, onCompletion)
+        val mediaPlayerHolder = MediaPlayerHolder()
+        mediaPlayerHolder.prepareAndPlay(context, id, onPrepared, onCompletion)
         mediaPlayerHolders.add(mediaPlayerHolder)
     }
 
@@ -38,8 +34,8 @@ class MediaPlayerQueue @Inject constructor() {
      * Releases all [MediaPlayer]s.
      */
     private fun releaseAll() {
-        for (mediaPlayerRepository in mediaPlayerHolders){
-            mediaPlayerRepository.release()
+        for (mediaPlayerHolder in mediaPlayerHolders){
+            mediaPlayerHolder.release()
         }
         mediaPlayerHolders.clear()
     }

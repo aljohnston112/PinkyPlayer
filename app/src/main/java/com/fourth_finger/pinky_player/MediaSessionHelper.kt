@@ -53,6 +53,12 @@ class MediaSessionHelper @Inject constructor() {
             build()
         }
 
+    /**
+     * Sets up the [MediaSessionCompat].
+     *
+     * @param context
+     * @param mediaSessionCallback A callback to be invoked by the [MediaSessionCompat].
+     */
     fun setUpMediaSession(
         context: Context,
         mediaSessionCallback: MediaSessionCompat.Callback
@@ -74,6 +80,12 @@ class MediaSessionHelper @Inject constructor() {
         return mediaSession?.sessionToken
     }
 
+    /**
+     * Updates the [MediaSessionCompat] and starts playing music.
+     *
+     * @param context
+     * @param notificationId The id of the notification to display the [MediaSessionCompat] data.
+     */
     fun onPlay(context: Context, notificationId: Int) {
         val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val result = am.requestAudioFocus(audioFocusRequest)
@@ -104,6 +116,13 @@ class MediaSessionHelper @Inject constructor() {
         }
     }
 
+    /**
+     * Creates the start notification and returns it.
+     *
+     * @param context
+     * @return The [Notification] linked to the [MediaSessionCompat] or
+     *         null if the [MediaSessionCompat] has not been started.
+     */
     fun getStartNotification(context: Context): Notification? {
         notificationHelper.createNotificationChannel(context, notificationChannelId)
         val notification = mediaSession?.let { mediaSession ->
@@ -116,6 +135,12 @@ class MediaSessionHelper @Inject constructor() {
         return notification
     }
 
+    /**
+     * Updates the [MediaSessionCompat] and pauses the music.
+     *
+     * @param context
+     * @param notificationId The id of the notification to display the [MediaSessionCompat] data.
+     */
     fun onPause(context: Context, notificationId: Int) {
         // TODO Update metadata
 
@@ -143,6 +168,13 @@ class MediaSessionHelper @Inject constructor() {
         mediaPlayerQueue.pause()
     }
 
+    /**
+     * Updates the [MediaSessionCompat] and starts playing the music with the given id.
+     *
+     * @param context
+     * @param mediaId The id of the music to start playing.
+     * @param notificationId The id of the notification to display the [MediaSessionCompat] data.
+     */
     fun onPlayFromMediaId(context: Context, mediaId: String, notificationId: Int) {
         stateBuilder.setActions(supportedActions)
 
@@ -200,7 +232,7 @@ class MediaSessionHelper @Inject constructor() {
         //////////////////////////////////
         // Start the media player queue //
         //////////////////////////////////
-        mediaPlayerQueue.start(
+        mediaPlayerQueue.clearPrepareAndPlay(
             context,
             mediaId.toLong(),
             onPrepared = {},
@@ -231,6 +263,11 @@ class MediaSessionHelper @Inject constructor() {
         )
     }
 
+    /**
+     * Stops the music.
+     *
+     * @param context
+     */
     fun onStop(context: Context) {
         val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         am.abandonAudioFocusRequest(audioFocusRequest)
@@ -239,6 +276,11 @@ class MediaSessionHelper @Inject constructor() {
     }
 
 
+    /**
+     * Stops the music.
+     *
+     * @param context
+     */
     fun destroy(context: Context) {
         onStop(context)
     }

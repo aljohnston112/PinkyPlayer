@@ -5,15 +5,16 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import com.fourth_finger.music_repository.MusicRepository
 import android.provider.MediaStore
-import dagger.hilt.EntryPoint
-import dagger.hilt.android.EntryPointAccessors
 import javax.inject.Inject
 
 /**
  * Holds a [MediaPlayer].
  * It can play a music file by its [MediaStore.Audio.Media] id (at least).
  */
-class MediaPlayerHolder constructor(private val musicRepository: MusicRepository) {
+class MediaPlayerHolder {
+
+    @Inject
+    lateinit var musicRepository: MusicRepository
 
     private var mediaPlayer: MediaPlayer? = null
     private var isPrepared = false
@@ -30,7 +31,7 @@ class MediaPlayerHolder constructor(private val musicRepository: MusicRepository
      * @param onCompletion To be "called when the end of a media source is reached during playback".
      *
      */
-    fun start(
+    fun prepareAndPlay(
         context: Context,
         id: Long,
         onPrepared: (MediaPlayer) -> Unit = { },
@@ -65,7 +66,7 @@ class MediaPlayerHolder constructor(private val musicRepository: MusicRepository
     }
 
     /**
-     * Plays the [MediaPlayer] if it has been prepared.
+     * Plays the [MediaPlayer] if it has been prepared and is not currently playing.
      */
     fun play() {
         if (isPrepared && !isPlaying) {

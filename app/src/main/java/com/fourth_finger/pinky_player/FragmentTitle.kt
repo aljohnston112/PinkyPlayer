@@ -9,6 +9,9 @@ import androidx.navigation.fragment.findNavController
 import com.fourth_finger.pinky_player.databinding.FragmentTitleBinding
 
 
+/**
+ * The title [Fragment] of the app.
+ */
 class FragmentTitle : Fragment() {
 
     private var _binding: FragmentTitleBinding? = null

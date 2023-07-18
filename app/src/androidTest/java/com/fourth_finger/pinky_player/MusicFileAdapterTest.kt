@@ -1,7 +1,6 @@
 package com.fourth_finger.pinky_player
 
 import android.view.Gravity
-import android.view.View.TEXT_ALIGNMENT_CENTER
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
@@ -35,7 +34,11 @@ class MusicFileAdapterTest {
     fun updateMusicList_NewList_UpdatesItemCountAndViewHolders() {
         val adapter = MusicFileAdapter(
             emptyList
-        )
+        ) { id ->
+            activity?.mediaController?.transportControls?.let { controls ->
+                viewModel.songClicked(id, controls)
+            }
+        }
         assert(adapter.itemCount == 0)
         adapter.updateMusicList(singletonList)
         assert(adapter.itemCount == 1)
@@ -53,7 +56,11 @@ class MusicFileAdapterTest {
     fun onCreateViewHolder_CorrectLayout() {
         val adapter = MusicFileAdapter(
             singletonList
-        )
+        ) { id ->
+            activity?.mediaController?.transportControls?.let { controls ->
+                viewModel.songClicked(id, controls)
+            }
+        }
         val viewHolder = adapter.createViewHolder(viewStub, 0)
         assert(viewHolder.textView.id == R.id.textView)
     }
@@ -69,7 +76,11 @@ class MusicFileAdapterTest {
                 MusicFile(0, "A"),
                 MusicFile(1, "B")
             )
-        )
+        ) { id ->
+            activity?.mediaController?.transportControls?.let { controls ->
+                viewModel.songClicked(id, controls)
+            }
+        }
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub)
 
         adapter.onBindViewHolder(viewHolder, 0)
@@ -87,7 +98,11 @@ class MusicFileAdapterTest {
     fun onBindViewHolder_ValidPositions_CentersText() {
         val adapter = MusicFileAdapter(
             singletonList
-        )
+        ) { id ->
+            activity?.mediaController?.transportControls?.let { controls ->
+                viewModel.songClicked(id, controls)
+            }
+        }
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub)
 
         adapter.onBindViewHolder(viewHolder, 0)
@@ -102,7 +117,11 @@ class MusicFileAdapterTest {
     fun onBindViewHolder_InValidPosition_Throws() {
         val adapter = MusicFileAdapter(
             singletonList
-        )
+        ) { id ->
+            activity?.mediaController?.transportControls?.let { controls ->
+                viewModel.songClicked(id, controls)
+            }
+        }
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub){ }
 
         adapter.onBindViewHolder(viewHolder, 1)
@@ -116,7 +135,11 @@ class MusicFileAdapterTest {
     fun onBindViewHolder_NegativePosition_Throws() {
         val adapter = MusicFileAdapter(
             singletonList
-        )
+        ) { id ->
+            activity?.mediaController?.transportControls?.let { controls ->
+                viewModel.songClicked(id, controls)
+            }
+        }
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub){ }
 
         adapter.onBindViewHolder(viewHolder, -1)
@@ -127,7 +150,11 @@ class MusicFileAdapterTest {
      */
     @Test
     fun getItemCount_EmptyList_ReturnsZero() {
-        val adapter = MusicFileAdapter(emptyList)
+        val adapter = MusicFileAdapter(emptyList) { id ->
+            activity?.mediaController?.transportControls?.let { controls ->
+                viewModel.songClicked(id, controls)
+            }
+        }
         assert(adapter.itemCount == 0)
     }
 
@@ -136,7 +163,11 @@ class MusicFileAdapterTest {
      */
     @Test
     fun getItemCount_ListWithOne_ReturnsOne() {
-        val adapter = MusicFileAdapter(singletonList)
+        val adapter = MusicFileAdapter(singletonList) { id ->
+            activity?.mediaController?.transportControls?.let { controls ->
+                viewModel.songClicked(id, controls)
+            }
+        }
         assert(adapter.itemCount == 1)
     }
 
