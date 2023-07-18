@@ -33,6 +33,10 @@ class MusicRepositoryTest {
     @Inject
     lateinit var musicRepository: MusicRepository
 
+
+    @BindValue @JvmField
+    val threadSafeMemoryCache = ThreadSafeMemoryCache<List<MusicFile>>()
+
     @Before
     fun init() {
         hiltRule.inject()
@@ -60,10 +64,16 @@ class MusicRepositoryTest {
 
     }
 
+    /**
+     * Tests that the [MusicRepository] caches the results of [MusicRepository.loadMusicFiles] and
+     * they can be retrieved via [MusicRepository.getCachedMusicFiles].
+     */
     @Test
     fun loadMusicFiles_ContentResolver_CachesCorrectSongs() = runTest {
         val contentResolver = InstrumentationRegistry.getInstrumentation().context.contentResolver
         val actualMusicFiles = MusicDataSource().getMusicFromMediaStore(contentResolver)!!
+
+        assert(!threadSafeMemoryCache.hasData())
         musicRepository.loadMusicFiles(contentResolver)!!
         val musicFiles = musicRepository.getCachedMusicFiles()!!
 

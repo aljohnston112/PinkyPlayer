@@ -15,12 +15,9 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.view.View
-import android.widget.ImageButton
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.FragmentContainerView
 import com.fourth_finger.pinky_player.databinding.ActivityMainBinding
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,6 +46,7 @@ class ActivityMain : AppCompatActivity() {
             when(state.state){
                 PlaybackStateCompat.STATE_PAUSED -> {
                     binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                    binding.controls.visibility = View.VISIBLE
                 }
                 PlaybackStateCompat.STATE_PLAYING -> {
                     binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
@@ -60,6 +58,7 @@ class ActivityMain : AppCompatActivity() {
                 PlaybackStateCompat.STATE_NONE -> {
                     binding.controls.visibility = View.GONE
                 }
+
             }
         }
 
@@ -120,8 +119,7 @@ class ActivityMain : AppCompatActivity() {
      */
     private fun setUpOnClickListeners() {
         binding.buttonPlayPause.setOnClickListener {
-            val isPlaying = mediaController.playbackState.state == PlaybackStateCompat.STATE_PLAYING
-            viewModel.playPause(isPlaying, mediaController.transportControls)
+            viewModel.playPause(mediaController)
         }
     }
 
