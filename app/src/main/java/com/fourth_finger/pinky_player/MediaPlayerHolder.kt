@@ -5,16 +5,12 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import com.fourth_finger.music_repository.MusicRepository
 import android.provider.MediaStore
-import javax.inject.Inject
 
 /**
  * Holds a [MediaPlayer].
  * It can play a music file by its [MediaStore.Audio.Media] id (at least).
  */
-class MediaPlayerHolder {
-
-    @Inject
-    lateinit var musicRepository: MusicRepository
+class MediaPlayerHolder constructor(private val musicRepository: MusicRepository) {
 
     private var mediaPlayer: MediaPlayer? = null
     private var isPrepared = false

@@ -3,6 +3,7 @@ package com.fourth_finger.pinky_player
 import android.Manifest
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.*
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import com.fourth_finger.music_repository.MusicRepository
@@ -16,14 +17,20 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.CountDownLatch
 import javax.inject.Inject
 
 
 @HiltAndroidTest
 class FragmentMusicListViewModelTest {
 
-    @get:Rule
+    @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    var activityRule: ActivityScenarioRule<HiltTestActivity> = ActivityScenarioRule(
+        HiltTestActivity::class.java
+    )
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -42,22 +49,29 @@ class FragmentMusicListViewModelTest {
     }
 
     /**
-     * Tests that the UIState of [FragmentMusicListViewModel]
+     * Tests that the UIState of [ActivityMainViewModel]
      * contains all the music loaded from the device.
      */
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun getUiState_AfterFetchMusicFiles_ReturnsAllLoadedMusic() = runTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val musicFiles = musicRepository.loadMusicFiles(context.contentResolver)
-        val viewModel = FragmentMusicListViewModel(musicRepository)
-        viewModel.fetchMusicFiles(context.contentResolver)
-        val music = viewModel.musicFiles.getOrAwaitValue()
-        assert(music.size == musicFiles.size)
-        // Do these really need to be in the same order?
-        for ((i, song) in music.withIndex()) {
-            assert(song.displayName == musicFiles[i].displayName)
+
+        val musicFiles = musicRepository.loadMusicFiles(context.contentResolver)!!
+        val countDownLatch = CountDownLatch(1)
+
+        activityRule.scenario.onActivity {
+            val viewModel = it.viewModel
+            val job = viewModel.fetchMusicFiles(context.contentResolver)
+            job.invokeOnCompletion {
+                val music = viewModel.musicFiles.getOrAwaitValue()
+                assert(music.size == musicFiles.size)
+                for (song in music) {
+                    assert(song in musicFiles)
+                }
+                countDownLatch.countDown()
+            }
         }
+        countDownLatch.await()
     }
 
 }

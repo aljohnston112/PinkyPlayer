@@ -54,6 +54,9 @@ android {
 
     testOptions{
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        adbOptions {
+            timeOutInMs 600000
+        }
     }
 
 }

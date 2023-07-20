@@ -2,31 +2,32 @@ package com.fourth_finger.pinky_player
 
 import android.Manifest
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import com.fourth_finger.music_repository.MusicRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.*
-import kotlinx.coroutines.yield
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
-
 import org.junit.Test
-import java.util.concurrent.TimeoutException
+import java.util.concurrent.CountDownLatch
 import javax.inject.Inject
 
 @HiltAndroidTest
 class ActivityMainViewModelTest {
 
-    @get:Rule
+    @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    var activityRule: ActivityScenarioRule<HiltTestActivity> = ActivityScenarioRule(
+        HiltTestActivity::class.java
+    )
 
     @get:Rule
     val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
@@ -49,15 +50,17 @@ class ActivityMainViewModelTest {
      * to the musicFiles of the [MusicRepository] when it is
      * notified that permission has been granted.
      */
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun permissionGranted_MusicLoaded() = runTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val viewModel = ActivityMainViewModel(musicRepository)
-        viewModel.permissionGranted(context.contentResolver)
-
-        val music = musicRepository.loadMusicFiles(context.contentResolver)
+        val music = musicRepository.loadMusicFiles(context.contentResolver)!!
         assert(music.isNotEmpty())
+        val countDownLatch = CountDownLatch(1)
+        activityRule.scenario.onActivity {
+            it.viewModel.permissionGranted(context.contentResolver)
+            countDownLatch.countDown()
+        }
+        countDownLatch.await()
     }
 
 }

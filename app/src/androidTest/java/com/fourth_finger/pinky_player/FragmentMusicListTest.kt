@@ -93,7 +93,7 @@ class FragmentMusicListTest {
     fun onViewCreated_LoadsMusicIntoRecyclerView()= runTest {
 
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val music = musicRepository.loadMusicFiles(context.contentResolver)
+        val music = musicRepository.loadMusicFiles(context.contentResolver)!!
 
         launchFragmentInHiltContainer<FragmentMusicList>()
         onView(withId(R.id.recycler_view)).check(matches(isCompletelyDisplayed()))

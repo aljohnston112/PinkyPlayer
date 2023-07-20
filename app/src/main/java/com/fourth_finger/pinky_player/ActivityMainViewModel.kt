@@ -64,8 +64,8 @@ class ActivityMainViewModel @Inject constructor() : ViewModel() {
      *
      *  @param contentResolver The [ContentResolver] to query for music.
      */
-    fun fetchMusicFiles(contentResolver: ContentResolver){
-        viewModelScope.launch {
+    fun fetchMusicFiles(contentResolver: ContentResolver): Job {
+        return viewModelScope.launch {
             _musicFiles.postValue(musicRepository.loadMusicFiles(contentResolver))
         }
     }

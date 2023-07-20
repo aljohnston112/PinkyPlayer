@@ -9,14 +9,12 @@ import androidx.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObject
 import androidx.test.uiautomator.UiSelector
 import com.fourth_finger.music_repository.MusicRepository
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.core.AllOf.allOf
 import org.junit.Before
@@ -28,7 +26,7 @@ import javax.inject.Inject
 @HiltAndroidTest
 class ActivityMainTest {
 
-    @get:Rule()
+    @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
     @get:Rule
@@ -42,7 +40,6 @@ class ActivityMainTest {
         hiltRule.inject()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun playFromMediaId_controlsVisible() = runTest {
         val allowPermissions = getPermissionUI()
@@ -50,7 +47,7 @@ class ActivityMainTest {
 
         val countDownLatchPlay = CountDownLatch(1)
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val music = musicRepository.loadMusicFiles(context.contentResolver)
+        val music = musicRepository.loadMusicFiles(context.contentResolver)!!
 
         activityScenarioRule.scenario.onActivity {
             it.mediaController.transportControls.playFromMediaId(music[0].id.toString(), null)
