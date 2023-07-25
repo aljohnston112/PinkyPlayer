@@ -7,12 +7,12 @@
 
     <fragment
         android:id="@+id/fragmentMusicList"
-        android:name="com.fourth_finger.pinky_player.FragmentMusicList"
+        android:name="io.fourth_finger.pinky_player.FragmentMusicList"
         android:label="fragment_music_list"
         tools:layout="@layout/fragment_music_list" />
     <fragment
         android:id="@+id/fragmentTitle"
-        android:name="com.fourth_finger.pinky_player.FragmentTitle"
+        android:name="io.fourth_finger.pinky_player.FragmentTitle"
         android:label="fragment_title"
         tools:layout="@layout/fragment_title" >
         <action

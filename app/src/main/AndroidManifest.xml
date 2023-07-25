@@ -28,7 +28,7 @@
 
         </activity>
 
-        <service android:name=".MainMediaBrowserService"
+        <service android:name=".ServiceMediaBrowser"
             android:exported="true"
             android:permission="android.permission.FOREGROUND_SERVICE">
             <intent-filter>

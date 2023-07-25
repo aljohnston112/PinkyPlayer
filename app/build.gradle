@@ -1,14 +1,12 @@
 plugins {
     id 'com.android.application'
+    id 'androidx.navigation.safeargs'
     id 'org.jetbrains.kotlin.android'
     id 'jacoco'
-    id 'com.google.dagger.hilt.android'
-    id 'androidx.navigation.safeargs'
-    id 'kotlin-kapt'
 }
 
 android {
-    namespace 'com.fourth_finger.pinky_player'
+    namespace 'io.fourth_finger.pinky_player'
     compileSdk 33
 
     buildFeatures {
@@ -16,15 +14,17 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.fourth_finger.pinky_player"
+        applicationId "io.fourth_finger.pinky_player"
         // May be as high as 28, if needed
         minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "com.fourth_finger.pinky_player.CustomTestRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
+        testInstrumentationRunnerArguments useTestStorageService: 'true'
+
     }
 
     buildTypes {
@@ -33,29 +33,34 @@ android {
             testCoverageEnabled true
         }
 
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        
+
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+
     kotlinOptions {
         jvmTarget = '17'
     }
 
-    hilt {
-        enableAggregatingTask = true
-    }
-
-    testOptions{
+    testOptions {
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
         adbOptions {
             timeOutInMs 600000
+        }
+    }
+
+    tasks.withType(Test) {
+        jacoco {
+            includeNoLocationClasses = true
+            excludes = ['jdk.internal.*']
         }
     }
 
@@ -70,25 +75,21 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.media:media:1.6.0'
-    def nav_version = "2.6.0"
-    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
-    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
-
-    implementation 'com.google.dagger:hilt-android:2.47'
-    kapt 'com.google.dagger:hilt-compiler:2.47'
+    implementation "androidx.navigation:navigation-fragment-ktx:2.6.0"
+    implementation "androidx.navigation:navigation-ui-ktx:2.6.0"
     implementation 'com.google.android.material:material:1.9.0'
-
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2'
-
 
     debugImplementation "androidx.fragment:fragment-testing:1.6.0"
     debugImplementation "androidx.test:monitor:1.6.1"
 
-
     testImplementation 'junit:junit:4.13.2'
 
+    androidTestUtil 'androidx.test:orchestrator:1.4.2'
+    androidTestUtil 'androidx.test.services:test-services:1.4.2'
 
     androidTestImplementation "androidx.arch.core:core-testing:2.2.0"
+    androidTestImplementation "androidx.navigation:navigation-testing:2.6.0"
     androidTestImplementation 'androidx.test:core-ktx:1.5.0'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -96,16 +97,46 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.5.0'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
-
-    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.47'
-    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.47'
-
     androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.2'
-
-    androidTestUtil 'androidx.test:orchestrator:1.4.2'
 
 }
 
-kapt {
-    correctErrorTypes true
+task jacocoTestReport(
+        type: JacocoReport,
+        dependsOn: [
+                'testDebugUnitTest',
+                'createDebugCoverageReport'
+        ]
+) {
+    reports {
+        html.getRequired().set(true)
+    }
+
+    def fileFilter = [
+            '**/R.class',
+            '**/R$*.class',
+            '**/BuildConfig.*',
+            '**/Manifest*.*',
+            '**/*Test*.*',
+            'android/**/*.*'
+    ]
+    def debugTree = fileTree(
+            dir: "$project.buildDir/tmp/kotlin-classes/debug",
+            excludes: fileFilter
+    )
+    def mainSrc = "$project.projectDir/src/main/java"
+
+    sourceDirectories.from(files([mainSrc]))
+    classDirectories.from(files([debugTree]))
+
+    executionData.from(
+            fileTree(
+                    dir: "$buildDir",
+                    includes: [
+                            "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                            "outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec"
+                    ]
+            )
+    )
+
 }
