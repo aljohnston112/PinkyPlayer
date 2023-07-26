@@ -1,8 +1,14 @@
 package io.fourth_finger.pinky_player
 
 import android.Manifest
+import android.os.Bundle
+import android.os.Looper
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import io.fourth_finger.music_repository.MusicRepository
@@ -67,6 +73,122 @@ class ActivityMainViewModelTest {
             }
             countDownLatch.countDown()
         }
+        countDownLatch.await()
+    }
+
+    @Test
+    fun onPlayPauseClicked_whenMediaControllerStateIsPlaying_triggersMediaSessionCallbackOnPause() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val application = ApplicationProvider.getApplicationContext<MainApplication>()
+        val viewModel = ActivityMainViewModel(application.musicRepository)
+
+        val mediaSession = MediaSessionCompat(
+            context,
+            "onPlayPauseClicked_whenMediaControllerStateIsPlaying_callsMediaSessionCallbackOnPause"
+        )
+
+        val countDownLatch = CountDownLatch(1)
+        val mediaSessionCallback = object: MediaSessionCompat.Callback(){
+            override fun onPause() {
+                super.onPause()
+                countDownLatch.countDown()
+            }
+        }
+        runOnUiThread {
+            mediaSession.setCallback(mediaSessionCallback)
+        }
+
+        val mediaController = MediaControllerCompat(context, mediaSession)
+
+        val stateBuilder = PlaybackStateCompat.Builder()
+        stateBuilder.setState(
+            PlaybackStateCompat.STATE_PLAYING,
+            PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN,
+            1F
+        )
+        mediaSession.setPlaybackState(stateBuilder.build())
+        runOnUiThread {
+            viewModel.onPlayPauseClicked(mediaController)
+        }
+
+        countDownLatch.await()
+    }
+
+    @Test
+    fun onPlayPauseClicked_whenMediaControllerStateIsPaused_triggersMediaSessionCallbackOnPlay() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val application = ApplicationProvider.getApplicationContext<MainApplication>()
+        val viewModel = ActivityMainViewModel(application.musicRepository)
+
+        val mediaSession = MediaSessionCompat(
+            context,
+            "onPlayPauseClicked_whenMediaControllerStateIsPaused_callsMediaSessionCallbackOnPlay"
+        )
+
+        val countDownLatch = CountDownLatch(1)
+        val mediaSessionCallback = object: MediaSessionCompat.Callback(){
+            override fun onPlay() {
+                super.onPlay()
+                countDownLatch.countDown()
+            }
+        }
+        runOnUiThread {
+            mediaSession.setCallback(mediaSessionCallback)
+        }
+
+        val mediaController = MediaControllerCompat(context, mediaSession)
+
+        val stateBuilder = PlaybackStateCompat.Builder()
+        stateBuilder.setState(
+            PlaybackStateCompat.STATE_PAUSED,
+            PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN,
+            1F
+        )
+        mediaSession.setPlaybackState(stateBuilder.build())
+        runOnUiThread {
+            viewModel.onPlayPauseClicked(mediaController)
+        }
+
+        countDownLatch.await()
+    }
+
+    @Test
+    fun songClicked_withId_triggersOnPlayFromMediaId(){
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val application = ApplicationProvider.getApplicationContext<MainApplication>()
+        val viewModel = ActivityMainViewModel(application.musicRepository)
+
+        val mediaSession = MediaSessionCompat(
+            context,
+            "songClicked_withId_triggersOnPlayFromMediaId"
+        )
+
+        val countDownLatch = CountDownLatch(1)
+        val testID = 84673456L
+        val mediaSessionCallback = object: MediaSessionCompat.Callback(){
+            override fun onPlayFromMediaId(mediaId: String, extras: Bundle) {
+                super.onPlayFromMediaId(mediaId, extras)
+                assert(mediaId == testID.toString())
+                countDownLatch.countDown()
+            }
+        }
+        runOnUiThread {
+            mediaSession.setCallback(mediaSessionCallback)
+        }
+
+        val mediaController = MediaControllerCompat(context, mediaSession)
+
+        val stateBuilder = PlaybackStateCompat.Builder()
+        stateBuilder.setState(
+            PlaybackStateCompat.STATE_PAUSED,
+            PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN,
+            1F
+        )
+        mediaSession.setPlaybackState(stateBuilder.build())
+        runOnUiThread {
+            viewModel.songClicked(testID, mediaController.transportControls)
+        }
+
         countDownLatch.await()
     }
 

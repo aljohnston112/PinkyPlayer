@@ -78,7 +78,7 @@ class ActivityMainViewModel constructor(
      */
     fun songClicked(
         id: Long,
-        transportControls: MediaController.TransportControls
+        transportControls: MediaControllerCompat.TransportControls
     ) {
         transportControls.playFromMediaId(id.toString(), null)
     }

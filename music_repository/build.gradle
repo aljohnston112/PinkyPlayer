@@ -37,10 +37,12 @@ android {
         jvmTarget = '17'
     }
 
-    tasks.withType(Test) {
-        jacoco {
-            includeNoLocationClasses = true
-            excludes = ['jdk.internal.*']
+    tasks.withType(Test).tap {
+        configureEach {
+            jacoco {
+                includeNoLocationClasses = true
+                excludes = ['jdk.internal.*']
+            }
         }
     }
 
@@ -54,7 +56,7 @@ dependencies {
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.2'
 
     androidTestImplementation "androidx.arch.core:core-testing:2.2.0"
-    androidTestImplementation 'androidx.lifecycle:lifecycle-livedata-core:2.6.1'
+    androidTestImplementation 'androidx.lifecycle:lifecycle-livedata-core-ktx:2.6.1'
     androidTestImplementation "androidx.test:rules:1.5.0"
     androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.2'
 

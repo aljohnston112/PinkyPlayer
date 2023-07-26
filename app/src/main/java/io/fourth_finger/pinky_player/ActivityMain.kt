@@ -34,72 +34,6 @@ class ActivityMain : AppCompatActivity() {
     private lateinit var mediaBrowser: MediaBrowserCompat
     private lateinit var mediaController: MediaControllerCompat
 
-    private val mediaControllerCallback = object : MediaControllerCompat.Callback() {
-
-        override fun onMetadataChanged(metadata: MediaMetadataCompat) {
-
-        }
-
-        override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
-            when (state.state) {
-                PlaybackStateCompat.STATE_PAUSED -> {
-                    binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
-                    binding.controls.visibility = View.VISIBLE
-                }
-
-                PlaybackStateCompat.STATE_PLAYING -> {
-                    binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
-                    binding.controls.visibility = View.VISIBLE
-                }
-
-                PlaybackStateCompat.STATE_STOPPED -> {
-                    binding.controls.visibility = View.GONE
-                }
-
-                PlaybackStateCompat.STATE_NONE -> {
-                    binding.controls.visibility = View.GONE
-                }
-
-            }
-        }
-
-        override fun onSessionDestroyed() {
-            mediaBrowser.disconnect()
-            // maybe schedule a reconnection using a new MediaBrowser instance
-        }
-
-    }
-
-    private val mediaBrowserConnectionCallback = object : MediaBrowserCompat.ConnectionCallback() {
-
-        override fun onConnected() {
-            super.onConnected()
-            mediaBrowser.sessionToken.also { token ->
-                mediaController = MediaControllerCompat(
-                    this@ActivityMain,
-                    token
-                )
-                MediaControllerCompat.setMediaController(
-                    this@ActivityMain,
-                    mediaController
-                )
-
-                setUpOnClickListeners()
-            }
-
-            mediaController.registerCallback(this@ActivityMain.mediaControllerCallback)
-        }
-
-        override fun onConnectionSuspended() {
-            // The Service has crashed. Disable transport controls until it automatically reconnects
-        }
-
-        override fun onConnectionFailed() {
-            // The Service has refused our connection
-        }
-
-    }
-
     /**
      * Sets up the onClickListeners
      */
@@ -203,6 +137,72 @@ class ActivityMain : AppCompatActivity() {
             }
             mediaBrowser.disconnect()
         }
+    }
+
+    private val mediaControllerCallback = object : MediaControllerCompat.Callback() {
+
+        override fun onMetadataChanged(metadata: MediaMetadataCompat) {
+
+        }
+
+        override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
+            when (state.state) {
+                PlaybackStateCompat.STATE_PAUSED -> {
+                    binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                    binding.controls.visibility = View.VISIBLE
+                }
+
+                PlaybackStateCompat.STATE_PLAYING -> {
+                    binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
+                    binding.controls.visibility = View.VISIBLE
+                }
+
+                PlaybackStateCompat.STATE_STOPPED -> {
+                    binding.controls.visibility = View.GONE
+                }
+
+                PlaybackStateCompat.STATE_NONE -> {
+                    binding.controls.visibility = View.GONE
+                }
+
+            }
+        }
+
+        override fun onSessionDestroyed() {
+            mediaBrowser.disconnect()
+            // maybe schedule a reconnection using a new MediaBrowser instance
+        }
+
+    }
+
+    private val mediaBrowserConnectionCallback = object : MediaBrowserCompat.ConnectionCallback() {
+
+        override fun onConnected() {
+            super.onConnected()
+            mediaBrowser.sessionToken.also { token ->
+                mediaController = MediaControllerCompat(
+                    this@ActivityMain,
+                    token
+                )
+                MediaControllerCompat.setMediaController(
+                    this@ActivityMain,
+                    mediaController
+                )
+
+                setUpOnClickListeners()
+            }
+
+            mediaController.registerCallback(this@ActivityMain.mediaControllerCallback)
+        }
+
+        override fun onConnectionSuspended() {
+            // The Service has crashed. Disable transport controls until it automatically reconnects
+        }
+
+        override fun onConnectionFailed() {
+            // The Service has refused our connection
+        }
+
     }
 
 }

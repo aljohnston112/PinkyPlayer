@@ -1,6 +1,7 @@
 package io.fourth_finger.pinky_player
 
 import android.os.Bundle
+import android.support.v4.media.session.MediaControllerCompat
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -41,9 +42,9 @@ class FragmentMusicList : Fragment() {
      */
     private fun setUpRecyclerView(view: View) {
         val adapter = MusicFileAdapter(emptyList()) { id ->
-            activity?.mediaController?.transportControls?.let { controls ->
-                viewModel.songClicked(id, controls)
-            }
+            val controls =
+                MediaControllerCompat.getMediaController(requireActivity()).transportControls
+            viewModel.songClicked(id, controls)
         }
         val rv = view.findViewById<RecyclerView>(R.id.recycler_view)
         rv.adapter = adapter
