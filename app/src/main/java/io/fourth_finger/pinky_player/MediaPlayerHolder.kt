@@ -84,8 +84,9 @@ class MediaPlayerHolder constructor(private val musicRepository: MusicRepository
      * Releases this class' resources.
      */
     fun release() {
+        // TODO how is this tested?
         pause()
-        mediaPlayer.reset();
+        mediaPlayer.reset()
         mediaPlayer.release()
     }
 

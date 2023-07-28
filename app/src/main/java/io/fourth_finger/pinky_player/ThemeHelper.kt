@@ -13,8 +13,11 @@ class ThemeHelper {
 
             var attr: Int? = null
             if (theme.resolveAttribute(resID, typedValue, true)) {
-                if (typedValue.resourceId != 0) {
-                    attr = ContextCompat.getColor(context, typedValue.resourceId)
+                if (typedValue.type == TypedValue.TYPE_REFERENCE) {
+                    attr = ContextCompat.getColor(context, typedValue.data)
+                } else if (typedValue.type >= TypedValue.TYPE_FIRST_COLOR_INT &&
+                    typedValue.type <= TypedValue.TYPE_LAST_COLOR_INT){
+                    attr = typedValue.data
                 }
             }
             return attr

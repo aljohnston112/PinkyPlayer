@@ -22,8 +22,8 @@ class MusicRepositoryTest {
     @Test
     fun loadMusicFiles_ContentResolver_ReturnsCorrectSongs() = runTest {
         val contentResolver = InstrumentationRegistry.getInstrumentation().context.contentResolver
-        val actualMusicFiles = MusicDataSource().getMusicFromMediaStore(contentResolver)!!
         val musicFiles = MusicRepository().loadMusicFiles(contentResolver)!!
+        val actualMusicFiles = MusicDataSource().getMusicFromMediaStore(contentResolver)!!
 
         // Assert there are music files
         assert(musicFiles.isNotEmpty())

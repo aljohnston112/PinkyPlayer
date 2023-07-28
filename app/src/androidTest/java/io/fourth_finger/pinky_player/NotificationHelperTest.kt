@@ -7,6 +7,7 @@ import android.graphics.drawable.Icon
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.view.ContextThemeWrapper
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.EXTRA_LARGE_ICON
 import androidx.core.app.NotificationCompat.EXTRA_SUB_TEXT
@@ -61,23 +62,23 @@ class NotificationHelperTest {
 
     @Test
     fun createNotificationChannel_createsNotificationChannel() {
-        val channelId =
-            "NotificationHelperTest.createNotificationChannel_createsNotificationChannel"
-        NotificationHelper.createNotificationChannel(context, channelId)
-
+        NotificationHelper.createNotificationChannel(
+            ContextThemeWrapper(context, R.style.AppTheme)
+        )
         val service = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notificationChannel = service.getNotificationChannel(channelId)
-        assert(notificationChannel.id == channelId)
+        assert(service.notificationChannels.isNotEmpty())
     }
 
     @Test
     fun updateNotification_updatesNotificationChannel() {
-        val channelId =
-            "NotificationHelperTest.createNotificationChannel_createsNotificationChannel"
-        NotificationHelper.createNotificationChannel(context, channelId)
-        val testNotification = NotificationHelper.createPlayNotification(context, channelId, mediaSession)
+        val contextWithTheme = ContextThemeWrapper(context, R.style.AppTheme)
+        NotificationHelper.createNotificationChannel(
+            contextWithTheme
+        )
+        val testNotification =
+            NotificationHelper.createPlayNotification(contextWithTheme, mediaSession)
         val notificationId = 9677454
-        NotificationHelper.updateNotification(context, notificationId, testNotification)
+        NotificationHelper.updateNotification(contextWithTheme, notificationId, testNotification)
 
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notification = manager.activeNotifications[0]
@@ -89,7 +90,7 @@ class NotificationHelperTest {
         val channelId =
             "NotificationHelperTest.createPauseNotification_createsNotificationWithCorrectMetadata"
         val notification = NotificationHelper.createPauseNotification(
-            context,
+            ContextThemeWrapper(context, R.style.AppTheme),
             channelId,
             mediaSession
         )
@@ -109,11 +110,8 @@ class NotificationHelperTest {
 
     @Test
     fun createPlayNotification_createsNotificationWithCorrectMetadata() {
-        val channelId =
-            "NotificationHelperTest.createPlayNotification_createsNotificationWithCorrectMetadata"
         val notification = NotificationHelper.createPlayNotification(
-            context,
-            channelId,
+            ContextThemeWrapper(context, R.style.AppTheme),
             mediaSession
         )
         val title = notification.extras.getString(EXTRA_TITLE)
@@ -135,7 +133,7 @@ class NotificationHelperTest {
         val channelId =
             "NotificationHelperTest.createEmptyNotification_createsNotificationWithCorrectMetadata"
         val notification = NotificationHelper.createEmptyNotification(
-            context,
+            ContextThemeWrapper(context, R.style.AppTheme),
             channelId,
         )
         val title = notification.extras.getString(EXTRA_TITLE)
@@ -156,19 +154,18 @@ class NotificationHelperTest {
         val channelId =
             "NotificationHelperTest.createPauseNotification_createsNotificationWithCorrectSetup"
         val notification = NotificationHelper.createPauseNotification(
-            context,
+            ContextThemeWrapper(context, R.style.AppTheme),
             channelId,
             mediaSession
         )
 
-        // TODO See [NotificationHelper.setUpNotificationBuilder]
-//        val colorPrimary = ThemeHelper.getAttr(
-//            context,
-//            com.google.android.material.R.attr.colorPrimary
-//        )
+        val colorPrimary = ThemeHelper.getAttr(
+            ContextThemeWrapper(context, R.style.AppTheme),
+            com.google.android.material.R.attr.colorPrimary
+        )
 
         assert(notification.visibility == NotificationCompat.VISIBILITY_PUBLIC)
-//        assert(notification.color == colorPrimary)
+        assert(notification.color == colorPrimary)
         assert(notification.contentIntent == mediaSession.controller.sessionActivity)
         assert(
             notification.deleteIntent ==
@@ -181,27 +178,23 @@ class NotificationHelperTest {
 
     @Test
     fun createPlayNotification_createsNotificationWithCorrectSetup() {
-        val channelId =
-            "NotificationHelperTest.createPauseNotification_createsNotificationWithCorrectSetup"
         val notification = NotificationHelper.createPlayNotification(
-            context,
-            channelId,
+            ContextThemeWrapper(context, R.style.AppTheme),
             mediaSession
         )
 
-        // TODO See [NotificationHelper.setUpNotificationBuilder]
-//        val colorPrimary = ThemeHelper.getAttr(
-//            context,
-//            com.google.android.material.R.attr.colorPrimary
-//        )
+        val colorPrimary = ThemeHelper.getAttr(
+            ContextThemeWrapper(context, R.style.AppTheme),
+            com.google.android.material.R.attr.colorPrimary
+        )
 
         assert(notification.visibility == NotificationCompat.VISIBILITY_PUBLIC)
-//        assert(notification.color == colorPrimary)
+        assert(notification.color == colorPrimary)
         assert(notification.contentIntent == mediaSession.controller.sessionActivity)
         assert(
             notification.deleteIntent ==
                     MediaButtonReceiver.buildMediaButtonPendingIntent(
-                        context,
+                        ContextThemeWrapper(context, R.style.AppTheme),
                         PlaybackStateCompat.ACTION_STOP
                     )
         )

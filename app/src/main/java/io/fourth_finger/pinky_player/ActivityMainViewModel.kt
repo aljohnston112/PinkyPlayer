@@ -41,6 +41,18 @@ class ActivityMainViewModel constructor(
     }
 
     /**
+     *  Starts loading music file data for music on the device.
+     *
+     *  @param contentResolver The [ContentResolver] to query for music.
+     */
+    fun fetchMusicFiles(contentResolver: ContentResolver): Job {
+        return viewModelScope.launch {
+            _musicFiles.postValue(musicRepository.loadMusicFiles(contentResolver))
+        }
+    }
+
+
+    /**
      * Pauses or plays the current song.
      *
      * @param mediaController The [MediaControllerCompat] interacting with the [MediaSessionCompat]
@@ -55,18 +67,6 @@ class ActivityMainViewModel constructor(
             controls.pause()
         } else {
             controls.play()
-        }
-    }
-
-
-    /**
-     *  Starts loading music file data for music on the device.
-     *
-     *  @param contentResolver The [ContentResolver] to query for music.
-     */
-    fun fetchMusicFiles(contentResolver: ContentResolver): Job {
-        return viewModelScope.launch {
-            _musicFiles.postValue(musicRepository.loadMusicFiles(contentResolver))
         }
     }
 

@@ -8,18 +8,23 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.PerformException
+import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
+import androidx.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withClassName
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
-import io.fourth_finger.music_repository.MusicRepository
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.core.AllOf.allOf
 import org.hamcrest.core.StringContains.containsString
 import org.junit.Assert.assertNotNull
 import org.junit.Rule
 import org.junit.Test
+import java.nio.file.Files
 
 class FragmentMusicListTest {
 
@@ -44,8 +49,8 @@ class FragmentMusicListTest {
             null,
             null
         )!!
-        val rv: RecyclerView = view.findViewById(R.id.recycler_view)
-        assertNotNull(rv)
+        val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
+        assertNotNull(recyclerView)
     }
 
     /**
@@ -68,25 +73,13 @@ class FragmentMusicListTest {
      * is displayed in the RecyclerView.
      */
     @Test
-    fun onViewCreated_LoadsMusicIntoRecyclerView()= runTest {
+    fun onViewCreated_LoadsMusicIntoRecyclerView() = runTest {
+        launchFragmentInContainer<FragmentMusicList>()
+        onView(withId(R.id.recycler_view)).check(matches(isCompletelyDisplayed()))
 
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val application = ApplicationProvider.getApplicationContext<MainApplication>()
         val music = application.musicRepository.loadMusicFiles(context.contentResolver)!!
-
-        launchFragmentInContainer<FragmentMusicList>()
-        onView(withId(R.id.recycler_view)).check(matches(isCompletelyDisplayed()))
-        try {
-            for (song in music) {
-                onView(withId(R.id.recycler_view)).perform(
-                    RecyclerViewActions.scrollTo<MusicFileAdapter.ViewHolder>(
-                        hasDescendant(withText(song.displayName))
-                    )
-                )
-            }
-        } catch (e: PerformException){
-            // Duplicates are an issue
-        }
 
         // Make sure they are all there
         onView(withId(R.id.recycler_view)).perform(

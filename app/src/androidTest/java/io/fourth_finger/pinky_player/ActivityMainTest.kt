@@ -30,7 +30,7 @@ class ActivityMainTest {
 
 
     @Test
-    fun whenPermissionDenied_UserToastShows(){
+    fun whenPermissionDenied_userToastShows(){
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val denyPermissions = getPermissionUIDenyButton()
         denyPermissions.click()

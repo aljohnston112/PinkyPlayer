@@ -117,7 +117,6 @@ class ActivityMain : AppCompatActivity() {
         ).show()
     }
 
-
     override fun onStart() {
         super.onStart()
         mediaBrowser = MediaBrowserCompat(

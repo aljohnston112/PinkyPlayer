@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.service.media.MediaBrowserService
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaSessionCompat
+import android.view.ContextThemeWrapper
 import androidx.media.MediaBrowserServiceCompat
 
 /**
@@ -20,11 +21,17 @@ class ServiceMediaBrowser : MediaBrowserServiceCompat() {
         mediaSessionHelper = MediaSessionHelper(
             (application as MainApplication).musicRepository
         )
-        sessionToken = mediaSessionHelper.setUpMediaSession(this, mediaSessionCallback)
+
+        sessionToken = mediaSessionHelper.setUpMediaSession(
+            ContextThemeWrapper(this, R.style.AppTheme),
+            mediaSessionCallback
+        )
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notification = mediaSessionHelper.getStartNotification(this)
+        val notification = mediaSessionHelper.getStartNotification(
+            ContextThemeWrapper(this, R.style.AppTheme)
+        )
         startForeground(notificationId, notification)
         return START_NOT_STICKY
     }
@@ -54,17 +61,23 @@ class ServiceMediaBrowser : MediaBrowserServiceCompat() {
 
         override fun onPlay() {
             super.onPlay()
-            mediaSessionHelper.onPlay(this@ServiceMediaBrowser, notificationId)
+            mediaSessionHelper.onPlay(
+                ContextThemeWrapper(this@ServiceMediaBrowser, R.style.AppTheme),
+                notificationId
+            )
         }
 
         override fun onPause() {
-            mediaSessionHelper.onPause(this@ServiceMediaBrowser, notificationId)
+            mediaSessionHelper.onPause(
+                ContextThemeWrapper(this@ServiceMediaBrowser, R.style.AppTheme),
+                        notificationId
+            )
         }
 
         override fun onPlayFromMediaId(mediaId: String, extras: Bundle) {
             super.onPlayFromMediaId(mediaId, extras)
             mediaSessionHelper.onPlayFromMediaId(
-                this@ServiceMediaBrowser,
+                ContextThemeWrapper(this@ServiceMediaBrowser, R.style.AppTheme),
                 mediaId,
                 notificationId
             )
@@ -72,7 +85,7 @@ class ServiceMediaBrowser : MediaBrowserServiceCompat() {
 
         override fun onStop() {
             super.onStop()
-            mediaSessionHelper.onStop(this@ServiceMediaBrowser)
+            mediaSessionHelper.onStop(ContextThemeWrapper(this@ServiceMediaBrowser, R.style.AppTheme))
             stopForeground(Service.STOP_FOREGROUND_DETACH)
         }
 

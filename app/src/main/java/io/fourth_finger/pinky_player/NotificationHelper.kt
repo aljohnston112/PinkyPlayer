@@ -24,15 +24,15 @@ class NotificationHelper {
 
     companion object {
 
+        private const val notificationChannelId = "MediaSessionHelperChannelId"
+
         /**
          * Creates a notification channel.
-         *
-         * @param channelId The id of the notification channel.
          */
-        fun createNotificationChannel(context: Context, channelId: String) {
+        fun createNotificationChannel(context: Context) {
             val channelName = "NotificationHelperChannelName"
             val notificationChannel = NotificationChannel(
-                channelId,
+                notificationChannelId,
                 channelName,
                 NotificationManager.IMPORTANCE_HIGH
             )
@@ -99,16 +99,14 @@ class NotificationHelper {
          * Creates a [Notification] showing the music is playing.
          *
          * @param context
-         * @param channelId The notification channel to create the [Notification] for.
          * @param mediaSession The [MediaSessionCompat] containing the meta data for the [Notification].
          * @return The [Notification] showing the music is playing.
          */
         fun createPlayNotification(
             context: Context,
-            channelId: String,
             mediaSession: MediaSessionCompat
         ): Notification {
-            val builder = NotificationCompat.Builder(context, channelId)
+            val builder = NotificationCompat.Builder(context, notificationChannelId)
             builder.apply {
                 setUpNotificationBuilder(this, mediaSession, context)
                 // TODO Integration test this action
@@ -131,7 +129,6 @@ class NotificationHelper {
          *
          * @param context
          * @param channelId The notification channel to create the [Notification] for.
-         * @param mediaSession The [MediaSessionCompat] containing the meta data for the [Notification].
          * @return The [Notification] showing that no music has been started.
          */
         fun createEmptyNotification(
@@ -149,7 +146,8 @@ class NotificationHelper {
                 val width = context.resources.getDimensionPixelSize(
                     com.google.android.material.R.dimen.compat_notification_large_icon_max_width
                 )
-                val drawable = ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground)!!
+                val drawable =
+                    ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground)!!
                 val bitmap = drawable.toBitmap(width = width, height = height, config = null)
                 setLargeIcon(bitmap)
 
@@ -169,7 +167,7 @@ class NotificationHelper {
                 // TODO How to get primary color from correct theme (light vs. dark) dynamically?
                 val colorPrimary = ThemeHelper.getAttr(
                     context,
-                    com.google.android.material.R.attr.colorPrimary
+                    androidx.appcompat.R.attr.colorPrimary
                 )
                 if (colorPrimary != null) {
                     color = colorPrimary
@@ -217,6 +215,54 @@ class NotificationHelper {
             }
         }
 
+        fun updateToPauseNotification(
+            context: Context,
+            mediaSession: MediaSessionCompat?,
+            notificationId: Int
+        ) {
+            mediaSession?.let { mediaSessionCompat ->
+                updateNotification(
+                    context,
+                    notificationId,
+                    createPauseNotification(
+                        context,
+                        notificationChannelId,
+                        mediaSessionCompat
+                    )
+                )
+            }
+        }
+
+        fun updateToPlayNotification(
+            context: Context,
+            mediaSession: MediaSessionCompat?,
+            notificationId: Int
+        ) {
+            mediaSession?.let { mediaSessionCompat ->
+                updateNotification(
+                    context,
+                    notificationId,
+                    createPlayNotification(
+                        context,
+                        mediaSessionCompat
+                    )
+                )
+            }
+        }
+
+        fun updateToEmptyNotification(
+            context: Context,
+            notificationId: Int
+        ) {
+            updateNotification(
+                context,
+                notificationId,
+                createEmptyNotification(
+                    context,
+                    notificationChannelId
+                )
+            )
+        }
 
     }
 

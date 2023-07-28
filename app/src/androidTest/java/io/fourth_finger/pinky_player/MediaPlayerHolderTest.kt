@@ -2,6 +2,7 @@ package io.fourth_finger.pinky_player
 
 import android.Manifest
 import android.media.MediaMetadataRetriever
+import android.media.MediaPlayer
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
@@ -37,12 +38,12 @@ class MediaPlayerHolderTest {
         var durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
         var shortestDuration = durationStr!!.toInt()
 
-        for(m in music){
+        for (m in music) {
             mmr.setDataSource(context, musicRepository.getUri(m.id))
             durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
 
             val duration = durationStr!!.toInt()
-            if(duration < shortestDuration) {
+            if (duration < shortestDuration) {
                 shortestDuration = duration
                 shortestMusic = m.id
             }
@@ -54,7 +55,7 @@ class MediaPlayerHolderTest {
     }
 
     @Test
-    fun play_validSong_playsToCompletion() = runTest(timeout = Duration.parse("60s")) {
+    fun prepareAndPlay_validSong_playsToCompletion() = runTest(timeout = Duration.parse("60s")) {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         val countDownLatchOnCompletion = CountDownLatch(1)
@@ -64,15 +65,68 @@ class MediaPlayerHolderTest {
         val mediaPlayerHolder = MediaPlayerHolder(musicRepository)
 
 
-        mediaPlayerHolder.prepareAndPlay(
-            context,
+        mediaPlayerHolder.prepareAndPlay(context,
             get_music_id_of_shortest_song(music),
             onPrepared = { },
             onCompletion = {
                 countDownLatchOnCompletion.countDown()
+            })
+        countDownLatchOnCompletion.await()
+    }
+
+    @Test
+    fun play_validSong_playsToCompletionAfterPause() = runTest(timeout = Duration.parse("60s")) {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        val countDownLatchOnCompletion = CountDownLatch(1)
+        val countDownLatchOnPrepared = CountDownLatch(1)
+        val application = ApplicationProvider.getApplicationContext<MainApplication>()
+        val musicRepository = application.musicRepository
+        val music = musicRepository.loadMusicFiles(context.contentResolver)!!
+        val mediaPlayerHolder = MediaPlayerHolder(musicRepository)
+
+        var mediaPlayer: MediaPlayer? = null
+        mediaPlayerHolder.prepareAndPlay(
+            context,
+            get_music_id_of_shortest_song(music),
+            onPrepared = {
+                mediaPlayer = it
+                countDownLatchOnPrepared.countDown()
+            },
+            onCompletion = {
+                countDownLatchOnCompletion.countDown()
             }
         )
+
+        countDownLatchOnPrepared.await()
+        mediaPlayerHolder.pause()
+        assert(mediaPlayer?.isPlaying == false)
+        mediaPlayerHolder.play()
         countDownLatchOnCompletion.await()
+    }
+
+    @Test
+    fun pause_validSong_pausesMediaPlayer() = runTest(timeout = Duration.parse("60s")) {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        val application = ApplicationProvider.getApplicationContext<MainApplication>()
+        val musicRepository = application.musicRepository
+        val music = musicRepository.loadMusicFiles(context.contentResolver)!!
+        val mediaPlayerHolder = MediaPlayerHolder(musicRepository)
+        val countDownLatch = CountDownLatch(1)
+
+        var mediaPlayer: MediaPlayer? = null
+        mediaPlayerHolder.prepareAndPlay(
+            context,
+            get_music_id_of_shortest_song(music),
+            onPrepared = {
+                mediaPlayer = it
+                countDownLatch.countDown()
+            },
+        )
+        countDownLatch.await()
+        mediaPlayerHolder.pause()
+        assert(mediaPlayer?.isPlaying == false)
     }
 
 }
