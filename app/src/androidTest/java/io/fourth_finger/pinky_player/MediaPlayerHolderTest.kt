@@ -27,33 +27,6 @@ class MediaPlayerHolderTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    private fun get_music_id_of_shortest_song(music: List<MusicFile>): Long {
-        val application = ApplicationProvider.getApplicationContext<MainApplication>()
-        val musicRepository = application.musicRepository
-        var shortestMusic = music[0].id
-
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val mmr = MediaMetadataRetriever()
-        mmr.setDataSource(context, musicRepository.getUri(music[0].id))
-        var durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-        var shortestDuration = durationStr!!.toInt()
-
-        for (m in music) {
-            mmr.setDataSource(context, musicRepository.getUri(m.id))
-            durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-
-            val duration = durationStr!!.toInt()
-            if (duration < shortestDuration) {
-                shortestDuration = duration
-                shortestMusic = m.id
-            }
-            if (duration < 10000) {
-                break
-            }
-        }
-        return shortestMusic
-    }
-
     @Test
     fun prepareAndPlay_validSong_playsToCompletion() = runTest(timeout = Duration.parse("60s")) {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -66,7 +39,7 @@ class MediaPlayerHolderTest {
 
 
         mediaPlayerHolder.prepareAndPlay(context,
-            get_music_id_of_shortest_song(music),
+            MediaPlayerUtil.get_music_id_of_shortest_song(music),
             onPrepared = { },
             onCompletion = {
                 countDownLatchOnCompletion.countDown()
@@ -88,7 +61,7 @@ class MediaPlayerHolderTest {
         var mediaPlayer: MediaPlayer? = null
         mediaPlayerHolder.prepareAndPlay(
             context,
-            get_music_id_of_shortest_song(music),
+            MediaPlayerUtil.get_music_id_of_shortest_song(music),
             onPrepared = {
                 mediaPlayer = it
                 countDownLatchOnPrepared.countDown()
@@ -100,7 +73,7 @@ class MediaPlayerHolderTest {
 
         countDownLatchOnPrepared.await()
         mediaPlayerHolder.pause()
-        assert(mediaPlayer?.isPlaying == false)
+        assert(mediaPlayer!!.isPlaying)
         mediaPlayerHolder.play()
         countDownLatchOnCompletion.await()
     }
@@ -118,15 +91,17 @@ class MediaPlayerHolderTest {
         var mediaPlayer: MediaPlayer? = null
         mediaPlayerHolder.prepareAndPlay(
             context,
-            get_music_id_of_shortest_song(music),
+            MediaPlayerUtil.get_music_id_of_shortest_song(music),
             onPrepared = {
                 mediaPlayer = it
                 countDownLatch.countDown()
             },
         )
         countDownLatch.await()
+        mediaPlayerHolder.play()
+        assert(mediaPlayer!!.isPlaying)
         mediaPlayerHolder.pause()
-        assert(mediaPlayer?.isPlaying == false)
+        assert(!mediaPlayer!!.isPlaying)
     }
 
 }

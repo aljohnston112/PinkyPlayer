@@ -158,7 +158,6 @@ class MediaSessionHelperTest {
 
         }
 
-
         runOnUiThread {
             val token = mediaSessionHelper.setUpMediaSession(context, mediaSessionCallback)!!
 
