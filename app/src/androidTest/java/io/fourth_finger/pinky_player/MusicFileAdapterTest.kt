@@ -1,19 +1,14 @@
 package io.fourth_finger.pinky_player
 
 import android.view.Gravity
-import android.view.View.TEXT_ALIGNMENT_CENTER
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.runner.AndroidJUnitRunner
 import io.fourth_finger.music_repository.MusicFile
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 
-@RunWith(AndroidJUnit4::class)
 class MusicFileAdapterTest {
 
     private val emptyList = emptyList<MusicFile>()
@@ -38,16 +33,14 @@ class MusicFileAdapterTest {
      */
     @Test
     fun updateMusicList_NewList_UpdatesItemCountAndViewHolders() {
-        val adapter = MusicFileAdapter(
-            emptyList
-        ){}
+        val adapter = MusicFileAdapter(emptyList){ /** onClick **/ }
         assert(adapter.itemCount == 0)
         adapter.updateMusicList(singletonList)
         assert(adapter.itemCount == 1)
 
         val viewHolder = adapter.createViewHolder(viewStub, 0)
         adapter.onBindViewHolder(viewHolder, 0)
-        assert(viewHolder.textView.text == singletonList[0].displayName)
+        assert(viewHolder.textView.text == singletonList[0].relativePath + singletonList[0].displayName)
     }
 
     /**
@@ -56,9 +49,7 @@ class MusicFileAdapterTest {
      */
     @Test
     fun onCreateViewHolder_CorrectLayout() {
-        val adapter = MusicFileAdapter(
-            singletonList
-        ){}
+        val adapter = MusicFileAdapter(singletonList){ /** onClick **/ }
         val viewHolder = adapter.createViewHolder(viewStub, 0)
         assert(viewHolder.textView.id == R.id.textView)
     }
@@ -74,14 +65,14 @@ class MusicFileAdapterTest {
                 MusicFile(0, "B/","A"),
                 MusicFile(1, "B/","B")
             )
-        ){}
+        ){ /** onClick **/ }
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub)
 
         adapter.onBindViewHolder(viewHolder, 0)
-        assert(viewHolder.textView.text == "A")
+        assert(viewHolder.textView.text == "B/A")
 
         adapter.onBindViewHolder(viewHolder, 1)
-        assert(viewHolder.textView.text == "B")
+        assert(viewHolder.textView.text == "B/B")
     }
 
     /**
@@ -90,9 +81,7 @@ class MusicFileAdapterTest {
      */
     @Test
     fun onBindViewHolder_ValidPositions_CentersText() {
-        val adapter = MusicFileAdapter(
-            singletonList
-        ){}
+        val adapter = MusicFileAdapter(singletonList){ /** onClick **/ }
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub)
 
         adapter.onBindViewHolder(viewHolder, 0)
@@ -105,9 +94,7 @@ class MusicFileAdapterTest {
      */
     @Test(expected = IndexOutOfBoundsException::class)
     fun onBindViewHolder_InValidPosition_Throws() {
-        val adapter = MusicFileAdapter(
-            singletonList
-        ){}
+        val adapter = MusicFileAdapter(singletonList){ /** onClick **/ }
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub){ }
 
         adapter.onBindViewHolder(viewHolder, 1)
@@ -119,9 +106,7 @@ class MusicFileAdapterTest {
      */
     @Test(expected = IndexOutOfBoundsException::class)
     fun onBindViewHolder_NegativePosition_Throws() {
-        val adapter = MusicFileAdapter(
-            singletonList
-        ){}
+        val adapter = MusicFileAdapter(singletonList){ /** onClick **/ }
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub){ }
 
         adapter.onBindViewHolder(viewHolder, -1)

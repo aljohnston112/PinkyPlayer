@@ -22,7 +22,7 @@ class MusicRepository {
      *         null if there was a problem loading the [MusicFile]s.
      */
     suspend fun loadMusicFiles(
-        contentResolver: ContentResolver,
+        contentResolver: ContentResolver
     ): List<MusicFile>? {
             val latestMusic = withContext(Dispatchers.IO) {
                 musicDataSource.getMusicFromMediaStore(contentResolver)

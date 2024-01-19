@@ -1,37 +1,48 @@
 package io.fourth_finger.pinky_player
 
+import android.content.ContentResolver
 import android.content.Context
-import android.graphics.BitmapFactory
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaSessionCompat
+import android.net.Uri
+import androidx.media3.common.MediaMetadata
 import io.fourth_finger.music_repository.MusicRepository
 
+/**
+ * Wrapper for a [MediaMetadata.Builder].
+ */
 class MetaDataHelper(private val musicRepository: MusicRepository) {
 
-    private val metaDataBuilder = MediaMetadataCompat.Builder()
+    private val metaDataBuilder = MediaMetadata.Builder()
 
-    fun updateMetaData(context: Context, mediaId: String, mediaSession: MediaSessionCompat?) {
+    /**
+     * Creates a [MediaMetadata] with the title and artwork associated with a music file and returns it.
+     *
+     * @param context
+     * @param mediaId The id of the music file to get the metadata from.
+     *@return The [MediaMetadata] of the music file with the given mediaId.
+     */
+    fun getMetaData(context: Context, mediaId: Long): MediaMetadata {
         // Music title
-        val musicFile = musicRepository.getMusicFile(mediaId.toLong())
+        val musicFile = musicRepository.getMusicFile(mediaId)
         if (musicFile != null) {
-            metaDataBuilder.putString(
-                MediaMetadataCompat.METADATA_KEY_TITLE,
-                musicFile.relativePath + musicFile.displayName
-            )
+            metaDataBuilder.setTitle(musicFile.relativePath + musicFile.displayName)
         }
 
         // Bitmap
-        val inputStream = musicRepository.getUri(mediaId.toLong())?.let { uri ->
-            context.contentResolver.openInputStream(uri)
-        }
-        metaDataBuilder.putBitmap(
-            MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON,
-            BitmapFactory.decodeStream(inputStream)
+        val resources = context.resources
+        val resourceId = R.drawable.ic_baseline_music_note_24
+        musicRepository.getUri(mediaId)?.let { uri ->
+            metaDataBuilder.setArtworkUri(uri)
+            uri
+        } ?: metaDataBuilder.setArtworkUri(
+            Uri.Builder()
+                .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                .authority(resources.getResourcePackageName(resourceId))
+                .appendPath(resources.getResourceTypeName(resourceId))
+                .appendPath(resources.getResourceEntryName(resourceId))
+                .build()
         )
-        inputStream?.close()
 
-        mediaSession?.setMetadata(metaDataBuilder.build())
+        return metaDataBuilder.build()
     }
-
 
 }

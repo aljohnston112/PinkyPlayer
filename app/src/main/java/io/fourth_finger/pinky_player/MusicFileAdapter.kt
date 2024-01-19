@@ -6,18 +6,17 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import io.fourth_finger.pinky_player.R
 import io.fourth_finger.music_repository.MusicFile
 import kotlin.properties.Delegates
 
 /**
  * A [RecyclerView.Adapter] for [MusicFile]s.
  *
- * @param dataSet The list of [MusicFile]s to display.
+ * @param music The list of [MusicFile]s to display.
  * @param onSongClickListener The callback to be invoked when a song is clicked.
  */
 class MusicFileAdapter(
-    private var dataSet: List<MusicFile>,
+    private var music: List<MusicFile>,
     private val onSongClickListener: (Long) -> Unit,
 ) : RecyclerView.Adapter<MusicFileAdapter.ViewHolder>() {
 
@@ -27,9 +26,9 @@ class MusicFileAdapter(
      * @param music The new list of [MusicFile]s.
      */
     fun updateMusicList(music: List<MusicFile>) {
-        val diffUtilCallback = MusicFileDiffUtilCallback(dataSet, music)
+        val diffUtilCallback = MusicFileDiffUtilCallback(this.music, music)
         val diff = DiffUtil.calculateDiff(diffUtilCallback)
-        dataSet = music
+        this.music = music
         diff.dispatchUpdatesTo(this)
     }
 
@@ -42,15 +41,18 @@ class MusicFileAdapter(
                 false
             ),
             onSongClickListener
-            )
+        )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.textView.text = dataSet[position].displayName
-        holder.id = dataSet[position].id
+        holder.textView.text = buildString {
+            append(music[position].relativePath)
+            append(music[position].displayName)
+        }
+        holder.id = music[position].id
     }
 
-    override fun getItemCount() = dataSet.size
+    override fun getItemCount() = music.size
 
     /**
      * A [RecyclerView.ViewHolder] for [MusicFile]s.

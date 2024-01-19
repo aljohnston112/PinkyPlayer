@@ -9,8 +9,8 @@ class MediaPlayerUtil {
 
     companion object {
 
-        fun get_music_id_of_shortest_song(music: List<MusicFile>): Long {
-            val application = ApplicationProvider.getApplicationContext<MainApplication>()
+        fun getMusicIdOfShortestSong(music: List<MusicFile>): Long {
+            val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
             val musicRepository = application.musicRepository
             var shortestMusic = music[0].id
 

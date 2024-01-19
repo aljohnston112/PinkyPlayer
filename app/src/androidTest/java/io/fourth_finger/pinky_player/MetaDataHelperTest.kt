@@ -1,20 +1,14 @@
 package io.fourth_finger.pinky_player
 
 import android.Manifest
-import android.content.Context
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.MediaSessionCompat
+import android.content.ContentResolver
+import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.CountDownLatch
-import kotlin.time.Duration
 
 class MetaDataHelperTest {
 
@@ -24,36 +18,29 @@ class MetaDataHelperTest {
     )
 
     @Test
-    fun updateMetaData_updatesMetaData() = runTest(timeout = Duration.parse("60s")) {
-        val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
-        val mediaSession = MediaSessionCompat(context, "TAG")
-        val application = ApplicationProvider.getApplicationContext<MainApplication>()
+    fun updateMetaData_updatesMetaData() = runTest {
+        val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
         val musicRepository = application.musicRepository
+        val music = musicRepository.loadMusicFiles(application.contentResolver)!!
         val metaDataHelper = MetaDataHelper(musicRepository)
-        val music = musicRepository.loadMusicFiles(context.contentResolver)!!
-        val testMusic = music[0]
 
-        val mediaController = MediaControllerCompat(
-            context,
-            mediaSession.sessionToken
-        )
+        for(testMusic in music) {
 
-        val countDownLatch = CountDownLatch(1)
+            val metadata = metaDataHelper.getMetaData(application, testMusic.id)
 
-        runOnUiThread {
-            mediaController.registerCallback(
-                object : MediaControllerCompat.Callback() {
-                    override fun onMetadataChanged(metadata: MediaMetadataCompat) {
-                        val title = metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE)
-                        assert(title == testMusic.relativePath + testMusic.displayName)
-                        countDownLatch.countDown()
-                    }
-                }
-            )
+            val resources = application.resources
+            val resourceId = R.drawable.ic_baseline_music_note_24
+            val uri = musicRepository.getUri(testMusic.id) ?: Uri.Builder()
+                .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                .authority(resources.getResourcePackageName(resourceId))
+                .appendPath(resources.getResourceTypeName(resourceId))
+                .appendPath(resources.getResourceEntryName(resourceId))
+                .build()
+
+            Assert.assertTrue(metadata.title == testMusic.relativePath + testMusic.displayName)
+            Assert.assertTrue(metadata.artworkUri == uri)
         }
 
-        metaDataHelper.updateMetaData(context, testMusic.id.toString(), mediaSession)
-        countDownLatch.await()
     }
 
 }

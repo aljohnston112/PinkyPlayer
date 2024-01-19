@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import io.fourth_finger.pinky_player.databinding.FragmentTitleBinding
 
@@ -17,21 +18,37 @@ class FragmentTitle : Fragment() {
     private var _binding: FragmentTitleBinding? = null
     private val binding get() = _binding!!
 
+    private val viewModel: ActivityMainViewModel by activityViewModels(
+        factoryProducer = { ActivityMainViewModel.Factory }
+    )
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentTitleBinding.inflate(inflater, container, false)
-        binding.buttonSongs.setOnClickListener {
-            findNavController().navigate(
-                FragmentTitleDirections.actionFragmentTitleToFragmentMusicList()
-            )
+
+        // Set up navigation button
+        viewModel.havePermission.observe(viewLifecycleOwner) {
+            // Must guarantee permissions are granted before launching [FragmentMusicList]
+            if (it) {
+                binding.buttonSongs.setOnClickListener{
+                    findNavController().navigate(
+                        FragmentTitleDirections.actionFragmentTitleToFragmentMusicList()
+                    )
+                }
+            } else {
+                binding.buttonSongs.setOnClickListener{
+                    viewModel.displayPermissionNeeded(binding.root)
+                }
+            }
         }
         return binding.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        binding.buttonSongs.setOnClickListener(null)
         _binding = null
     }
 
