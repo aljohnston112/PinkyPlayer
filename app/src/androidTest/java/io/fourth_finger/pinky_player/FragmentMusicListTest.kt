@@ -23,6 +23,8 @@ import org.junit.Test
 
 class FragmentMusicListTest {
 
+    // TODO https://github.com/android/android-test/issues/2113
+
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
