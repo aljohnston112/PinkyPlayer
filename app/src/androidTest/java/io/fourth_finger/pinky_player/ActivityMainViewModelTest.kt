@@ -95,7 +95,7 @@ class ActivityMainViewModelTest {
 
         val music = application.musicRepository.loadMusicFiles(application.contentResolver)!!
         UiThreadStatement.runOnUiThread {
-            viewModel.songClicked(music[0].id, browser)
+            viewModel.songClicked(application, music[0].id, browser)
         }
         countDownLatchPlay.await()
 
@@ -135,7 +135,7 @@ class ActivityMainViewModelTest {
 
         val music = application.musicRepository.loadMusicFiles(application.contentResolver)!!
         UiThreadStatement.runOnUiThread {
-            viewModel.songClicked(music[0].id, browser)
+            viewModel.songClicked(application, music[0].id, browser)
         }
         countDownLatchPlay.await()
 
@@ -172,7 +172,7 @@ class ActivityMainViewModelTest {
         )
 
         UiThreadStatement.runOnUiThread {
-            viewModel.songClicked(id, browser)
+            viewModel.songClicked(application, id, browser)
         }
         countDownLatch.await()
     }

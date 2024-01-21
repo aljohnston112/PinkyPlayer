@@ -1,6 +1,7 @@
 package io.fourth_finger.pinky_player
 
 import android.content.ContentResolver
+import android.content.Context
 import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -31,6 +32,8 @@ class ActivityMainViewModel(
 
     private val _havePermission = MutableLiveData(false)
     val havePermission: LiveData<Boolean> = _havePermission
+
+    private val metaDataHelper = MetaDataHelper(musicRepository)
 
     /**
      * Lets the user know that permission is needed to access the music files.
@@ -96,12 +99,14 @@ class ActivityMainViewModel(
      * @param controller The [MediaController] connected to the [ServiceMediaLibrary].
      */
     fun songClicked(
+        context: Context,
         id: Long,
         controller: MediaController
     ) {
         val mediaItem = MediaItem.Builder()
             .setUri(musicRepository.getUri(id))
             .setMediaId(id.toString())
+            .setMediaMetadata(metaDataHelper.getMetaData(context, id))
             .build()
         controller.setMediaItem(mediaItem)
         controller.play()

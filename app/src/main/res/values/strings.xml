@@ -8,5 +8,6 @@
     <string name="pause">Pause</string>
     <string name="app_despcription">Intelligent Music Player</string>
     <string name="playToStart">Play a song to start</string>
+    <string name="search">Search</string>
 
 </resources>

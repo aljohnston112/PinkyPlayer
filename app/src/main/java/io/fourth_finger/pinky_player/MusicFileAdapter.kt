@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import io.fourth_finger.music_repository.MusicFile
 import kotlin.properties.Delegates
@@ -17,7 +16,7 @@ import kotlin.properties.Delegates
  */
 class MusicFileAdapter(
     private var music: List<MusicFile>,
-    private val onSongClickListener: (Long) -> Unit,
+    private val onSongClickListener: (Long) -> Unit
 ) : RecyclerView.Adapter<MusicFileAdapter.ViewHolder>() {
 
     /**
@@ -26,10 +25,8 @@ class MusicFileAdapter(
      * @param music The new list of [MusicFile]s.
      */
     fun updateMusicList(music: List<MusicFile>) {
-        val diffUtilCallback = MusicFileDiffUtilCallback(this.music, music)
-        val diff = DiffUtil.calculateDiff(diffUtilCallback)
         this.music = music
-        diff.dispatchUpdatesTo(this)
+        notifyDataSetChanged()
     }
 
 
