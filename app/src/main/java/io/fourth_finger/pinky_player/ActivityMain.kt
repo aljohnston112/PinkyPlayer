@@ -22,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.media3.session.MediaBrowser
 import io.fourth_finger.pinky_player.databinding.ActivityMainBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
@@ -53,14 +54,17 @@ class ActivityMain : AppCompatActivity() {
             }
         }
 
-//        TODO this seems like a bad idea in case the user wants to play the same playlist again
-//        override fun onPlaybackStateChanged(playbackState: Int) {
-//            super.onPlaybackStateChanged(playbackState)
-//            if(playbackState == Player.STATE_ENDED){
-//                binding.controls.visibility = View.GONE
-//                ended = true
-//            }
-//        }
+    }
+
+    private val menuProvider = object : MenuProvider {
+
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+            menuInflater.inflate(R.menu.actvity_main_menu, menu)
+        }
+
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+            return false
+        }
 
     }
 
@@ -81,23 +85,17 @@ class ActivityMain : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setUpToolbar()
+        requestPermissionsAndLoadMusicFiles()
+    }
+
+    private fun setUpToolbar() {
         setSupportActionBar(findViewById(R.id.toolbar))
         addMenuProvider(
-            object : MenuProvider {
-
-                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                    menuInflater.inflate(R.menu.actvity_main_menu, menu)
-                }
-
-                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                    return false
-                }
-
-            },
+            menuProvider,
             this,
             Lifecycle.State.RESUMED
         )
-        requestPermissionsAndLoadMusicFiles()
     }
 
     /**
@@ -156,7 +154,7 @@ class ActivityMain : AppCompatActivity() {
      */
     override fun onStart() {
         super.onStart()
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             mediaBrowser = (application as ApplicationMain).getMediaBrowser()
             mediaBrowser.addListener(listener)
         }
@@ -166,6 +164,11 @@ class ActivityMain : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         mediaBrowser.removeListener(listener)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        removeMenuProvider(menuProvider)
     }
 
 }

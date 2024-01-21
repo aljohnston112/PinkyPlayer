@@ -24,6 +24,9 @@ class ApplicationMain : Application() {
     private var browser: MediaBrowser? = null
 
     /**
+     * Gets a [MediaBrowser] connected to the [ServiceMediaLibrary].
+     * This method must not be called before onCreate.
+     *
      * @return The [MediaBrowser] connected to the [ServiceMediaLibrary]
      */
     suspend fun getMediaBrowser(): MediaBrowser {
@@ -40,7 +43,7 @@ class ApplicationMain : Application() {
             applicationContext,
             ComponentName(applicationContext, ServiceMediaLibrary::class.java)
         )
-        browserJob = scope.launch {
+        browserJob = scope.launch(Dispatchers.IO) {
             browser = MediaBrowser.Builder(applicationContext, sessionToken)
                 .buildAsync()
                 .await()

@@ -95,7 +95,7 @@ class MusicFileAdapterTest {
     @Test(expected = IndexOutOfBoundsException::class)
     fun onBindViewHolder_InValidPosition_Throws() {
         val adapter = MusicFileAdapter(singletonList){ /** onClick **/ }
-        val viewHolder = MusicFileAdapter.ViewHolder(viewStub){ }
+        val viewHolder = MusicFileAdapter.ViewHolder(viewStub)
 
         adapter.onBindViewHolder(viewHolder, 1)
     }
@@ -107,7 +107,7 @@ class MusicFileAdapterTest {
     @Test(expected = IndexOutOfBoundsException::class)
     fun onBindViewHolder_NegativePosition_Throws() {
         val adapter = MusicFileAdapter(singletonList){ /** onClick **/ }
-        val viewHolder = MusicFileAdapter.ViewHolder(viewStub){ }
+        val viewHolder = MusicFileAdapter.ViewHolder(viewStub)
 
         adapter.onBindViewHolder(viewHolder, -1)
     }

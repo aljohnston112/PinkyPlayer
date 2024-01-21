@@ -9,15 +9,19 @@ import io.fourth_finger.music_repository.MusicRepository
  * A wrapper for a [MediaSession].
  */
 class MediaSessionHelper(
-    musicRepository: MusicRepository,
-    context: Context
+    context: Context,
+    musicRepository: MusicRepository
 ) {
 
-    private val playerHolder = PlayerHolder(musicRepository, context)
+    private val playerHolder = PlayerHolder(context, musicRepository)
     private var mediaSession: MediaLibraryService.MediaLibrarySession? = null
 
     /**
      * Sets up the [MediaSession].
+     *
+     * @param service The [MediaLibraryService] to host the
+     *                [MediaLibraryService.MediaLibrarySession].
+     * @param callback The callback for the [MediaLibraryService.MediaLibrarySession].
      */
     fun setUpMediaSession(
         service: MediaLibraryService,
@@ -31,7 +35,7 @@ class MediaSessionHelper(
     }
 
     /**
-     * @return The [MediaSession] wrapped by this class or
+     * @return The [MediaLibraryService.MediaLibrarySession] wrapped by this class or
      *         null if [setUpMediaSession] has not been called.
      */
     fun getMediaSession(): MediaLibraryService.MediaLibrarySession? {
@@ -40,43 +44,43 @@ class MediaSessionHelper(
 
     /**
 
-     TODO probably not needed
+    TODO probably not needed
 
     /**
      * Starts playing the music with the given id.
      *
      * @param context
      * @param mediaId The id of the music to start playing.
-     */
+    */
     fun onPlayFromMediaId(context: Context, mediaId: String) {
-        playerHolder.clearPrepareAndPlay(
-            context,
-            mediaId.toLong()
-        )
+    playerHolder.clearPrepareAndPlay(
+    context,
+    mediaId.toLong()
+    )
     }
 
     /**
      * Starts playing music.
-     */
+    */
     fun onPlay() {
-        playerHolder.play()
+    playerHolder.play()
     }
 
     /**
      * Pauses the music.
-     */
+    */
     fun onPause() {
-        playerHolder.pause()
+    playerHolder.pause()
     }
 
     /**
      * Stops the music.
-     */
+    */
     fun onStop() {
-        playerHolder.stop()
+    playerHolder.stop()
     }
 
-    **/
+     **/
 
     /**
      * Releases the wrapped [MediaSession].

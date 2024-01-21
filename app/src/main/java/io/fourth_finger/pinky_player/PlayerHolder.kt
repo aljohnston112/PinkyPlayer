@@ -14,17 +14,21 @@ import io.fourth_finger.music_repository.MusicRepository
 
 /**
  * Wrapper for a [Player].
+ *
+ * @param context
+ * @param musicRepository
  */
 @OptIn(UnstableApi::class)
 class PlayerHolder(
-    private val musicRepository: MusicRepository,
-    context: Context
+    context: Context,
+    private val musicRepository: MusicRepository
 ) {
 
     private val player: ForwardingPlayer
     private val metaDataHelper = MetaDataHelper(musicRepository)
 
     init {
+        // TODO add audio focus parameter
         val exoPlayer = ExoPlayer.Builder(context)
             .setSkipSilenceEnabled(true)
             .setSeekParameters(SeekParameters.EXACT)
@@ -62,7 +66,6 @@ class PlayerHolder(
      */
     fun play() {
         if (!player.isPlaying) {
-            player.prepare()
             player.play()
         }
     }
@@ -77,19 +80,18 @@ class PlayerHolder(
     }
 
     /**
-     * Releases this class' resources.
-     */
-    fun release() {
-        // TODO how is this tested?
-        pause()
-        player.release()
-    }
-
-    /**
      * Stops the player.
      */
     fun stop() {
         player.stop()
+    }
+
+    /**
+     * Releases this class' resources.
+     */
+    fun release() {
+        // TODO how is this tested?
+        player.release()
     }
 
     /**

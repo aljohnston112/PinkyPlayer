@@ -54,7 +54,7 @@ class MusicSearchUseCase {
             val music = repository.getCachedMusicFiles()!!
             val siftedMusic = mutableListOf<MusicFile>()
             for (song in music) {
-                if ((song.relativePath + song.displayName).lowercase().contains(searchText)) {
+                if (song.fullPath.lowercase().contains(searchText)) {
                     siftedMusic.add(song)
                 }
             }
@@ -62,8 +62,10 @@ class MusicSearchUseCase {
             val countDownLatch = CountDownLatch(1)
             activityScenarioRule.scenario.onActivity {
                 val recyclerView = it.findViewById<RecyclerView>(R.id.recycler_view)
-                Assert.assertTrue(recyclerView.adapter!!.itemCount == siftedMusic.size)
-                countDownLatch.countDown()
+                recyclerView.post {
+                    Assert.assertTrue(recyclerView.adapter!!.itemCount == siftedMusic.size)
+                    countDownLatch.countDown()
+                }
             }
             countDownLatch.await()
             for (song in siftedMusic) {
@@ -71,7 +73,7 @@ class MusicSearchUseCase {
                     .perform(
                         scrollTo<MusicFileAdapter.ViewHolder>(
                             hasDescendant(
-                                withText(song.relativePath + song.displayName)
+                                withText(song.fullPath)
                             )
                         )
                     )

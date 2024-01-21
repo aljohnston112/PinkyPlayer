@@ -34,7 +34,7 @@ class PlayerHolderTest {
         val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
         val musicRepository = application.musicRepository
         val music = musicRepository.loadMusicFiles(application.contentResolver)!!
-        val playerHolder = PlayerHolder(musicRepository, application)
+        val playerHolder = PlayerHolder(application, musicRepository)
 
         playerHolder.getPlayer().addListener(
             object : Player.Listener {
@@ -64,7 +64,7 @@ class PlayerHolderTest {
         val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
         val musicRepository = application.musicRepository
         val music = musicRepository.loadMusicFiles(application.contentResolver)!!
-        val playerHolder = PlayerHolder(musicRepository, application)
+        val playerHolder = PlayerHolder(application, musicRepository)
 
         playerHolder.getPlayer().addListener(
             object : Player.Listener {
@@ -101,7 +101,7 @@ class PlayerHolderTest {
         val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
         val musicRepository = application.musicRepository
         val music = musicRepository.loadMusicFiles(application.contentResolver)!!
-        val playerHolder = PlayerHolder(musicRepository, application)
+        val playerHolder = PlayerHolder(application, musicRepository)
         val countDownLatchPlay = CountDownLatch(1)
         val countDownLatchPause = CountDownLatch(1)
 

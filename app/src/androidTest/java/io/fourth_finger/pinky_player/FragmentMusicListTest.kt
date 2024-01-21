@@ -39,7 +39,7 @@ class FragmentMusicListTest {
             context.getSystemService(LayoutInflater::class.java),
             null,
             null
-        )!!
+        )
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
         assertNotNull(recyclerView)
     }
@@ -66,13 +66,13 @@ class FragmentMusicListTest {
         onView(withId(R.id.recycler_view))
             .perform(
                 RecyclerViewActions.scrollTo<MusicFileAdapter.ViewHolder>(
-                    hasDescendant(withText(firstMusic.relativePath + firstMusic.displayName))
+                    hasDescendant(withText(firstMusic.fullPath))
                 )
             )
         onView(withId(R.id.recycler_view))
             .perform(
                 RecyclerViewActions.scrollTo<MusicFileAdapter.ViewHolder>(
-                    hasDescendant(withText(lastMusic.relativePath + lastMusic.displayName))
+                    hasDescendant(withText(lastMusic.fullPath))
                 )
             )
 

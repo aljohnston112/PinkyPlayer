@@ -15,6 +15,7 @@ import androidx.media3.session.MediaController
 import com.google.android.material.snackbar.Snackbar
 import io.fourth_finger.music_repository.MusicFile
 import io.fourth_finger.music_repository.MusicRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -57,7 +58,7 @@ class ActivityMainViewModel(
         contentResolver: ContentResolver,
     ): Job {
         _havePermission.postValue(true)
-        return viewModelScope.launch {
+        return viewModelScope.launch(Dispatchers.IO) {
             musicRepository.loadMusicFiles(contentResolver)
             loadMusicFiles()
         }
@@ -70,25 +71,8 @@ class ActivityMainViewModel(
      * @return The job that loads the music files.
      */
     private fun loadMusicFiles(): Job {
-        return viewModelScope.launch {
-            _musicFiles.postValue(musicRepository.getCachedMusicFiles())
-        }
-    }
-
-
-    /**
-     * Pauses or plays the current song.
-     *
-     * @param controller The [MediaController] connected to the [ServiceMediaLibrary].
-     *
-     */
-    fun onPlayPauseClicked(
-        controller: MediaController
-    ) {
-        if (controller.isPlaying) {
-            controller.pause()
-        } else {
-            controller.play()
+        return viewModelScope.launch(Dispatchers.IO) {
+            _musicFiles.postValue(musicRepository.getCachedMusicFiles() ?: listOf())
         }
     }
 
@@ -112,6 +96,22 @@ class ActivityMainViewModel(
         controller.play()
     }
 
+    /**
+     * Pauses or plays the current song.
+     *
+     * @param controller The [MediaController] connected to the [ServiceMediaLibrary].
+     *
+     */
+    fun onPlayPauseClicked(
+        controller: MediaController
+    ) {
+        if (controller.isPlaying) {
+            controller.pause()
+        } else {
+            controller.play()
+        }
+    }
+
     companion object {
 
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
@@ -122,7 +122,9 @@ class ActivityMainViewModel(
                 extras: CreationExtras
             ): T {
                 val application = checkNotNull(extras[APPLICATION_KEY])
-                return ActivityMainViewModel((application as ApplicationMain).musicRepository) as T
+                return ActivityMainViewModel(
+                    (application as ApplicationMain).musicRepository
+                ) as T
             }
 
         }

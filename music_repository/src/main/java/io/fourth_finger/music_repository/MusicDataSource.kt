@@ -15,6 +15,8 @@ import android.provider.MediaStore
  */
 data class MusicFile(val id: Long, val relativePath: String, val displayName: String) {
 
+    val fullPath: String = relativePath + displayName
+
     override fun equals(other: Any?): Boolean {
         return other is MusicFile &&
                 id == other.id &&

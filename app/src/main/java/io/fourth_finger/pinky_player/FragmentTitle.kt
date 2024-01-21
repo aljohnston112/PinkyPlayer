@@ -23,11 +23,16 @@ class FragmentTitle : Fragment() {
     )
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentTitleBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         // Set up navigation button
         viewModel.havePermission.observe(viewLifecycleOwner) {
             // Must guarantee permissions are granted before launching [FragmentMusicList]
@@ -43,7 +48,6 @@ class FragmentTitle : Fragment() {
                 }
             }
         }
-        return binding.root
     }
 
     override fun onDestroyView() {
@@ -51,6 +55,5 @@ class FragmentTitle : Fragment() {
         binding.buttonSongs.setOnClickListener(null)
         _binding = null
     }
-
 
 }

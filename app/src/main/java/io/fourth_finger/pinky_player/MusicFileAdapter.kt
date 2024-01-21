@@ -1,5 +1,6 @@
 package io.fourth_finger.pinky_player
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,11 +25,11 @@ class MusicFileAdapter(
      *
      * @param music The new list of [MusicFile]s.
      */
+    @SuppressLint("NotifyDataSetChanged")
     fun updateMusicList(music: List<MusicFile>) {
         this.music = music
         notifyDataSetChanged()
     }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
@@ -36,17 +37,24 @@ class MusicFileAdapter(
                 R.layout.music_file_holder,
                 parent,
                 false
-            ),
-            onSongClickListener
+            )
         )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.id = music[position].id
         holder.textView.text = buildString {
             append(music[position].relativePath)
             append(music[position].displayName)
         }
-        holder.id = music[position].id
+        holder.textView.setOnClickListener {
+            onSongClickListener(holder.id)
+        }
+    }
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        super.onViewRecycled(holder)
+        holder.textView.setOnClickListener(null)
     }
 
     override fun getItemCount() = music.size
@@ -55,21 +63,14 @@ class MusicFileAdapter(
      * A [RecyclerView.ViewHolder] for [MusicFile]s.
      *
      * @param view The item holder [View].
-     * @param onSongClickedListener The callback to be invoked when a song is clicked.
      */
     class ViewHolder(
-        view: View,
-        private val onSongClickedListener: (Long) -> Unit = { }
+        view: View
     ) : RecyclerView.ViewHolder(view) {
 
         val textView: TextView = view.findViewById(R.id.textView)
         var id by Delegates.notNull<Long>()
 
-        init {
-            textView.setOnClickListener {
-                onSongClickedListener(id)
-            }
-        }
 
     }
 

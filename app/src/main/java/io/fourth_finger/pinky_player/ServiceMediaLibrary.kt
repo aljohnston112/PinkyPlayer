@@ -14,18 +14,18 @@ class ServiceMediaLibrary : MediaLibraryService() {
     // TODO might move to the MediaSessionHelper
     private val callback = object : MediaLibrarySession.Callback {}
 
-    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? {
-        return mediaSessionHelper.getMediaSession()
-    }
-
     override fun onCreate() {
         super.onCreate()
         // Create the MediaLibrarySession
         mediaSessionHelper = MediaSessionHelper(
-            (application as ApplicationMain).musicRepository,
-            this
+            this,
+            (application as ApplicationMain).musicRepository
         )
         mediaSessionHelper.setUpMediaSession(this, callback)
+    }
+
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? {
+        return mediaSessionHelper.getMediaSession()
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
