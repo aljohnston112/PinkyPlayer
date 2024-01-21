@@ -33,7 +33,6 @@ class ActivityMain : AppCompatActivity() {
 
     private lateinit var mediaBrowser: MediaBrowser
 
-
     private val viewModel: ActivityMainViewModel by viewModels(
         factoryProducer = { ActivityMainViewModel.Factory }
     )
