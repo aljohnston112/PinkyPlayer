@@ -93,4 +93,23 @@ class FragmentTitleTestWithoutPermission {
         assert(navController.currentDestination?.id == R.id.fragmentTitle)
     }
 
+    @Test
+    fun clickingSettingsButton_navigates() = runTest {
+        val navController = TestNavHostController(
+            ApplicationProvider.getApplicationContext()
+        )
+
+        val countDownLatch = CountDownLatch(1)
+        val titleScenario = launchFragmentInContainer<FragmentTitle>()
+        titleScenario.onFragment { fragment ->
+            navController.setGraph(R.navigation.nav_graph)
+            Navigation.setViewNavController(fragment.requireView(), navController)
+            countDownLatch.countDown()
+        }
+
+        countDownLatch.await()
+        onView(ViewMatchers.withId(R.id.button_settings)).perform(ViewActions.click())
+        assert(navController.currentDestination?.id == R.id.fragmentSettings)
+    }
+
 }

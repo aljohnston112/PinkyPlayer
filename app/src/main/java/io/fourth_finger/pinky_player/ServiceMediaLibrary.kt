@@ -11,9 +11,6 @@ class ServiceMediaLibrary : MediaLibraryService() {
 
     private lateinit var mediaSessionHelper: MediaSessionHelper
 
-    // TODO might move to the MediaSessionHelper
-    private val callback = object : MediaLibrarySession.Callback {}
-
     override fun onCreate() {
         super.onCreate()
         // Create the MediaLibrarySession
@@ -21,7 +18,7 @@ class ServiceMediaLibrary : MediaLibraryService() {
             this,
             (application as ApplicationMain).musicRepository
         )
-        mediaSessionHelper.setUpMediaSession(this, callback)
+        mediaSessionHelper.setUpMediaSession(this)
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? {

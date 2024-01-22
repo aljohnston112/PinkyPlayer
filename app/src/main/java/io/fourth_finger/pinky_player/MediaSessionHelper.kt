@@ -1,6 +1,9 @@
 package io.fourth_finger.pinky_player
 
 import android.content.Context
+import androidx.media3.common.Player
+import androidx.media3.common.Player.STATE_ENDED
+import androidx.media3.common.Player.STATE_READY
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import io.fourth_finger.music_repository.MusicRepository
@@ -15,23 +18,39 @@ class MediaSessionHelper(
 
     private val playerHolder = PlayerHolder(context, musicRepository)
     private var mediaSession: MediaLibraryService.MediaLibrarySession? = null
+    private val callback = object : MediaLibraryService.MediaLibrarySession.Callback {}
+    private val listener = object : Player.Listener {
+
+        override fun onEvents(player: Player, events: Player.Events) {
+            super.onEvents(player, events)
+        }
+
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            super.onPlaybackStateChanged(playbackState)
+            if(playbackState == STATE_ENDED){
+                playerHolder.getPlayer().seekToPreviousMediaItem()
+                playerHolder.getPlayer().prepare()
+                playerHolder.play()
+            }
+        }
+
+    }
 
     /**
      * Sets up the [MediaSession].
      *
      * @param service The [MediaLibraryService] to host the
      *                [MediaLibraryService.MediaLibrarySession].
-     * @param callback The callback for the [MediaLibraryService.MediaLibrarySession].
      */
     fun setUpMediaSession(
-        service: MediaLibraryService,
-        callback: MediaLibraryService.MediaLibrarySession.Callback
+        service: MediaLibraryService
     ) {
         mediaSession = MediaLibraryService.MediaLibrarySession.Builder(
             service,
             playerHolder.getPlayer(),
             callback
         ).build()
+        playerHolder.getPlayer().addListener(listener)
     }
 
     /**

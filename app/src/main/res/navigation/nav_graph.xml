@@ -18,5 +18,14 @@
         <action
             android:id="@+id/action_fragmentTitle_to_fragmentMusicList"
             app:destination="@id/fragmentMusicList" />
+        <action
+            android:id="@+id/action_fragmentTitle_to_fragmentSettings"
+            app:destination="@id/fragmentSettings" />
     </fragment>
+    <fragment
+        android:id="@+id/fragmentSettings"
+        android:name="io.fourth_finger.pinky_player.FragmentSettings"
+        android:label="FragmentSettings"
+        tools:layout="@layout/fragment_settings"/>
+
 </navigation>

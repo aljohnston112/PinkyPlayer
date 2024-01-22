@@ -16,3 +16,5 @@ rootProject.name = "PinkyPlayer"
 include ':app'
 include ':music_repository'
 include ':probability_map'
+include ':settings_repository'
+include ':file_util'

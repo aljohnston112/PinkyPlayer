@@ -21,6 +21,7 @@ import io.fourth_finger.pinky_player.databinding.FragmentTitleBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * A [Fragment] that displays a list of [MusicFile]s.
@@ -48,13 +49,11 @@ class FragmentMusicList : Fragment() {
                 if (job?.isActive == true) {
                     job?.cancel()
                 }
-                job = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                    val songs = getSongsWithText(newText)
-                    binding.recyclerView.post {
-                        (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
-                            songs
-                        )
-                    }
+                job = viewLifecycleOwner.lifecycleScope.launch {
+                    val songs = withContext(Dispatchers.IO) { getSongsWithText(newText) }
+                    (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
+                        songs
+                    )
                 }
                 return true
             }
@@ -105,13 +104,13 @@ class FragmentMusicList : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpRecyclerView(view)
+        setUpRecyclerView()
     }
 
     /**
      * Sets up the RecyclerView.
      */
-    private fun setUpRecyclerView(view: View) {
+    private fun setUpRecyclerView() {
         val application = requireActivity().application as ApplicationMain
 
         // Sets up the adapter
