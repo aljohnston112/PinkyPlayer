@@ -48,7 +48,7 @@ class FragmentMusicList : Fragment() {
                 if (job?.isActive == true) {
                     job?.cancel()
                 }
-                job = lifecycleScope.launch(Dispatchers.IO) {
+                job = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                     val songs = getSongsWithText(newText)
                     binding.recyclerView.post {
                         (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
