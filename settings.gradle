@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 rootProject.name = "PinkyPlayer"
 include ':app'
 include ':music_repository'
+include ':probability_map'
