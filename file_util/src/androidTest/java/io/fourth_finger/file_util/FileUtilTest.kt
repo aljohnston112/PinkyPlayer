@@ -16,9 +16,23 @@ class FileUtilTest {
         val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
         val testData = TestData("Test data", 123)
         val saveFileVerificationNumber = 136034L
-        FileUtil.save(testData, context, "testFile", saveFileVerificationNumber)
-        val loadedData = FileUtil.load<TestData>(context, "testFile", saveFileVerificationNumber)
+        val fileName = "testFile"
+        FileUtil.save(testData, context, fileName, saveFileVerificationNumber)
+        val loadedData = FileUtil.load<TestData>(context, fileName, saveFileVerificationNumber)
         assertEquals(testData, loadedData)
+    }
+
+    @Test
+    fun saveTwiceFollowedByLoadObject_withSameVerificationNumber_loadsCorrectData() {
+        val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
+        val testData = TestData("Test data", 123)
+        val testData2 = TestData("Test data2", 1232)
+        val fileName = "testFile"
+        val saveFileVerificationNumber = 136034L
+        FileUtil.save(testData, context, fileName, saveFileVerificationNumber)
+        FileUtil.save(testData2, context, fileName, saveFileVerificationNumber)
+        val loadedData = FileUtil.load<TestData>(context, fileName, saveFileVerificationNumber)
+        assertEquals(testData2, loadedData)
     }
 
     @Test
