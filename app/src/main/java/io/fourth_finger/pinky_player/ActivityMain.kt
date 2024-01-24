@@ -20,6 +20,7 @@ import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
+import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.session.MediaBrowser
 import io.fourth_finger.pinky_player.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
@@ -43,13 +44,18 @@ class ActivityMain : AppCompatActivity() {
      */
     private val listener = object : Player.Listener {
 
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            super.onPlaybackStateChanged(playbackState)
+            if (playbackState == STATE_ENDED) {
+                binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                binding.controls.visibility = View.VISIBLE
+            }
+        }
+
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
             if (isPlaying) {
                 binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
-                binding.controls.visibility = View.VISIBLE
-            } else {
-                binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
                 binding.controls.visibility = View.VISIBLE
             }
         }
@@ -74,6 +80,13 @@ class ActivityMain : AppCompatActivity() {
     private fun setUpOnClickListener() {
         binding.buttonPlayPause.setOnClickListener {
             viewModel.onPlayPauseClicked(mediaBrowser)
+            if(mediaBrowser.isPlaying){
+                binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
+                binding.controls.visibility = View.VISIBLE
+            } else {
+                binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                binding.controls.visibility = View.VISIBLE
+            }
         }
     }
 

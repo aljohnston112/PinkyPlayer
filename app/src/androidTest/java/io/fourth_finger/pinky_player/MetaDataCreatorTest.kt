@@ -10,7 +10,7 @@ import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 
-class MetaDataHelperTest {
+class MetaDataCreatorTest {
 
     @get:Rule
     val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
@@ -21,12 +21,12 @@ class MetaDataHelperTest {
     fun updateMetaData_updatesMetaData() = runTest {
         val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
         val musicRepository = application.musicRepository
-        val music = musicRepository.loadMusicFiles(application.contentResolver)!!
-        val metaDataHelper = MetaDataHelper(musicRepository)
+        val music = musicRepository.loadMusicFiles(application.contentResolver)
+        val metaDataCreator = MetaDataCreator(musicRepository)
 
         for(testMusic in music) {
 
-            val metadata = metaDataHelper.getMetaData(application, testMusic.id)
+            val metadata = metaDataCreator.getMetaData(application, testMusic.id)
 
             val resources = application.resources
             val resourceId = R.drawable.ic_baseline_music_note_24

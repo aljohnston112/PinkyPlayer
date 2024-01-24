@@ -69,6 +69,7 @@ android {
 dependencies {
 
     implementation project(':music_repository')
+    implementation project(':probability_map')
 
     implementation "androidx.activity:activity-ktx:1.8.2"
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -82,7 +83,6 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:2.7.6"
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2'
-    implementation 'androidx.preference:preference:1.2.0'
 
     debugImplementation "androidx.fragment:fragment-testing:1.6.2"
     debugImplementation "androidx.test:monitor:1.6.1"

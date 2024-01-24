@@ -22,15 +22,18 @@ class MusicRepository {
      *         null if there was a problem loading the [MusicFile]s.
      */
     suspend fun loadMusicFiles(
-        contentResolver: ContentResolver
-    ): List<MusicFile>? {
-            val latestMusic = withContext(Dispatchers.IO) {
-                musicDataSource.getMusicFromMediaStore(contentResolver)
+        contentResolver: ContentResolver,
+        refresh: Boolean = false
+    ): List<MusicFile> {
+            if (!musicCache.hasData() || refresh) {
+                val latestMusic = withContext(Dispatchers.IO) {
+                    musicDataSource.getMusicFromMediaStore(contentResolver)
+                }
+                if (latestMusic != null) {
+                    musicCache.updateData(latestMusic)
+                }
             }
-            if (latestMusic != null) {
-                musicCache.updateData(latestMusic)
-            }
-        return musicCache.getData()
+        return musicCache.getData()!!
     }
 
     /**

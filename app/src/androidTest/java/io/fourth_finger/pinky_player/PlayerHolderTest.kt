@@ -33,8 +33,8 @@ class PlayerHolderTest {
         val countDownLatchOnCompletion = CountDownLatch(1)
         val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
         val musicRepository = application.musicRepository
-        val music = musicRepository.loadMusicFiles(application.contentResolver)!!
-        val playerHolder = PlayerHolder(application, musicRepository)
+        val music = musicRepository.loadMusicFiles(application.contentResolver)
+        val playerHolder = PlayerHolder(application, application.mediaItemCreator)
 
         playerHolder.getPlayer().addListener(
             object : Player.Listener {
@@ -63,8 +63,8 @@ class PlayerHolderTest {
         val countDownLatchOnPrepared = CountDownLatch(1)
         val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
         val musicRepository = application.musicRepository
-        val music = musicRepository.loadMusicFiles(application.contentResolver)!!
-        val playerHolder = PlayerHolder(application, musicRepository)
+        val music = musicRepository.loadMusicFiles(application.contentResolver)
+        val playerHolder = PlayerHolder(application, application.mediaItemCreator)
 
         playerHolder.getPlayer().addListener(
             object : Player.Listener {
@@ -100,8 +100,8 @@ class PlayerHolderTest {
     fun pause_validSong_pausesMediaPlayer() = runTest(timeout = Duration.parse("60s")) {
         val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
         val musicRepository = application.musicRepository
-        val music = musicRepository.loadMusicFiles(application.contentResolver)!!
-        val playerHolder = PlayerHolder(application, musicRepository)
+        val music = musicRepository.loadMusicFiles(application.contentResolver)
+        val playerHolder = PlayerHolder(application, application.mediaItemCreator)
         val countDownLatchPlay = CountDownLatch(1)
         val countDownLatchPause = CountDownLatch(1)
 

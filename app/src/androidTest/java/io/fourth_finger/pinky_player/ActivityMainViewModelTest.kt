@@ -39,9 +39,12 @@ class ActivityMainViewModelTest {
         val intent = Intent(application, ActivityMain::class.java)
         intent.flags = intent.flags or FLAG_ACTIVITY_NEW_TASK
         application.startActivity(intent)
-        val viewModel = ActivityMainViewModel(application.musicRepository)
+        val viewModel = ActivityMainViewModel(
+            application.musicRepository,
+            application.mediaItemCreator
+        )
 
-        onView(isRoot()).check { rootView, noView ->
+        onView(isRoot()).check { rootView, _ ->
             val view = View(application.applicationContext)
             (rootView as ViewGroup).addView(view)
             viewModel.displayPermissionNeeded(view)
@@ -54,10 +57,12 @@ class ActivityMainViewModelTest {
     @Test
     fun permissionGranted_MusicLoaded() = runTest {
         val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
-        val viewModel = ActivityMainViewModel(application.musicRepository)
-
+        val viewModel = ActivityMainViewModel(
+            application.musicRepository,
+            application.mediaItemCreator
+        )
         val repository = MusicRepository()
-        val music = repository.loadMusicFiles(application.contentResolver)!!
+        val music = repository.loadMusicFiles(application.contentResolver)
         assert(music.isNotEmpty())
 
         viewModel.loadMusic(application.contentResolver).join()
@@ -73,7 +78,10 @@ class ActivityMainViewModelTest {
     @Test
     fun onPlayPauseClicked_whenMediaControllerIsPlaying_pausesMediaPlayer() = runTest {
         val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
-        val viewModel = ActivityMainViewModel(application.musicRepository)
+        val viewModel = ActivityMainViewModel(
+            application.musicRepository,
+            application.mediaItemCreator
+        )
         val browser = application.getMediaBrowser()
 
         val countDownLatchPlay = CountDownLatch(1)
@@ -93,7 +101,7 @@ class ActivityMainViewModelTest {
             }
         )
 
-        val music = application.musicRepository.loadMusicFiles(application.contentResolver)!!
+        val music = application.musicRepository.loadMusicFiles(application.contentResolver)
         UiThreadStatement.runOnUiThread {
             viewModel.songClicked(application, music[0].id, browser)
         }
@@ -108,8 +116,10 @@ class ActivityMainViewModelTest {
     @Test
     fun onPlayPauseClicked_whenMediaControllerIsPaused_playsMediaPlayer() = runTest {
         val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
-        val viewModel = ActivityMainViewModel(application.musicRepository)
-
+        val viewModel = ActivityMainViewModel(
+            application.musicRepository,
+            application.mediaItemCreator
+        )
         val browser = application.getMediaBrowser()
         val countDownLatchPlay = CountDownLatch(1)
         val countDownLatchPause = CountDownLatch(1)
@@ -133,7 +143,7 @@ class ActivityMainViewModelTest {
             }
         )
 
-        val music = application.musicRepository.loadMusicFiles(application.contentResolver)!!
+        val music = application.musicRepository.loadMusicFiles(application.contentResolver)
         UiThreadStatement.runOnUiThread {
             viewModel.songClicked(application, music[0].id, browser)
         }
@@ -153,8 +163,11 @@ class ActivityMainViewModelTest {
     @Test
     fun songClicked_triggersPlayOfClickedSong() = runTest {
         val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
-        val viewModel = ActivityMainViewModel(application.musicRepository)
-        val music = application.musicRepository.loadMusicFiles(application.contentResolver)!!
+        val viewModel = ActivityMainViewModel(
+            application.musicRepository,
+            application.mediaItemCreator
+        )
+        val music = application.musicRepository.loadMusicFiles(application.contentResolver)
         val id = music[0].id
 
         val browser = application.getMediaBrowser()

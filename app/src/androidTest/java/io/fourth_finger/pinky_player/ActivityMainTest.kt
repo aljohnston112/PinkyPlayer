@@ -50,7 +50,7 @@ class ActivityMainTest {
             .buildAsync()
             .await()
 
-        val music = application.musicRepository.loadMusicFiles(application.contentResolver)!!
+        val music = application.musicRepository.loadMusicFiles(application.contentResolver)
         val mediaItem = MediaItem.Builder()
             .setUri(application.musicRepository.getUri(music[0].id))
             .build()
@@ -109,7 +109,7 @@ class ActivityMainTest {
             .buildAsync()
             .await()
 
-        val music = application.musicRepository.loadMusicFiles(application.contentResolver)!!
+        val music = application.musicRepository.loadMusicFiles(application.contentResolver)
         val mediaItem = MediaItem.Builder()
             .setUri(application.musicRepository.getUri(music[0].id))
             .build()

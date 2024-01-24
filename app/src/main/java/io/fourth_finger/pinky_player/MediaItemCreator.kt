@@ -1,0 +1,29 @@
+package io.fourth_finger.pinky_player
+
+import android.content.Context
+import android.provider.MediaStore
+import androidx.media3.common.MediaItem
+import io.fourth_finger.music_repository.MusicRepository
+
+class MediaItemCreator(
+    private val musicRepository: MusicRepository,
+    private val metaDataCreator: MetaDataCreator
+) {
+
+    /**
+     * Creates and returns a [MediaItem] for the music with the given id.
+     * Metadata is included in the [MediaItem].
+     *
+     * @param context
+     * @param id The music file's [MediaStore.Audio.Media] id.
+     * @return The constructed [MediaItem].
+     */
+    fun getMediaItem(context: Context, id: Long): MediaItem {
+        return MediaItem.Builder()
+            .setMediaId(id.toString())
+            .setUri(musicRepository.getUri(id))
+            .setMediaMetadata(metaDataCreator.getMetaData(context, id))
+            .build()
+    }
+
+}

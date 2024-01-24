@@ -1,6 +1,5 @@
 package io.fourth_finger.pinky_player
 
-import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import androidx.media3.common.MediaMetadata
@@ -11,7 +10,7 @@ import io.fourth_finger.music_repository.MusicRepository
  *
  * @param musicRepository
  */
-class MetaDataHelper(private val musicRepository: MusicRepository) {
+class MetaDataCreator(private val musicRepository: MusicRepository) {
 
     private val metaDataBuilder = MediaMetadata.Builder()
 

@@ -16,9 +16,18 @@ class ServiceMediaLibrary : MediaLibraryService() {
         // Create the MediaLibrarySession
         mediaSessionHelper = MediaSessionHelper(
             this,
+            (application as ApplicationMain).mediaItemCreator
+        )
+        mediaSessionHelper.setUpMediaSession(
+            this,
             (application as ApplicationMain).musicRepository
         )
-        mediaSessionHelper.setUpMediaSession(this)
+
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+
+        return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? {

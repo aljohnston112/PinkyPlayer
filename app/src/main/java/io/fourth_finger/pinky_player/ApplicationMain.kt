@@ -18,7 +18,10 @@ import kotlinx.coroutines.launch
 class ApplicationMain : Application() {
 
     val musicRepository = MusicRepository()
-
+    val mediaItemCreator = MediaItemCreator(
+        musicRepository,
+        MetaDataCreator(musicRepository)
+    )
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var browserJob: Job? = null
     private var browser: MediaBrowser? = null

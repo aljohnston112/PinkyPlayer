@@ -23,9 +23,11 @@ import kotlinx.coroutines.launch
  * The [ViewModel] for [ActivityMain].
  *
  * @param musicRepository
+ * @param mediaItemCreator For creating [MediaItem]s.
  */
 class ActivityMainViewModel(
-    private val musicRepository: MusicRepository
+    private val musicRepository: MusicRepository,
+    private val mediaItemCreator: MediaItemCreator
 ) : ViewModel() {
 
     private val _musicFiles = MutableLiveData<List<MusicFile>>()
@@ -33,8 +35,6 @@ class ActivityMainViewModel(
 
     private val _havePermission = MutableLiveData(false)
     val havePermission: LiveData<Boolean> = _havePermission
-
-    private val metaDataHelper = MetaDataHelper(musicRepository)
 
     /**
      * Lets the user know that permission is needed to access the music files.
@@ -58,10 +58,7 @@ class ActivityMainViewModel(
         contentResolver: ContentResolver,
     ): Job {
         _havePermission.postValue(true)
-        return viewModelScope.launch(Dispatchers.IO) {
-            musicRepository.loadMusicFiles(contentResolver)
-            loadMusicFiles()
-        }
+        return loadMusicFiles(contentResolver)
     }
 
     /**
@@ -70,9 +67,9 @@ class ActivityMainViewModel(
      *
      * @return The job that loads the music files.
      */
-    private fun loadMusicFiles(): Job {
+    private fun loadMusicFiles(contentResolver: ContentResolver): Job {
         return viewModelScope.launch(Dispatchers.IO) {
-            _musicFiles.postValue(musicRepository.getCachedMusicFiles() ?: listOf())
+            _musicFiles.postValue(musicRepository.loadMusicFiles(contentResolver))
         }
     }
 
@@ -87,12 +84,9 @@ class ActivityMainViewModel(
         id: Long,
         controller: MediaController
     ) {
-        val mediaItem = MediaItem.Builder()
-            .setUri(musicRepository.getUri(id))
-            .setMediaId(id.toString())
-            .setMediaMetadata(metaDataHelper.getMetaData(context, id))
-            .build()
-        controller.setMediaItem(mediaItem)
+        controller.setMediaItem(
+            mediaItemCreator.getMediaItem(context, id)
+        )
         controller.play()
     }
 
@@ -121,9 +115,10 @@ class ActivityMainViewModel(
                 modelClass: Class<T>,
                 extras: CreationExtras
             ): T {
-                val application = checkNotNull(extras[APPLICATION_KEY])
+                val application = checkNotNull(extras[APPLICATION_KEY]) as ApplicationMain
                 return ActivityMainViewModel(
-                    (application as ApplicationMain).musicRepository
+                    application.musicRepository,
+                    application.mediaItemCreator
                 ) as T
             }
 

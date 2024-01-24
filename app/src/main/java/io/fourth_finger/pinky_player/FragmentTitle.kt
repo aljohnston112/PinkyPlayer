@@ -33,7 +33,7 @@ class FragmentTitle : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Set up navigation button
+        // Set up navigation buttons
         viewModel.havePermission.observe(viewLifecycleOwner) {
             // Must guarantee permissions are granted before launching [FragmentMusicList]
             if (it) {
@@ -47,6 +47,11 @@ class FragmentTitle : Fragment() {
                     viewModel.displayPermissionNeeded(binding.root)
                 }
             }
+        }
+        binding.buttonSettings.setOnClickListener {
+            findNavController().navigate(
+                FragmentTitleDirections.actionFragmentTitleToFragmentSettings()
+            )
         }
     }
 

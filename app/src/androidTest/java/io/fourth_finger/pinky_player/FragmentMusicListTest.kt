@@ -56,7 +56,7 @@ class FragmentMusicListTest {
     @Test
     fun onViewCreated_loadsAllMusicIntoRecyclerView() = runTest {
         val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
-        val music = application.musicRepository.loadMusicFiles(application.contentResolver)!!
+        val music = application.musicRepository.loadMusicFiles(application.contentResolver)
 
         launchFragmentInContainer<FragmentMusicList>()
         onView(withId(R.id.recycler_view))
