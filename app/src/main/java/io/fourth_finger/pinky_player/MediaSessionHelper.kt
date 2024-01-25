@@ -14,17 +14,38 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * A wrapper for a [MediaSession].
  */
 class MediaSessionHelper(
     context: Context,
-    mediaItemCreator: MediaItemCreator
+    mediaItemCreator: MediaItemCreator,
+    private val musicRepository: MusicRepository
 ) {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private lateinit var playlistJob: Job
+    private val musicObserver: (List<MusicFile>?) -> Unit = { music ->
+        music?.let {
+            scope.launch {
+                if (!::playlist.isInitialized) {
+                    playlist = ProbabilityMap(music)
+                } else {
+                    for (song in music) {
+                        if(!playlist.contains(song)) {
+                            playlist.addElement(song)
+                        }
+                    }
 
+                    for (song in playlist.getElements()){
+                        if(playlist.contains(song))
+                            playlist.removeElement(song)
+                    }
+                }
+            }
+        }
+    }
 
     private val playerHolder = PlayerHolder(context, mediaItemCreator)
     private var mediaSession: MediaLibraryService.MediaLibrarySession? = null
@@ -64,8 +85,7 @@ class MediaSessionHelper(
      *                [MediaLibraryService.MediaLibrarySession].
      */
     fun setUpMediaSession(
-        service: MediaLibraryService,
-        musicRepository: MusicRepository
+        service: MediaLibraryService
     ) {
         mediaSession = MediaLibraryService.MediaLibrarySession.Builder(
             service,
@@ -73,9 +93,11 @@ class MediaSessionHelper(
             callback
         ).build()
         playerHolder.getPlayer().addListener(listener)
-        if(!::playlistJob.isInitialized) {
+        if (!::playlistJob.isInitialized) {
             playlistJob = scope.launch {
-                playlist = ProbabilityMap(musicRepository.loadMusicFiles(service.contentResolver))
+                withContext(Dispatchers.Main) {
+                    musicRepository.musicFiles.observeForever(musicObserver)
+                }
             }
         }
     }
@@ -92,6 +114,7 @@ class MediaSessionHelper(
      * Releases the wrapped [MediaSession].
      */
     fun destroy() {
+        musicRepository.musicFiles.removeObserver(musicObserver)
         playerHolder.release()
         mediaSession?.release()
         mediaSession = null

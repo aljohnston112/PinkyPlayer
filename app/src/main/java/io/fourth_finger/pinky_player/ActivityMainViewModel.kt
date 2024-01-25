@@ -30,8 +30,7 @@ class ActivityMainViewModel(
     private val mediaItemCreator: MediaItemCreator
 ) : ViewModel() {
 
-    private val _musicFiles = MutableLiveData<List<MusicFile>>()
-    val musicFiles: LiveData<List<MusicFile>> = _musicFiles
+    val musicFiles: LiveData<List<MusicFile>> = musicRepository.musicFiles
 
     private val _havePermission = MutableLiveData(false)
     val havePermission: LiveData<Boolean> = _havePermission
@@ -69,7 +68,7 @@ class ActivityMainViewModel(
      */
     private fun loadMusicFiles(contentResolver: ContentResolver): Job {
         return viewModelScope.launch(Dispatchers.IO) {
-            _musicFiles.postValue(musicRepository.loadMusicFiles(contentResolver))
+            musicRepository.loadMusicFiles(contentResolver)
         }
     }
 

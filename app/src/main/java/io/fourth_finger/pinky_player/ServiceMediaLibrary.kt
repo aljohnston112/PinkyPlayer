@@ -16,11 +16,11 @@ class ServiceMediaLibrary : MediaLibraryService() {
         // Create the MediaLibrarySession
         mediaSessionHelper = MediaSessionHelper(
             this,
-            (application as ApplicationMain).mediaItemCreator
+            (application as ApplicationMain).mediaItemCreator,
+            (application as ApplicationMain).musicRepository
         )
         mediaSessionHelper.setUpMediaSession(
-            this,
-            (application as ApplicationMain).musicRepository
+            this
         )
 
     }

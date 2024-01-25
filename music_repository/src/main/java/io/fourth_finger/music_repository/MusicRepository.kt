@@ -3,6 +3,8 @@ package io.fourth_finger.music_repository
 import android.content.ContentResolver
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -13,6 +15,9 @@ class MusicRepository {
 
     private val musicDataSource = MusicDataSource()
     private val musicCache = ThreadSafeMemoryCache<List<MusicFile>>()
+
+    private val _musicFiles = MutableLiveData<List<MusicFile>>(null)
+    val musicFiles: LiveData<List<MusicFile>> = _musicFiles
 
     /**
      * Loads [MusicFile]s representing music files that are on the device.
@@ -33,7 +38,9 @@ class MusicRepository {
                     musicCache.updateData(latestMusic)
                 }
             }
-        return musicCache.getData()!!
+        val music  = musicCache.getData()!!
+        _musicFiles.postValue(music)
+        return music
     }
 
     /**

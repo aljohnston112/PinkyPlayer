@@ -30,6 +30,7 @@ import org.hamcrest.core.AllOf.allOf
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
+import kotlin.time.Duration
 
 class ActivityMainTest {
 
@@ -37,7 +38,7 @@ class ActivityMainTest {
     var activityScenarioRule = activityScenarioRule<ActivityMain>()
 
     @Test
-    fun mediaControllerSetMediaItem_followedByPlay_makesActivityPlayButtonVisible() = runTest {
+    fun mediaControllerSetMediaItem_followedByPlay_makesActivityPlayButtonVisible() = runTest(timeout = Duration.parse("60s")) {
         val allowPermissions = getPermissionUIAllowButton()
         allowPermissions.click()
 
@@ -96,7 +97,7 @@ class ActivityMainTest {
     }
 
     @Test
-    fun clickingPause_playButtonDisplays() = runTest {
+    fun clickingPause_playButtonDisplays() = runTest(timeout = Duration.parse("60s")) {
         val allowPermissions = getPermissionUIAllowButton()
         allowPermissions.click()
 

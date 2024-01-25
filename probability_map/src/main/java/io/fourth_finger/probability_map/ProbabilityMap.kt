@@ -108,4 +108,12 @@ class ProbabilityMap<T>(elements: List<T>) {
         totalSum = totalSum.subtract(removedProbability)
     }
 
+    fun contains(t: T): Boolean {
+        return elementProbabilities.containsKey(t)
+    }
+
+    fun getElements(): Set<T> {
+        return elementProbabilities.keys
+    }
+
 }
