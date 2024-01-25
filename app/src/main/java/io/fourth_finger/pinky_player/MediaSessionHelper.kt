@@ -31,6 +31,7 @@ class MediaSessionHelper(
             scope.launch {
                 if (!::playlist.isInitialized) {
                     playlist = ProbabilityMap(music)
+                    playerHolder.setPlaylist(playlist)
                 } else {
                     for (song in music) {
                         if(!playlist.contains(song)) {
@@ -38,9 +39,10 @@ class MediaSessionHelper(
                         }
                     }
 
-                    for (song in playlist.getElements()){
-                        if(playlist.contains(song))
+                    for (song in playlist.getElements().toList()){
+                        if(!music.contains(song)) {
                             playlist.removeElement(song)
+                        }
                     }
                 }
             }
@@ -52,10 +54,6 @@ class MediaSessionHelper(
     private lateinit var playlist: ProbabilityMap<MusicFile>
     private val callback = object : MediaLibraryService.MediaLibrarySession.Callback {}
     private val listener = object : Player.Listener {
-
-        override fun onEvents(player: Player, events: Player.Events) {
-            super.onEvents(player, events)
-        }
 
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)

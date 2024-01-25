@@ -7,6 +7,8 @@ import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
+import io.fourth_finger.music_repository.MusicFile
+import io.fourth_finger.probability_map.ProbabilityMap
 
 /**
  * Wrapper for a [Player].
@@ -23,7 +25,7 @@ class PlayerHolder(
     private val player: PinkyPlayer
 
     init {
-        player = PinkyPlayer(context)
+        player = PinkyPlayer(context, mediaItemCreator)
     }
 
     /**
@@ -45,7 +47,7 @@ class PlayerHolder(
         id: Long,
     ) {
         val mediaItem = mediaItemCreator.getMediaItem(context, id)
-        player.wrappedPlayer.setMediaItem(mediaItem)
+        player.setMediaItem(mediaItem)
         player.prepare()
         player.play()
     }
@@ -81,6 +83,10 @@ class PlayerHolder(
     fun release() {
         // TODO how is this tested?
         player.release()
+    }
+
+    fun setPlaylist(playlist: ProbabilityMap<MusicFile>) {
+        player.setPlaylist(playlist)
     }
 
 }

@@ -88,6 +88,9 @@ class ActivityMain : AppCompatActivity() {
                 binding.controls.visibility = View.VISIBLE
             }
         }
+        binding.buttonNext.setOnClickListener {
+            mediaBrowser.seekToNextMediaItem()
+        }
     }
 
     /**
