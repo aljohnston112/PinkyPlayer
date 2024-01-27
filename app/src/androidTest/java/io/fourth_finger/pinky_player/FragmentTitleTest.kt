@@ -1,10 +1,8 @@
 package io.fourth_finger.pinky_player
 
 import android.Manifest
-import android.app.Application
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.navigation.Navigation
@@ -15,36 +13,49 @@ import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.rule.GrantPermissionRule
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
+import io.fourth_finger.pinky_player.hilt.launchFragmentInHiltContainer
 import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
 
+@HiltAndroidTest
 class FragmentTitleTestWithPermission {
+
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
 
     @get:Rule
     val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         Manifest.permission.READ_EXTERNAL_STORAGE
     )
 
+    @Before
+    fun init() {
+        hiltRule.inject()
+    }
+
     @Test
     fun clickingSongsButton_whenPermissionGranted_navigates() = runTest {
         val navController = TestNavHostController(
-            ApplicationProvider.getApplicationContext()
+            ApplicationProvider.getApplicationContext<HiltTestApplication>()
         )
 
         val countDownLatch = CountDownLatch(1)
-        val titleScenario = launchFragmentInContainer<FragmentTitle>()
         var viewModel: ActivityMainViewModel? = null
-        titleScenario.onFragment { fragment ->
+        launchFragmentInHiltContainer<FragmentTitle> {
             navController.setGraph(R.navigation.nav_graph)
-            Navigation.setViewNavController(fragment.requireView(), navController)
+            Navigation.setViewNavController(requireView(), navController)
 
             viewModel = ViewModelProvider(
-                fragment.requireActivity().viewModelStore,
-                ActivityMainViewModel.Factory,
+                requireActivity().viewModelStore,
+                ViewModelProvider.AndroidViewModelFactory(),
                 CreationExtras.Empty
             )[ActivityMainViewModel::class.java]
 
@@ -54,7 +65,7 @@ class FragmentTitleTestWithPermission {
         countDownLatch.await()
 
         viewModel!!.loadMusic(
-            ApplicationProvider.getApplicationContext<Application>().contentResolver
+            ApplicationProvider.getApplicationContext<HiltTestApplication>().contentResolver
         ).asCompletableFuture().await()
 
         onView(ViewMatchers.withId(R.id.button_songs)).perform(ViewActions.click())
@@ -63,26 +74,34 @@ class FragmentTitleTestWithPermission {
 
 }
 
+@HiltAndroidTest
 class FragmentTitleTestWithoutPermission {
+
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
+
+    @Before
+    fun init() {
+        hiltRule.inject()
+    }
 
     @Test
     fun clickingSongsButton_whenPermissionNotGranted_displaysToast() {
         val navController = TestNavHostController(
-            ApplicationProvider.getApplicationContext()
+            ApplicationProvider.getApplicationContext<HiltTestApplication>()
         )
 
         val countDownLatch = CountDownLatch(1)
-        val titleScenario = launchFragmentInContainer<FragmentTitle>(themeResId = R.style.AppTheme)
-        titleScenario.onFragment { fragment ->
+        launchFragmentInHiltContainer<FragmentTitle>(themeResId = R.style.AppTheme) {
             // Make sure permission has not been granted
             val permissionStatus = ContextCompat.checkSelfPermission(
-                fragment.requireContext(),
+                requireContext(),
                 Manifest.permission.READ_EXTERNAL_STORAGE
             )
             assert(permissionStatus == PackageManager.PERMISSION_DENIED)
 
             navController.setGraph(R.navigation.nav_graph)
-            Navigation.setViewNavController(fragment.requireView(), navController)
+            Navigation.setViewNavController(requireView(), navController)
             countDownLatch.countDown()
         }
 
@@ -96,14 +115,13 @@ class FragmentTitleTestWithoutPermission {
     @Test
     fun clickingSettingsButton_navigates() = runTest {
         val navController = TestNavHostController(
-            ApplicationProvider.getApplicationContext()
+            ApplicationProvider.getApplicationContext<HiltTestApplication>()
         )
 
         val countDownLatch = CountDownLatch(1)
-        val titleScenario = launchFragmentInContainer<FragmentTitle>()
-        titleScenario.onFragment { fragment ->
+        launchFragmentInHiltContainer<FragmentTitle>() {
             navController.setGraph(R.navigation.nav_graph)
-            Navigation.setViewNavController(fragment.requireView(), navController)
+            Navigation.setViewNavController(requireView(), navController)
             countDownLatch.countDown()
         }
 

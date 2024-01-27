@@ -22,22 +22,25 @@ import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.session.MediaBrowser
+import dagger.hilt.android.AndroidEntryPoint
 import io.fourth_finger.pinky_player.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * The main [Activity].
  */
+@AndroidEntryPoint
 class ActivityMain : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var mediaBrowser: MediaBrowser
+    @Inject
+    lateinit var mediaBrowserProvider: MediaBrowserProvider
 
-    private val viewModel: ActivityMainViewModel by viewModels(
-        factoryProducer = { ActivityMainViewModel.Factory }
-    )
+    private val viewModel: ActivityMainViewModel by viewModels()
 
     /**
      * Handles UI updates in response to player updates
@@ -79,17 +82,23 @@ class ActivityMain : AppCompatActivity() {
      */
     private fun setUpOnClickListener() {
         binding.buttonPlayPause.setOnClickListener {
-            viewModel.onPlayPauseClicked(mediaBrowser)
-            if(mediaBrowser.isPlaying){
-                binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
-                binding.controls.visibility = View.VISIBLE
-            } else {
-                binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
-                binding.controls.visibility = View.VISIBLE
+            lifecycleScope.launch(Dispatchers.Main) {
+                val mediaBrowser = withContext(Dispatchers.IO) { mediaBrowserProvider.get() }
+                viewModel.onPlayPauseClicked(mediaBrowser)
+                if (mediaBrowser.isPlaying) {
+                    binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
+                    binding.controls.visibility = View.VISIBLE
+                } else {
+                    binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                    binding.controls.visibility = View.VISIBLE
+                }
             }
         }
         binding.buttonNext.setOnClickListener {
-            mediaBrowser.seekToNextMediaItem()
+            lifecycleScope.launch(Dispatchers.Main) {
+                val mediaBrowser = withContext(Dispatchers.IO) { mediaBrowserProvider.get() }
+                mediaBrowser.seekToNextMediaItem()
+            }
         }
     }
 
@@ -171,7 +180,7 @@ class ActivityMain : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         lifecycleScope.launch(Dispatchers.IO) {
-            mediaBrowser = (application as ApplicationMain).getMediaBrowser()
+            val mediaBrowser = mediaBrowserProvider.get()
             mediaBrowser.addListener(listener)
         }
         setUpOnClickListener()
@@ -179,7 +188,10 @@ class ActivityMain : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        mediaBrowser.removeListener(listener)
+        lifecycleScope.launch(Dispatchers.Main) {
+            val mediaBrowser = withContext(Dispatchers.IO){ mediaBrowserProvider.get() }
+            mediaBrowser.removeListener(listener)
+        }
     }
 
     override fun onDestroy() {

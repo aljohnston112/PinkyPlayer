@@ -1,9 +1,12 @@
 package io.fourth_finger.pinky_player
 
 import android.content.Context
+import androidx.annotation.OptIn
 import androidx.media3.common.C
 import androidx.media3.common.Player
+import androidx.media3.common.Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM
 import androidx.media3.common.Player.STATE_ENDED
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import io.fourth_finger.music_repository.MusicFile
@@ -14,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * A wrapper for a [MediaSession].
@@ -28,7 +30,7 @@ class MediaSessionHelper(
     private lateinit var playlistJob: Job
     private val musicObserver: (List<MusicFile>?) -> Unit = { music ->
         music?.let {
-            scope.launch {
+            scope.launch(Dispatchers.IO) {
                 if (!::playlist.isInitialized) {
                     playlist = ProbabilityMap(music)
                     playerHolder.setPlaylist(playlist)
@@ -74,6 +76,16 @@ class MediaSessionHelper(
             }
         }
 
+        @OptIn(UnstableApi::class) override fun onAvailableCommandsChanged(availableCommands: Player.Commands) {
+            super.onAvailableCommandsChanged(
+                availableCommands
+                    .buildUpon()
+                    .add(COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
+                    .add(Player.COMMAND_SEEK_TO_NEXT)
+                    .build()
+            )
+        }
+
     }
 
     /**
@@ -92,10 +104,8 @@ class MediaSessionHelper(
         ).build()
         playerHolder.getPlayer().addListener(listener)
         if (!::playlistJob.isInitialized) {
-            playlistJob = scope.launch {
-                withContext(Dispatchers.Main) {
-                    musicRepository.musicFiles.observeForever(musicObserver)
-                }
+            playlistJob = scope.launch(Dispatchers.Main) {
+                musicRepository.musicFiles.observeForever(musicObserver)
             }
         }
     }

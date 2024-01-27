@@ -18,6 +18,9 @@ class ProbabilityMap<T>(elements: List<T>) {
     private val random = SecureRandom()
 
     init {
+        if(elements.isEmpty()){
+            throw IllegalArgumentException("There must be at least one element in the map")
+        }
         val n = 1L
         for (element in elements) {
             elementProbabilities[element] = BigInteger.valueOf(n)

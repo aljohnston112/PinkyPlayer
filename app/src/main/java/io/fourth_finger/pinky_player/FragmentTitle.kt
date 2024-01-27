@@ -7,20 +7,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import io.fourth_finger.pinky_player.databinding.FragmentTitleBinding
 
 
 /**
  * The title [Fragment] of the app.
  */
+@AndroidEntryPoint
 class FragmentTitle : Fragment() {
 
     private var _binding: FragmentTitleBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: ActivityMainViewModel by activityViewModels(
-        factoryProducer = { ActivityMainViewModel.Factory }
-    )
+    private val viewModel: ActivityMainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,

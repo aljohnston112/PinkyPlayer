@@ -25,24 +25,41 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObject
 import androidx.test.uiautomator.UiSelector
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
+import io.fourth_finger.music_repository.MusicRepository
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.core.AllOf.allOf
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
+import javax.inject.Inject
 import kotlin.time.Duration
 
+@HiltAndroidTest
 class ActivityMainTest {
 
     @get:Rule
+    var hiltRule = HiltAndroidRule(this)
+
+    @Inject lateinit var musicRepository: MusicRepository
+
+    @get:Rule
     var activityScenarioRule = activityScenarioRule<ActivityMain>()
+
+    @Before
+    fun init() {
+        hiltRule.inject()
+    }
 
     @Test
     fun mediaControllerSetMediaItem_followedByPlay_makesActivityPlayButtonVisible() = runTest(timeout = Duration.parse("60s")) {
         val allowPermissions = getPermissionUIAllowButton()
         allowPermissions.click()
 
-        val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
+        val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
         val sessionToken = SessionToken(
             application,
             ComponentName(application, ServiceMediaLibrary::class.java)
@@ -51,9 +68,9 @@ class ActivityMainTest {
             .buildAsync()
             .await()
 
-        val music = application.musicRepository.loadMusicFiles(application.contentResolver)
+        val music = musicRepository.loadMusicFiles(application.contentResolver)
         val mediaItem = MediaItem.Builder()
-            .setUri(application.musicRepository.getUri(music[0].id))
+            .setUri(musicRepository.getUri(music[0].id))
             .build()
 
         val countDownLatchPlay = CountDownLatch(1)
@@ -101,7 +118,7 @@ class ActivityMainTest {
         val allowPermissions = getPermissionUIAllowButton()
         allowPermissions.click()
 
-        val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
+        val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
         val sessionToken = SessionToken(
             application,
             ComponentName(application, ServiceMediaLibrary::class.java)
@@ -110,9 +127,9 @@ class ActivityMainTest {
             .buildAsync()
             .await()
 
-        val music = application.musicRepository.loadMusicFiles(application.contentResolver)
+        val music = musicRepository.loadMusicFiles(application.contentResolver)
         val mediaItem = MediaItem.Builder()
-            .setUri(application.musicRepository.getUri(music[0].id))
+            .setUri(musicRepository.getUri(music[0].id))
             .build()
 
         val countDownLatchPlay = CountDownLatch(1)

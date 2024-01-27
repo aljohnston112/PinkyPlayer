@@ -14,26 +14,28 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 import io.fourth_finger.music_repository.MusicFile
 import io.fourth_finger.pinky_player.databinding.FragmentMusicListBinding
-import io.fourth_finger.pinky_player.databinding.FragmentTitleBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * A [Fragment] that displays a list of [MusicFile]s.
  */
+@AndroidEntryPoint
 class FragmentMusicList : Fragment() {
+
+    @Inject
+    lateinit var mediaBrowserProvider: MediaBrowserProvider
 
     private var _binding: FragmentMusicListBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: ActivityMainViewModel by activityViewModels(
-        factoryProducer = { ActivityMainViewModel.Factory }
-    )
+    private val viewModel: ActivityMainViewModel by activityViewModels()
 
     private val menuProvider = object : MenuProvider {
 
@@ -49,7 +51,7 @@ class FragmentMusicList : Fragment() {
                 if (job?.isActive == true) {
                     job?.cancel()
                 }
-                job = viewLifecycleOwner.lifecycleScope.launch {
+                job = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
                     val songs = withContext(Dispatchers.IO) { getSongsWithText(newText) }
                     (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
                         songs
@@ -111,14 +113,13 @@ class FragmentMusicList : Fragment() {
      * Sets up the RecyclerView.
      */
     private fun setUpRecyclerView() {
-        val application = requireActivity().application as ApplicationMain
-
-        // Sets up the adapter
+        // Set up the adapter
         val adapter = MusicFileAdapter(emptyList()) {
             // Callback for when a song item is tapped
                 songID ->
-            lifecycleScope.launch {
-                viewModel.songClicked(requireContext(), songID, application.getMediaBrowser())
+            lifecycleScope.launch(Dispatchers.Main) {
+                val mediaBrowser = withContext(Dispatchers.IO) { mediaBrowserProvider.get() }
+                viewModel.songClicked(requireContext(), songID, mediaBrowser)
             }
         }
         binding.recyclerView.adapter = adapter
@@ -129,8 +130,10 @@ class FragmentMusicList : Fragment() {
 
         // Set up music list updates
         viewModel.musicFiles.observe(viewLifecycleOwner) { musicFiles ->
-            binding.recyclerView.post {
-                adapter.updateMusicList(musicFiles.toList())
+            musicFiles?.let {
+                binding.recyclerView.post {
+                    adapter.updateMusicList(musicFiles.toList())
+                }
             }
         }
         // [FragmentTitle] must guarantee permissions are granted before launching this Fragment

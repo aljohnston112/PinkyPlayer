@@ -4,11 +4,15 @@ import android.content.Context
 import android.provider.MediaStore
 import androidx.media3.common.MediaItem
 import io.fourth_finger.music_repository.MusicRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MediaItemCreator(
+@Singleton
+class MediaItemCreator @Inject constructor(
     private val musicRepository: MusicRepository,
-    private val metaDataCreator: MetaDataCreator
 ) {
+
+    private val metaDataCreator = MetaDataCreator(musicRepository)
 
     /**
      * Creates and returns a [MediaItem] for the music with the given id.

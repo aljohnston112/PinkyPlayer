@@ -6,29 +6,28 @@ import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import androidx.media3.common.MediaItem
 import androidx.media3.session.MediaController
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.fourth_finger.music_repository.MusicFile
 import io.fourth_finger.music_repository.MusicRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * The [ViewModel] for [ActivityMain].
  *
  * @param musicRepository
- * @param mediaItemCreator For creating [MediaItem]s.
+ * @param mediaItemCreator
  */
-class ActivityMainViewModel(
+@HiltViewModel
+class ActivityMainViewModel @Inject constructor(
     private val musicRepository: MusicRepository,
     private val mediaItemCreator: MediaItemCreator
-) : ViewModel() {
+): ViewModel() {
 
     val musicFiles: LiveData<List<MusicFile>> = musicRepository.musicFiles
 
@@ -75,6 +74,7 @@ class ActivityMainViewModel(
     /**
      * Starts playing a music file.
      *
+     * @param context
      * @param id The id of the [MusicFile] corresponding to the music file to play.
      * @param controller The [MediaController] connected to the [ServiceMediaLibrary].
      */
@@ -102,25 +102,6 @@ class ActivityMainViewModel(
             controller.pause()
         } else {
             controller.play()
-        }
-    }
-
-    companion object {
-
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(
-                modelClass: Class<T>,
-                extras: CreationExtras
-            ): T {
-                val application = checkNotNull(extras[APPLICATION_KEY]) as ApplicationMain
-                return ActivityMainViewModel(
-                    application.musicRepository,
-                    application.mediaItemCreator
-                ) as T
-            }
-
         }
     }
 

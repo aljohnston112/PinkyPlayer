@@ -7,11 +7,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * A repository for the music on an Android device.
  */
-class MusicRepository {
+@Singleton
+class MusicRepository @Inject constructor() {
 
     private val musicDataSource = MusicDataSource()
     private val musicCache = ThreadSafeMemoryCache<List<MusicFile>>()
@@ -30,15 +33,15 @@ class MusicRepository {
         contentResolver: ContentResolver,
         refresh: Boolean = false
     ): List<MusicFile> {
-            if (!musicCache.hasData() || refresh) {
-                val latestMusic = withContext(Dispatchers.IO) {
-                    musicDataSource.getMusicFromMediaStore(contentResolver)
-                }
-                if (latestMusic != null) {
-                    musicCache.updateData(latestMusic)
-                }
+        if (!musicCache.hasData() || refresh) {
+            val latestMusic = withContext(Dispatchers.IO) {
+                musicDataSource.getMusicFromMediaStore(contentResolver)
             }
-        val music  = musicCache.getData()!!
+            if (latestMusic != null) {
+                musicCache.updateData(latestMusic)
+            }
+        }
+        val music = musicCache.getData()!!
         _musicFiles.postValue(music)
         return music
     }

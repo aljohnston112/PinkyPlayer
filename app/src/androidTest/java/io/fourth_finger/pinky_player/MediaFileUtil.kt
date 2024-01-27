@@ -1,17 +1,17 @@
 package io.fourth_finger.pinky_player
 
 import android.media.MediaMetadataRetriever
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
-import io.fourth_finger.music_repository.MusicFile
+import io.fourth_finger.music_repository.MusicRepository
 
-class MediaPlayerUtil {
+class MediaFileUtil {
 
     companion object {
 
-        fun getMusicIdOfShortestSong(music: List<MusicFile>): Long {
-            val application = ApplicationProvider.getApplicationContext<ApplicationMain>()
-            val musicRepository = application.musicRepository
+        suspend fun getMusicIdOfShortestSong(
+            musicRepository: MusicRepository,
+        ): Long {
+            val music = musicRepository.getCachedMusicFiles()!!
             var shortestMusic = music[0].id
 
             val context = InstrumentationRegistry.getInstrumentation().targetContext

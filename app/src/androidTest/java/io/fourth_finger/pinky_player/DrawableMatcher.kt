@@ -2,9 +2,7 @@ package io.fourth_finger.pinky_player
 
 import android.graphics.drawable.Drawable
 import android.view.View
-import android.widget.ImageButton
 import android.widget.ImageView
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.graphics.drawable.toBitmap
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description

@@ -4,13 +4,16 @@ import android.content.Context
 import android.net.Uri
 import androidx.media3.common.MediaMetadata
 import io.fourth_finger.music_repository.MusicRepository
+import javax.inject.Inject
 
 /**
  * Wrapper for a [MediaMetadata.Builder].
  *
  * @param musicRepository
  */
-class MetaDataCreator(private val musicRepository: MusicRepository) {
+class MetaDataCreator @Inject constructor(
+    private val musicRepository: MusicRepository
+) {
 
     private val metaDataBuilder = MediaMetadata.Builder()
 
