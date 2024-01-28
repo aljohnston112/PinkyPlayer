@@ -3,12 +3,15 @@ package io.fourth_finger.pinky_player
 import android.content.Context
 import androidx.annotation.OptIn
 import androidx.media3.common.C
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.Player.COMMAND_PLAY_PAUSE
 import androidx.media3.common.Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
+import com.google.common.collect.ImmutableList
 import io.fourth_finger.music_repository.MusicFile
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.probability_map.ProbabilityMap
@@ -38,14 +41,14 @@ class MediaSessionHelper(
 
                     // Add new songs to the playlist
                     for (newSong in newMusic) {
-                        if(!playlist.contains(newSong)) {
+                        if (!playlist.contains(newSong)) {
                             playlist.addElement(newSong)
                         }
                     }
 
                     // Remove missing songs from the playlist
-                    for (oldSong in playlist.getElements().toList()){
-                        if(!newMusic.contains(oldSong)) {
+                    for (oldSong in playlist.getElements().toList()) {
+                        if (!newMusic.contains(oldSong)) {
                             playlist.removeElement(oldSong)
                         }
                     }
@@ -57,12 +60,29 @@ class MediaSessionHelper(
     private val playerHolder = PlayerHolder(context, mediaItemCreator)
     private var mediaSession: MediaLibraryService.MediaLibrarySession? = null
     private lateinit var playlist: ProbabilityMap<MusicFile>
-    private val callback = object : MediaLibraryService.MediaLibrarySession.Callback {}
+    private val callback = object : MediaLibraryService.MediaLibrarySession.Callback {
+
+        @OptIn(UnstableApi::class)
+        override fun onConnect(
+            session: MediaSession,
+            controller: MediaSession.ControllerInfo
+        ): MediaSession.ConnectionResult {
+            val playerCommands =
+                session.player.availableCommands.buildUpon()
+                    .add(COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
+                    .build()
+            return MediaSession.ConnectionResult.AcceptedResultBuilder(session)
+                .setAvailablePlayerCommands(playerCommands)
+                .build()
+        }
+
+    }
+
     private val listener = object : Player.Listener {
 
-        override fun onPlaybackStateChanged(playbackState: Int) {
-            super.onPlaybackStateChanged(playbackState)
-            if (playbackState == STATE_ENDED) {
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            super.onMediaItemTransition(mediaItem, reason)
+            if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
                 playlistJob.invokeOnCompletion {
                     val player = playerHolder.getPlayer()
                     player.addMediaItem(
@@ -71,20 +91,16 @@ class MediaSessionHelper(
                             playlist.sample().id
                         )
                     )
-                    player.seekTo(
-                        player.mediaItemCount - 1,
-                        C.TIME_UNSET
-                    )
                 }
             }
         }
 
-        @OptIn(UnstableApi::class) override fun onAvailableCommandsChanged(availableCommands: Player.Commands) {
+        @OptIn(UnstableApi::class)
+        override fun onAvailableCommandsChanged(availableCommands: Player.Commands) {
             super.onAvailableCommandsChanged(
                 availableCommands
                     .buildUpon()
                     .add(COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
-                    .add(Player.COMMAND_SEEK_TO_NEXT)
                     .build()
             )
         }

@@ -56,51 +56,111 @@ class PlayMusicUseCase {
     }
 
     @Test
-    fun userNavigatesToFragmentMusicList_tapsSong_andSongPlaysToCompletion() = runTest(
-        timeout = Duration.parse("60s")
-    ) {
+    fun userNavigatesToFragmentMusicList_tapsSong_andSongPlaysToCompletionAndPlaysNextSong() =
+        runTest(
+            timeout = Duration.parse("60s")
+        ) {
 
-        // Go to music list fragment
-        onView(withId(R.id.button_songs))
-            .perform(click())
+            // Go to music list fragment
+            onView(withId(R.id.button_songs))
+                .perform(click())
 
-        // Set up the media browser listener
-        val countDownLatchPlay = CountDownLatch(1)
-        val countDownLatchPause = CountDownLatch(1)
-        val mediaBrowser = mediaBrowserProvider.await()
-        val shortestMusicId = MediaFileUtil.getMusicIdOfShortDurationSong(musicRepository)
-        mediaBrowser.addListener(
-            object : Player.Listener {
-                override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    super.onIsPlayingChanged(isPlaying)
-                    if (isPlaying) {
-                        countDownLatchPlay.countDown()
+            // Set up the media browser listener
+            val countDownLatchPlay = CountDownLatch(1)
+            val countDownLatchPlay2 = CountDownLatch(1)
+            val mediaBrowser = mediaBrowserProvider.await()
+            val shortestMusicId = MediaFileUtil.getMusicIdOfShortDurationSong(musicRepository)
+            mediaBrowser.addListener(
+                object : Player.Listener {
+
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        super.onIsPlayingChanged(isPlaying)
+                        if (isPlaying) {
+                            countDownLatchPlay.countDown()
+                        }
+                    }
+
+                    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                        super.onMediaItemTransition(mediaItem, reason)
+                        // This has a small chance of failing if the same song plays after
+                        if (mediaItem?.mediaId != shortestMusicId.toString() && countDownLatchPlay.count == 0L) {
+                            countDownLatchPlay2.countDown()
+                        }
                     }
                 }
-
-                override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                    super.onMediaItemTransition(mediaItem, reason)
-                    if (mediaItem?.mediaId != shortestMusicId.toString() && countDownLatchPlay.count == 0L) {
-                        countDownLatchPause.countDown()
-                    }
-                }
-            }
-        )
-
-        // Click the song and wait for it to load
-        val shortestMusic = musicRepository.getMusicFile(shortestMusicId)!!
-        onView(withId(R.id.recycler_view))
-            .perform(
-                RecyclerViewActions.actionOnItem<MusicFileAdapter.ViewHolder>(
-                    ViewMatchers.hasDescendant(
-                        ViewMatchers.withText(
-                            shortestMusic.fullPath
-                        )
-                    ),
-                    click()
-                )
             )
-        countDownLatchPause.await()
-    }
+
+            // Click the song and wait for it to load
+            val shortestMusic = musicRepository.getMusicFile(shortestMusicId)!!
+            onView(withId(R.id.recycler_view))
+                .perform(
+                    RecyclerViewActions.actionOnItem<MusicFileAdapter.ViewHolder>(
+                        ViewMatchers.hasDescendant(
+                            ViewMatchers.withText(
+                                shortestMusic.fullPath
+                            )
+                        ),
+                        click()
+                    )
+                )
+            countDownLatchPlay2.await()
+        }
+
+    @Test
+    fun userNavigatesToFragmentMusicList_tapsSong_tapsNext_playsNextSong() =
+        runTest(
+            timeout = Duration.parse("60s")
+        ) {
+
+            // Go to music list fragment
+            onView(withId(R.id.button_songs))
+                .perform(click())
+
+            // Set up the media browser listener
+            val countDownLatchPlay = CountDownLatch(1)
+            val countDownLatchPlay2 = CountDownLatch(1)
+            val mediaBrowser = mediaBrowserProvider.await()
+            val musicId = musicRepository.getCachedMusicFiles()!![0].id
+            mediaBrowser.addListener(
+                object : Player.Listener {
+
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        super.onIsPlayingChanged(isPlaying)
+                        if (isPlaying) {
+                            if (countDownLatchPlay.count == 1L) {
+                                countDownLatchPlay.countDown()
+                            }
+                        }
+                    }
+
+                    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                        super.onMediaItemTransition(mediaItem, reason)
+                        // This has a small chance of failing if the same song plays after
+                        if (mediaItem?.mediaId != musicId.toString() && countDownLatchPlay.count == 0L) {
+                            countDownLatchPlay2.countDown()
+                        }
+                    }
+                }
+            )
+
+            // Click the song and wait for it to load
+            val song = musicRepository.getMusicFile(musicId)!!
+            onView(withId(R.id.recycler_view))
+                .perform(
+                    RecyclerViewActions.actionOnItem<MusicFileAdapter.ViewHolder>(
+                        ViewMatchers.hasDescendant(
+                            ViewMatchers.withText(
+                                song.fullPath
+                            )
+                        ),
+                        click()
+                    )
+                )
+
+            countDownLatchPlay.await()
+            onView(withId(R.id.button_next))
+                .perform(click())
+            countDownLatchPlay2.await()
+        }
 
 }

@@ -34,7 +34,6 @@ class PinkyPlayer(
         return super.getAvailableCommands()
             .buildUpon()
             .add(COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
-            .add(COMMAND_SEEK_TO_NEXT)
             .build()
     }
 
@@ -43,19 +42,17 @@ class PinkyPlayer(
     }
 
     override fun setMediaItem(mediaItem: MediaItem) {
+
+    }
+
+    override fun setMediaItems(mediaItems: MutableList<MediaItem>, resetPosition: Boolean) {
         val next = mediaItemCreator.getMediaItem(
             context!!,
             _playlist.sample().id
         )
-        super.setMediaItems(listOf(mediaItem, next))
-    }
-
-    override fun setMediaItems(mediaItems: MutableList<MediaItem>, resetPosition: Boolean) {
-        super.setMediaItems(mediaItems, resetPosition)
-    }
-
-    override fun prepare() {
-        super.prepare()
+        val songs = mediaItems.toMutableList()
+        songs.add(next)
+        super.setMediaItems(songs, resetPosition)
     }
 
     override fun seekToNextMediaItem() {
