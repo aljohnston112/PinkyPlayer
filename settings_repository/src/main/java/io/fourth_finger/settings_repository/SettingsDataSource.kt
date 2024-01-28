@@ -19,7 +19,7 @@ internal class SettingsDataSource {
         FileUtil.save(
             settings,
             context,
-            FILE_NAME_SETTINGS,
+            SETTINGS_FILE_NAME,
             SAVE_FILE_VERIFICATION_NUMBER
         )
     }
@@ -33,13 +33,14 @@ internal class SettingsDataSource {
     fun loadSettings(context: Context): Settings? {
         return FileUtil.load(
             context,
-            FILE_NAME_SETTINGS,
+            SETTINGS_FILE_NAME,
             SAVE_FILE_VERIFICATION_NUMBER
         )
     }
 
     companion object {
-        private const val FILE_NAME_SETTINGS = "SETTINGS"
+
+        private const val SETTINGS_FILE_NAME = "SETTINGS"
         private const val SAVE_FILE_VERIFICATION_NUMBER = 4596834290567902435L
 
     }

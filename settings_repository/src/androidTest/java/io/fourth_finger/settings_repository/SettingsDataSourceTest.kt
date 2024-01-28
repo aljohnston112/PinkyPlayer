@@ -7,11 +7,11 @@ import org.junit.Test
 
 class SettingsDataSourceTest {
 
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val settingsDataSource = SettingsDataSource()
+
     @Test
     fun saveAndLoadSettings() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val settingsDataSource = SettingsDataSource()
-
         val testSettings = Settings(42)
         settingsDataSource.saveSettings(context, testSettings)
 
@@ -21,9 +21,6 @@ class SettingsDataSourceTest {
 
     @Test
     fun load_nonexistentSettings_returnsNull() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val settingsDataSource = SettingsDataSource()
-
         val loadedSettings = settingsDataSource.loadSettings(context)
         assertNull(loadedSettings)
     }

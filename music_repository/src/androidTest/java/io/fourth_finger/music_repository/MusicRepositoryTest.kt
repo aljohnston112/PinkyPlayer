@@ -14,6 +14,10 @@ class MusicRepositoryTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
+    private val contentResolver =
+        InstrumentationRegistry.getInstrumentation().context.contentResolver
+
+
     /**
      * Tests that the [MusicFile]s returned by [MusicRepository.loadMusicFiles] match those
      * loaded by the [MusicDataSource].
@@ -21,8 +25,7 @@ class MusicRepositoryTest {
      */
     @Test
     fun loadMusicFiles_ContentResolver_ReturnsCorrectSongs() = runTest {
-        val contentResolver = InstrumentationRegistry.getInstrumentation().context.contentResolver
-        val musicFiles = MusicRepository().loadMusicFiles(contentResolver)!!
+        val musicFiles = MusicRepository().loadMusicFiles(contentResolver)
         val actualMusicFiles = MusicDataSource().getMusicFromMediaStore(contentResolver)!!
 
         // Assert there are music files
@@ -42,12 +45,11 @@ class MusicRepositoryTest {
      */
     @Test
     fun loadMusicFiles_ContentResolver_CachesCorrectSongs() = runTest {
-        val contentResolver = InstrumentationRegistry.getInstrumentation().context.contentResolver
         val actualMusicFiles = MusicDataSource().getMusicFromMediaStore(contentResolver)!!
 
         val musicRepository = MusicRepository()
         assert(musicRepository.getCachedMusicFiles() == null)
-        musicRepository.loadMusicFiles(contentResolver)!!
+        musicRepository.loadMusicFiles(contentResolver)
         val musicFiles = musicRepository.getCachedMusicFiles()!!
 
         // Assert there are music files

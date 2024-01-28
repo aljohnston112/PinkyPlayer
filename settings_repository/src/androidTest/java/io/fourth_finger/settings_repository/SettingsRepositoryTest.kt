@@ -6,25 +6,22 @@ import org.junit.Test
 
 class SettingsRepositoryTest {
 
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val settingsRepository = SettingsRepository(context)
+
     @Test
     fun loadSettings_withNoSavedSettings_returnsDefaultSettings() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val settingsRepository = SettingsRepository(context)
-
         val initialSettings = settingsRepository.settings
         assertEquals(initialSettings, Settings(skipMultiplier = 10L))
     }
 
     @Test
     fun saveSettings_followedByLoadSettings_returnsSavedSettings() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val settingsRepository = SettingsRepository(context)
-
-        val newSettings = Settings(skipMultiplier = 5)
-        settingsRepository.saveSettings(context, newSettings)
+        val initialSettings = Settings(skipMultiplier = 5L)
+        settingsRepository.saveSettings(context, initialSettings)
 
         val loadedSettings = settingsRepository.settings
-        assertEquals(newSettings, loadedSettings)
+        assertEquals(initialSettings, loadedSettings)
     }
 
 }

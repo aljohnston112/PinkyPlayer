@@ -1,4 +1,5 @@
-import io.fourth_finger.probability_map.ProbabilityMap
+package io.fourth_finger.probability_map
+
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
