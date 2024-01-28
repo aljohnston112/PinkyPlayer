@@ -82,8 +82,7 @@ class ActivityMain : AppCompatActivity() {
      */
     private fun setUpOnClickListener() {
         binding.buttonPlayPause.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.Main) {
-                val mediaBrowser = withContext(Dispatchers.IO) { mediaBrowserProvider.get() }
+            mediaBrowserProvider.invokeOnConnection(Dispatchers.Main.immediate) { mediaBrowser ->
                 viewModel.onPlayPauseClicked(mediaBrowser)
                 if (mediaBrowser.isPlaying) {
                     binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
@@ -95,12 +94,12 @@ class ActivityMain : AppCompatActivity() {
             }
         }
         binding.buttonNext.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.Main) {
-                val mediaBrowser = withContext(Dispatchers.IO) { mediaBrowserProvider.get() }
+            mediaBrowserProvider.invokeOnConnection(Dispatchers.Main.immediate) { mediaBrowser ->
                 mediaBrowser.seekToNextMediaItem()
             }
         }
     }
+
 
     /**
      *  Makes sure the proper permissions are granted and
@@ -111,7 +110,6 @@ class ActivityMain : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setUpToolbar()
-        requestPermissionsAndLoadMusicFiles()
     }
 
     private fun setUpToolbar() {
@@ -158,7 +156,7 @@ class ActivityMain : AppCompatActivity() {
         when {
             ContextCompat.checkSelfPermission(
                 this,
-                READ_MEDIA_AUDIO
+                permission
             ) == PackageManager.PERMISSION_GRANTED -> {
                 viewModel.loadMusic(contentResolver)
             }
@@ -179,8 +177,8 @@ class ActivityMain : AppCompatActivity() {
      */
     override fun onStart() {
         super.onStart()
-        lifecycleScope.launch(Dispatchers.IO) {
-            val mediaBrowser = mediaBrowserProvider.get()
+        requestPermissionsAndLoadMusicFiles()
+        mediaBrowserProvider.invokeOnConnection(Dispatchers.Main.immediate) { mediaBrowser ->
             mediaBrowser.addListener(listener)
         }
         setUpOnClickListener()
@@ -188,10 +186,7 @@ class ActivityMain : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        lifecycleScope.launch(Dispatchers.Main) {
-            val mediaBrowser = withContext(Dispatchers.IO){ mediaBrowserProvider.get() }
-            mediaBrowser.removeListener(listener)
-        }
+        mediaBrowserProvider.getOrNull()?.removeListener(listener)
     }
 
     override fun onDestroy() {

@@ -50,6 +50,10 @@ class PinkyPlayer(
         super.setMediaItems(listOf(mediaItem, next))
     }
 
+    override fun setMediaItems(mediaItems: MutableList<MediaItem>, resetPosition: Boolean) {
+        super.setMediaItems(mediaItems, resetPosition)
+    }
+
     override fun prepare() {
         super.prepare()
     }

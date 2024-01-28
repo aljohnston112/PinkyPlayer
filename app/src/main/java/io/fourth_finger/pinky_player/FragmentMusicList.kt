@@ -41,17 +41,17 @@ class FragmentMusicList : Fragment() {
 
         private val queryTextListener = object : SearchView.OnQueryTextListener {
 
-            var job: Job? = null
+            private var job: Job = Job()
 
             override fun onQueryTextSubmit(query: String): Boolean {
                 return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                if (job?.isActive == true) {
-                    job?.cancel()
+                if (job.isActive) {
+                    job.cancel()
                 }
-                job = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                job = viewLifecycleOwner.lifecycleScope.launch {
                     val songs = withContext(Dispatchers.IO) { getSongsWithText(newText) }
                     (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
                         songs
@@ -117,8 +117,7 @@ class FragmentMusicList : Fragment() {
         val adapter = MusicFileAdapter(emptyList()) {
             // Callback for when a song item is tapped
                 songID ->
-            lifecycleScope.launch(Dispatchers.Main) {
-                val mediaBrowser = withContext(Dispatchers.IO) { mediaBrowserProvider.get() }
+            mediaBrowserProvider.invokeOnConnection(Dispatchers.Main.immediate) { mediaBrowser ->
                 viewModel.songClicked(requireContext(), songID, mediaBrowser)
             }
         }

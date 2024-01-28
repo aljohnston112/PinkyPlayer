@@ -30,25 +30,25 @@ import kotlin.time.Duration
 @HiltAndroidTest
 class PlayMusicUseCase {
 
-    @get:Rule
+    @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val rule = InstantTaskExecutorRule()
+
+    @get:Rule(order = 2)
+    val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    )
+
+    @get:Rule(order = 3)
+    var activityScenarioRule = activityScenarioRule<ActivityMain>()
 
     @Inject
     lateinit var mediaBrowserProvider: MediaBrowserProvider
 
     @Inject
     lateinit var musicRepository: MusicRepository
-
-    @get:Rule
-    var activityScenarioRule = activityScenarioRule<ActivityMain>()
-
-    @get:Rule
-    val rule = InstantTaskExecutorRule()
-
-    @get:Rule
-    val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        Manifest.permission.READ_EXTERNAL_STORAGE
-    )
 
     @Before
     fun init() {
@@ -59,12 +59,16 @@ class PlayMusicUseCase {
     fun userNavigatesToFragmentMusicList_tapsSong_andSongPlaysToCompletion() = runTest(
         timeout = Duration.parse("60s")
     ) {
-        onView(withId(R.id.button_songs)).perform(click())
-        val shortestMusicId = MediaFileUtil.getMusicIdOfShortestSong(musicRepository)
 
+        // Go to music list fragment
+        onView(withId(R.id.button_songs))
+            .perform(click())
+
+        // Set up the media browser listener
         val countDownLatchPlay = CountDownLatch(1)
         val countDownLatchPause = CountDownLatch(1)
-        val mediaBrowser = mediaBrowserProvider.get()
+        val mediaBrowser = mediaBrowserProvider.await()
+        val shortestMusicId = MediaFileUtil.getMusicIdOfShortDurationSong(musicRepository)
         mediaBrowser.addListener(
             object : Player.Listener {
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -83,6 +87,7 @@ class PlayMusicUseCase {
             }
         )
 
+        // Click the song and wait for it to load
         val shortestMusic = musicRepository.getMusicFile(shortestMusicId)!!
         onView(withId(R.id.recycler_view))
             .perform(

@@ -31,22 +31,23 @@ import javax.inject.Inject
 @HiltAndroidTest
 class MusicSearchUseCase {
 
-    @get:Rule
+    @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val rule = InstantTaskExecutorRule()
+
+    @get:Rule(order = 2)
+    val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    )
+
+    @get:Rule(order = 3)
+    var activityScenarioRule = activityScenarioRule<ActivityMain>()
 
     @Inject
     lateinit var musicRepository: MusicRepository
 
-    @get:Rule
-    var activityScenarioRule = activityScenarioRule<ActivityMain>()
-
-    @get:Rule
-    val rule = InstantTaskExecutorRule()
-
-    @get:Rule
-    val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        Manifest.permission.READ_EXTERNAL_STORAGE
-    )
 
     @Before
     fun init() {
@@ -56,16 +57,24 @@ class MusicSearchUseCase {
     @Test
     fun userPerformsTextSearchInFragmentMusicList_recyclerViewOnlyShowsSongsContainingSearchText() =
         runTest {
-            val repository = musicRepository
-            val searchText = "floaroma"
+
+            // Go to the music list fragment
             onView(withId(R.id.button_songs))
                 .perform(click())
+
+            // Type text into the search view
             onView(withId(R.id.action_search))
                 .perform(click())
+            val searchText = "floaroma"
+            // The id approach here was recommended by Google
             onView(withId(androidx.appcompat.R.id.search_src_text))
-                .perform(typeText(searchText), closeSoftKeyboard())
+                .perform(
+                    typeText(searchText),
+                    closeSoftKeyboard()
+                )
 
-            val music = repository.getCachedMusicFiles()!!
+            // Get songs containing the search text in their full path
+            val music = musicRepository.getCachedMusicFiles()!!
             val siftedMusic = mutableListOf<MusicFile>()
             for (song in music) {
                 if (song.fullPath.lowercase().contains(searchText)) {
@@ -73,6 +82,8 @@ class MusicSearchUseCase {
                 }
             }
 
+            // Make sure the number of songs in the music list
+            // matches the number of items on the recycler view
             val countDownLatch = CountDownLatch(1)
             activityScenarioRule.scenario.onActivity {
                 val recyclerView = it.findViewById<RecyclerView>(R.id.recycler_view)
@@ -82,6 +93,8 @@ class MusicSearchUseCase {
                 }
             }
             countDownLatch.await()
+
+            // Make sure all songs are in the recycler view
             for (song in siftedMusic) {
                 onView(withId(R.id.recycler_view))
                     .perform(
@@ -92,6 +105,7 @@ class MusicSearchUseCase {
                         )
                     )
             }
+
         }
 
 }

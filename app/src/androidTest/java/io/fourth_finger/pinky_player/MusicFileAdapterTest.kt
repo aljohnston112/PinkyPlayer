@@ -32,7 +32,7 @@ class MusicFileAdapterTest {
      * updates the backing list.
      */
     @Test
-    fun updateMusicList_NewList_UpdatesItemCountAndViewHolders() {
+    fun updateMusicList_newList_updatesViewHolders() {
         val adapter = MusicFileAdapter(emptyList){ /** onClick **/ }
         assert(adapter.itemCount == 0)
         adapter.updateMusicList(singletonList)
@@ -59,7 +59,7 @@ class MusicFileAdapterTest {
      * to the layout correctly.
      */
     @Test
-    fun onBindViewHolder_ValidPositions_BindCorrectly() {
+    fun onBindViewHolder_validPositions_bindsCorrectly() {
         val adapter = MusicFileAdapter(
             listOf(
                 MusicFile(0, "B/","A"),
@@ -143,6 +143,14 @@ class MusicFileAdapterTest {
         adapter.bindViewHolder(viewHolder, 0)
         viewHolder.textView.performClick()
         countDownLatch.await()
+    }
+
+    @Test
+    fun onViewRecycled_removesListener(){
+        val adapter = MusicFileAdapter(singletonList){ /** onClick **/ }
+        val viewHolder = adapter.createViewHolder(viewStub, 0)
+        adapter.onViewRecycled(viewHolder)
+        assert(!viewHolder.textView.hasOnClickListeners())
     }
 
 }

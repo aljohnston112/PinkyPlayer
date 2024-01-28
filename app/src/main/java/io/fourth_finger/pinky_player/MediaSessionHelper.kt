@@ -28,22 +28,25 @@ class MediaSessionHelper(
 ) {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private lateinit var playlistJob: Job
-    private val musicObserver: (List<MusicFile>?) -> Unit = { music ->
-        music?.let {
+    private val musicObserver: (List<MusicFile>?) -> Unit = { newMusic ->
+        newMusic?.let {
             scope.launch(Dispatchers.IO) {
                 if (!::playlist.isInitialized) {
-                    playlist = ProbabilityMap(music)
-                    playerHolder.setPlaylist(playlist)
+                    playlist = ProbabilityMap(newMusic)
+                    playerHolder.setProbabilityMap(playlist)
                 } else {
-                    for (song in music) {
-                        if(!playlist.contains(song)) {
-                            playlist.addElement(song)
+
+                    // Add new songs to the playlist
+                    for (newSong in newMusic) {
+                        if(!playlist.contains(newSong)) {
+                            playlist.addElement(newSong)
                         }
                     }
 
-                    for (song in playlist.getElements().toList()){
-                        if(!music.contains(song)) {
-                            playlist.removeElement(song)
+                    // Remove missing songs from the playlist
+                    for (oldSong in playlist.getElements().toList()){
+                        if(!newMusic.contains(oldSong)) {
+                            playlist.removeElement(oldSong)
                         }
                     }
                 }

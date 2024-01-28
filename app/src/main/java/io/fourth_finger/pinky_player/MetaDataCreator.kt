@@ -1,5 +1,6 @@
 package io.fourth_finger.pinky_player
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import androidx.media3.common.MediaMetadata
@@ -33,10 +34,14 @@ class MetaDataCreator @Inject constructor(
         }
 
         // Bitmap
+        val resources = context.resources
         val resourceId = R.drawable.ic_baseline_music_note_24
-        val packageName = context.packageName
-        val resourceName = context.resources.getResourceName(resourceId)
-        val drawableUri = Uri.parse("android.resource://${packageName}/${resourceName}")
+        val drawableUri = Uri.Builder()
+            .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+            .authority(resources.getResourcePackageName(resourceId))
+            .appendPath(resources.getResourceTypeName(resourceId))
+            .appendPath(resources.getResourceEntryName(resourceId))
+            .build()
         musicRepository.getUri(mediaId)?.let { uri ->
             metaDataBuilder.setArtworkUri(uri)
             uri

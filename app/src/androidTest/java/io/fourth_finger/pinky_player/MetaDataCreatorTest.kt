@@ -22,27 +22,27 @@ class MetaDataCreatorTest {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
-    @Inject lateinit var musicRepository: MusicRepository
-
-    @get:Rule
+    @get:Rule(order = 1)
     val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         Manifest.permission.READ_EXTERNAL_STORAGE
     )
 
+    @Inject lateinit var musicRepository: MusicRepository
+
+    private lateinit var metaDataCreator: MetaDataCreator
+
+    private val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
+
     @Before
     fun init() {
         hiltRule.inject()
+        metaDataCreator = MetaDataCreator(musicRepository)
     }
 
     @Test
     fun updateMetaData_updatesMetaData() = runTest {
-        val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
-        val musicRepository = musicRepository
         val music = musicRepository.loadMusicFiles(application.contentResolver)
-        val metaDataCreator = MetaDataCreator(musicRepository)
-
         for(testMusic in music) {
-
             val metadata = metaDataCreator.getMetaData(application, testMusic.id)
 
             val resources = application.resources

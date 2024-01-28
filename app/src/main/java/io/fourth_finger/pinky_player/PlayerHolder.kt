@@ -71,13 +71,6 @@ class PlayerHolder(
     }
 
     /**
-     * Stops the player.
-     */
-    fun stop() {
-        player.stop()
-    }
-
-    /**
      * Releases this class' resources.
      */
     fun release() {
@@ -85,8 +78,13 @@ class PlayerHolder(
         player.release()
     }
 
-    fun setPlaylist(playlist: ProbabilityMap<MusicFile>) {
-        player.setPlaylist(playlist)
+    /**
+     * Sets the probability map to get songs from.
+     *
+     * @param probabilityMap The probability map to sample songs from
+     */
+    fun setProbabilityMap(probabilityMap: ProbabilityMap<MusicFile>) {
+        player.setPlaylist(probabilityMap)
     }
 
 }

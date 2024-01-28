@@ -8,8 +8,9 @@ class MediaFileUtil {
 
     companion object {
 
-        suspend fun getMusicIdOfShortestSong(
+        suspend fun getMusicIdOfShortDurationSong(
             musicRepository: MusicRepository,
+            doNotConsider: List<Long> = listOf()
         ): Long {
             val music = musicRepository.getCachedMusicFiles()!!
             var shortestMusic = music[0].id
@@ -21,16 +22,18 @@ class MediaFileUtil {
             var shortestDuration = durationStr!!.toInt()
 
             for (m in music) {
-                mmr.setDataSource(context, musicRepository.getUri(m.id))
-                durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                if(m.id !in doNotConsider) {
+                    mmr.setDataSource(context, musicRepository.getUri(m.id))
+                    durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
 
-                val duration = durationStr!!.toInt()
-                if (duration < shortestDuration) {
-                    shortestDuration = duration
-                    shortestMusic = m.id
-                }
-                if (duration < 10000) {
-                    break
+                    val duration = durationStr!!.toInt()
+                    if (duration < shortestDuration) {
+                        shortestDuration = duration
+                        shortestMusic = m.id
+                    }
+                    if (duration < 10000) {
+                        break
+                    }
                 }
             }
             return shortestMusic

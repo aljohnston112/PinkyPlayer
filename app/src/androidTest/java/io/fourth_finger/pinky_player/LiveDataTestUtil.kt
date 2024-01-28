@@ -12,6 +12,10 @@ import java.util.concurrent.TimeoutException
  *
  * Use this extension from host-side (JVM) tests. It's recommended to use it alongside
  * `InstantTaskExecutorRule` or a similar mechanism to execute tasks synchronously.
+ *
+ * @param time The timeout value
+ * @param timeUnit The timeout unit
+ * @param afterObserve The lambda to run after the value is available
  */
 @VisibleForTesting(otherwise = VisibleForTesting.NONE)
 fun <T> LiveData<T>.getOrAwaitValue(
@@ -20,22 +24,22 @@ fun <T> LiveData<T>.getOrAwaitValue(
     afterObserve: () -> Unit = {}
 ): T {
     var data: T? = null
-    val latch = CountDownLatch(1)
+    val countDownLatch = CountDownLatch(1)
     val observer = object : Observer<T> {
         override fun onChanged(value: T) {
             data = value
-            latch.countDown()
+            countDownLatch.countDown()
             this@getOrAwaitValue.removeObserver(this)
         }
     }
     this.observeForever(observer)
 
     try {
-        if (!latch.await(time, timeUnit)) {
+        if (!countDownLatch.await(time, timeUnit)) {
             throw TimeoutException("LiveData value was never set.")
         }
 
-        afterObserve.invoke()
+        afterObserve()
 
     } finally {
         this.removeObserver(observer)
