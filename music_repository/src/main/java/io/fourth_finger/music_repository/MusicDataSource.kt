@@ -13,7 +13,7 @@ import android.provider.MediaStore
  * @param id The id the MediaStore gave this music file.
  * @param displayName The display name of the music file.
  */
-data class MusicFile(val documentId: Long, val id: Long, val relativePath: String, val displayName: String) {
+data class MusicFile(val id: Long, val relativePath: String, val displayName: String) {
 
     val fullPath: String = relativePath + displayName
 
@@ -38,8 +38,6 @@ data class MusicFile(val documentId: Long, val id: Long, val relativePath: Strin
  * This class acts as the adapter between the [MediaStore] music and [MusicFile]s.
  */
 internal class MusicDataSource {
-
-    // TODO migrate to using document id for the id of the MusicFiles
 
     private lateinit var idToUriMap: Map<Long, Uri>
     private lateinit var idToMusicFileMap: Map<Long, MusicFile>
@@ -81,7 +79,6 @@ internal class MusicDataSource {
 
         // The query parameters
         val projection = arrayOf(
-            MediaStore.Audio.Media.DOCUMENT_ID,
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.DISPLAY_NAME,
             MediaStore.Audio.Media.IS_MUSIC,
@@ -115,7 +112,6 @@ internal class MusicDataSource {
         val mutableIdToMusicFile = mutableMapOf<Long, MusicFile>()
 
         // The database columns
-        val documentIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DOCUMENT_ID)
         val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
         val displayNameColumn = cursor.getColumnIndexOrThrow(
             MediaStore.Audio.Media.DISPLAY_NAME
@@ -128,7 +124,6 @@ internal class MusicDataSource {
         while (cursor.moveToNext()) {
 
             // Extract data from columns
-            val documentId = cursor.getLong(documentIdColumn)
             val id = cursor.getLong(idColumn)
             val displayName = cursor.getString(displayNameColumn)
             val relativePath = cursor.getString(relativePathColumn)
@@ -139,7 +134,7 @@ internal class MusicDataSource {
             )
 
             // Create the MusicFile and populate caches
-            val musicFile = MusicFile(documentId, id, relativePath, displayName)
+            val musicFile = MusicFile(id, relativePath, displayName)
             mutableIdToUriMap[id] = contentUri
             mutableIdToMusicFile[id] = musicFile
         }
