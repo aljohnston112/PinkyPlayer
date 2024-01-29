@@ -18,15 +18,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.session.MediaBrowser
 import dagger.hilt.android.AndroidEntryPoint
 import io.fourth_finger.pinky_player.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -50,16 +47,16 @@ class ActivityMain : AppCompatActivity() {
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
             if (playbackState == STATE_ENDED) {
-                binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
-                binding.controls.visibility = View.VISIBLE
+                setPlayButton()
             }
         }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
             if (isPlaying) {
-                binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
-                binding.controls.visibility = View.VISIBLE
+                setPauseButton()
+            } else {
+                setPlayButton()
             }
         }
 
@@ -84,13 +81,7 @@ class ActivityMain : AppCompatActivity() {
         binding.buttonPlayPause.setOnClickListener {
             mediaBrowserProvider.invokeOnConnection(Dispatchers.Main.immediate) { mediaBrowser ->
                 viewModel.onPlayPauseClicked(mediaBrowser)
-                if (mediaBrowser.isPlaying) {
-                    binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
-                    binding.controls.visibility = View.VISIBLE
-                } else {
-                    binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
-                    binding.controls.visibility = View.VISIBLE
-                }
+                setUpUI(mediaBrowser)
             }
         }
         binding.buttonNext.setOnClickListener {
@@ -98,6 +89,26 @@ class ActivityMain : AppCompatActivity() {
                 mediaBrowser.seekToNextMediaItem()
             }
         }
+    }
+
+    private fun setUpUI(mediaBrowser: MediaBrowser) {
+        if(mediaBrowser.mediaItemCount > 0) {
+            if (mediaBrowser.isPlaying) {
+                setPauseButton()
+            } else {
+                setPlayButton()
+            }
+        }
+    }
+
+    private fun setPlayButton() {
+        binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+        binding.controls.visibility = View.VISIBLE
+    }
+
+    private fun setPauseButton() {
+        binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
+        binding.controls.visibility = View.VISIBLE
     }
 
 
