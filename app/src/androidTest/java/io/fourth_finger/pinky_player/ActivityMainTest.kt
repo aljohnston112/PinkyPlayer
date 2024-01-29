@@ -60,6 +60,7 @@ class ActivityMainTest {
 
     @Test
     fun mediaControllerSetMediaItem_followedByPlay_makesPlayButtonVisible() =
+        // TODO this hangs now; run all tests when fixed
         runTest(timeout = Duration.parse("60s")) {
             val allowPermissions = getPermissionUIAllowButton()
             allowPermissions.click()
