@@ -12,7 +12,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.fourth_finger.music_repository.MusicFile
 import io.fourth_finger.music_repository.MusicRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,7 +26,7 @@ import javax.inject.Inject
 class ActivityMainViewModel @Inject constructor(
     private val musicRepository: MusicRepository,
     private val mediaItemCreator: MediaItemCreator
-): ViewModel() {
+) : ViewModel() {
 
     val musicFiles: LiveData<List<MusicFile>> = musicRepository.musicFiles
 
@@ -66,7 +65,7 @@ class ActivityMainViewModel @Inject constructor(
      * @return The job that loads the music files.
      */
     private fun loadMusicFiles(contentResolver: ContentResolver): Job {
-        return viewModelScope.launch(Dispatchers.IO) {
+        return viewModelScope.launch {
             musicRepository.loadMusicFiles(contentResolver)
         }
     }

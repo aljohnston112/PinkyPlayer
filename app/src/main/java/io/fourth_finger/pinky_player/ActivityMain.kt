@@ -81,22 +81,11 @@ class ActivityMain : AppCompatActivity() {
         binding.buttonPlayPause.setOnClickListener {
             mediaBrowserProvider.invokeOnConnection(Dispatchers.Main.immediate) { mediaBrowser ->
                 viewModel.onPlayPauseClicked(mediaBrowser)
-                setUpUI(mediaBrowser)
             }
         }
         binding.buttonNext.setOnClickListener {
             mediaBrowserProvider.invokeOnConnection(Dispatchers.Main.immediate) { mediaBrowser ->
                 mediaBrowser.seekToNextMediaItem()
-            }
-        }
-    }
-
-    private fun setUpUI(mediaBrowser: MediaBrowser) {
-        if(mediaBrowser.mediaItemCount > 0) {
-            if (mediaBrowser.isPlaying) {
-                setPauseButton()
-            } else {
-                setPlayButton()
             }
         }
     }

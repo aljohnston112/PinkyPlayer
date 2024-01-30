@@ -4,11 +4,12 @@ import android.Manifest
 import android.content.ComponentName
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.concurrent.futures.await
 import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.session.MediaController
+import androidx.media3.session.MediaBrowser
 import androidx.media3.session.SessionToken
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
@@ -44,31 +45,34 @@ class ActivityMainTest {
     var hiltRule = HiltAndroidRule(this)
 
     @get:Rule(order = 1)
+    val rule = InstantTaskExecutorRule()
+
+    @get:Rule(order = 2)
     var activityScenarioRule = activityScenarioRule<ActivityMain>()
 
     private val application: HiltTestApplication = ApplicationProvider.getApplicationContext()
 
-    private val sessionToken = SessionToken(
-        application,
-        ComponentName(application, ServiceMediaLibrary::class.java)
-    )
+    private lateinit var mediaBrowser: MediaBrowser
 
     @Before
-    fun init() {
+    fun init() = runTest {
         hiltRule.inject()
+        val sessionToken = SessionToken(
+            application,
+            ComponentName(application, ServiceMediaLibrary::class.java)
+        )
+        mediaBrowser = MediaBrowser.Builder(application, sessionToken).buildAsync().await()
     }
 
     @Test
-    fun mediaControllerSetMediaItem_followedByPlay_makesPlayButtonVisible() =
-        // TODO this hangs now; run all tests when fixed
+    fun mediaControllerSetMediaItem_followedByPlay_makesPauseButtonVisible() =
         runTest(timeout = Duration.parse("60s")) {
             val allowPermissions = getPermissionUIAllowButton()
             allowPermissions.click()
 
             // Setup media controller listener
             val countDownLatchPlay = CountDownLatch(1)
-            val mediaController = buildMediaController()
-            mediaController.addListener(
+            mediaBrowser.addListener(
                 object : Player.Listener {
                     override fun onIsPlayingChanged(isPlaying: Boolean) {
                         super.onIsPlayingChanged(isPlaying)
@@ -82,8 +86,8 @@ class ActivityMainTest {
             // Play a song and wait for it to start
             val mediaItem = getFirstMusicUri()
             UiThreadStatement.runOnUiThread {
-                mediaController.setMediaItem(mediaItem)
-                mediaController.play()
+                mediaBrowser.setMediaItem(mediaItem)
+                mediaBrowser.play()
             }
             countDownLatchPlay.await()
 
@@ -108,46 +112,46 @@ class ActivityMainTest {
         }
 
     @Test
-    fun mediaControllerSetMediaItem_followedByPlay_thenByClickingPause_makesPlayButtonVisible() = runTest(timeout = Duration.parse("60s")) {
-        val allowPermissions = getPermissionUIAllowButton()
-        allowPermissions.click()
+    fun mediaControllerSetMediaItem_followedByPlay_thenByClickingPause_makesPlayButtonVisible() =
+        runTest(timeout = Duration.parse("60s")) {
+            val allowPermissions = getPermissionUIAllowButton()
+            allowPermissions.click()
 
-        // Setup media controller listener
-        val countDownLatchPlay = CountDownLatch(1)
-        val mediaController = buildMediaController()
-        mediaController.addListener(
-            object : Player.Listener {
-                override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    super.onIsPlayingChanged(isPlaying)
-                    if (isPlaying) {
-                        countDownLatchPlay.countDown()
+            // Setup media controller listener
+            val countDownLatchPlay = CountDownLatch(1)
+            mediaBrowser.addListener(
+                object : Player.Listener {
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        super.onIsPlayingChanged(isPlaying)
+                        if (isPlaying) {
+                            countDownLatchPlay.countDown()
+                        }
                     }
                 }
+            )
+
+            // Play a song and wait for it to start
+            val mediaItem = getFirstMusicUri()
+            UiThreadStatement.runOnUiThread {
+                mediaBrowser.setMediaItem(mediaItem)
+                mediaBrowser.play()
             }
-        )
+            countDownLatchPlay.await()
 
-        // Play a song and wait for it to start
-        val mediaItem = getFirstMusicUri()
-        UiThreadStatement.runOnUiThread {
-            mediaController.setMediaItem(mediaItem)
-            mediaController.play()
-        }
-        countDownLatchPlay.await()
+            // Pause the music
+            onView(withId(R.id.button_play_pause))
+                .perform(click())
 
-        // Pause the music
-        onView(withId(R.id.button_play_pause))
-            .perform(click())
-
-        onView(withId(R.id.button_play_pause))
-            .check(
-                matches(
-                    allOf(
-                        isCompletelyDisplayed(),
-                        DrawableMatcher(R.drawable.ic_baseline_play_arrow_24)
+            onView(withId(R.id.button_play_pause))
+                .check(
+                    matches(
+                        allOf(
+                            isCompletelyDisplayed(),
+                            DrawableMatcher(R.drawable.ic_baseline_play_arrow_24)
+                        )
                     )
                 )
-            )
-    }
+        }
 
     @Test
     fun whenNoPermission_AsksForCorrectPermission() {
@@ -190,12 +194,6 @@ class ActivityMainTest {
 
         onView(withText(R.string.permission_needed))
             .check(matches(isCompletelyDisplayed()))
-    }
-
-    private suspend fun buildMediaController(): MediaController {
-        return MediaController.Builder(application, sessionToken)
-            .buildAsync()
-            .await()
     }
 
     private suspend fun getFirstMusicUri(): MediaItem {

@@ -26,6 +26,10 @@ class PinkyPlayer(
 
     private lateinit var _playlist: ProbabilityMap<MusicFile>
 
+    init {
+        prepare()
+    }
+
     fun setPlaylist(playlist: ProbabilityMap<MusicFile>) {
         _playlist = playlist
     }
@@ -43,16 +47,26 @@ class PinkyPlayer(
     }
 
     override fun setMediaItem(mediaItem: MediaItem) {
+        setMediaItems(mutableListOf(mediaItem), true)
+    }
 
+    override fun setMediaItem(mediaItem: MediaItem, resetPosition: Boolean) {
+        setMediaItems(mutableListOf(mediaItem), resetPosition)
+    }
+
+    override fun setMediaItem(mediaItem: MediaItem, startPositionMs: Long) {
+        super.setMediaItems(mutableListOf(mediaItem), 0, startPositionMs)
     }
 
     override fun setMediaItems(mediaItems: MutableList<MediaItem>, resetPosition: Boolean) {
-        val next = mediaItemCreator.getMediaItem(
-            context!!,
-            _playlist.sample().id
-        )
         val songs = mediaItems.toMutableList()
-        songs.add(next)
+        if(mediaItems.size == 1 && ::_playlist.isInitialized) {
+            val next = mediaItemCreator.getMediaItem(
+                context!!,
+                _playlist.sample().id
+            )
+            songs.add(next)
+        }
         super.setMediaItems(songs, resetPosition)
     }
 

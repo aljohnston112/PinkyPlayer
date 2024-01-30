@@ -13,7 +13,7 @@ class MusicFileAdapterTest {
 
     private val emptyList = emptyList<MusicFile>()
     private val singletonList = listOf(
-        MusicFile(1, 0, "/B", "A")
+        MusicFile(0, "/B", "A")
     )
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -62,8 +62,8 @@ class MusicFileAdapterTest {
     fun onBindViewHolder_validPositions_bindsCorrectly() {
         val adapter = MusicFileAdapter(
             listOf(
-                MusicFile(1, 0, "B/","A"),
-                MusicFile(0, 1, "B/","B")
+                MusicFile(0, "B/","A"),
+                MusicFile(1, "B/","B")
             )
         ){ /** onClick **/ }
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub)

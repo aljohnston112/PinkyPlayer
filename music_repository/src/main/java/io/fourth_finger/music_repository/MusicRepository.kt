@@ -5,6 +5,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -26,24 +27,27 @@ class MusicRepository @Inject constructor() {
      * Loads [MusicFile]s representing music files that are on the device.
      *
      * @param contentResolver The [ContentResolver] used to query the [MediaStore] for music files.
+     * @param refresh Whether ot not to reload data when data has already been loaded.
+     * @param dispatcher The dispatcher to load the music on.
      * @return A [List] of [MusicFile]s representing music files that are on the device or
      *         null if there was a problem loading the [MusicFile]s.
      */
     suspend fun loadMusicFiles(
         contentResolver: ContentResolver,
-        refresh: Boolean = false
+        refresh: Boolean = false,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO
     ): List<MusicFile> {
-        if (!musicCache.hasData() || refresh) {
-            val latestMusic = withContext(Dispatchers.IO) {
-                musicDataSource.getMusicFromMediaStore(contentResolver)
+        return withContext(dispatcher) {
+            if (!musicCache.hasData() || refresh) {
+                val latestMusic = musicDataSource.getMusicFromMediaStore(contentResolver)
+                if (latestMusic != null) {
+                    musicCache.updateData(latestMusic)
+                }
             }
-            if (latestMusic != null) {
-                musicCache.updateData(latestMusic)
-            }
+            val music = musicCache.getData()!!
+            _musicFiles.postValue(music)
+            music
         }
-        val music = musicCache.getData()!!
-        _musicFiles.postValue(music)
-        return music
     }
 
     /**

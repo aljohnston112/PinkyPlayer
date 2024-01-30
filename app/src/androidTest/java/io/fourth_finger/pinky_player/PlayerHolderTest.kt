@@ -53,17 +53,19 @@ class PlayerHolderTest {
 
 
     @Before
-    fun init() = runTest {
+    fun init() = runTest(timeout = Duration.parse("60s")) {
         hiltRule.inject()
         mediaItemCreator = MediaItemCreator(musicRepository)
-        playerHolder = PlayerHolder(application, mediaItemCreator)
+        UiThreadStatement.runOnUiThread {
+            playerHolder = PlayerHolder(application, mediaItemCreator)
+        }
         music = musicRepository.loadMusicFiles(application.contentResolver)
         shortestSong = MediaFileUtil.getMusicIdOfShortDurationSong(musicRepository)
         playerHolder.setProbabilityMap(ProbabilityMap(listOf(music[0])))
     }
 
     @Test
-    fun clearPrepareAndPlay_validSong_playsToCompletion() =
+    fun clearAndPlay_validSong_playsToCompletion() =
         runTest(timeout = Duration.parse("60s")) {
 
             // Set up the player holder
@@ -90,7 +92,7 @@ class PlayerHolderTest {
 
             // Play the song and wait for it to complete
             UiThreadStatement.runOnUiThread {
-                playerHolder.clearPrepareAndPlay(
+                playerHolder.clearAndPlay(
                     application,
                     shortestSong
                 )
@@ -99,7 +101,7 @@ class PlayerHolderTest {
         }
 
     @Test
-    fun clearPrepareAndPlayCalledTwice_validSong_playsSecondSongToCompletion() =
+    fun clearAndPlayCalledTwice_validSong_playsSecondSongToCompletion() =
         runTest(timeout = Duration.parse("60s")) {
 
             // Set up the player holder
@@ -111,13 +113,13 @@ class PlayerHolderTest {
                 object : Player.Listener {
                     override fun onIsPlayingChanged(isPlaying: Boolean) {
                         super.onIsPlayingChanged(isPlaying)
-                        if (isPlaying ) {
-                            if(countDownLatchOnPrepared.count == 1L) {
+                        if (isPlaying) {
+                            if (countDownLatchOnPrepared.count == 1L) {
                                 Assert.assertTrue(countDownLatchOnCompletion.count == 1L)
                                 Assert.assertTrue(countDownLatchOnPrepared2.count == 1L)
                                 Assert.assertTrue(countDownLatchOnCompletion2.count == 1L)
                                 countDownLatchOnPrepared.countDown()
-                            } else if(countDownLatchOnPrepared2.count == 1L){
+                            } else if (countDownLatchOnPrepared2.count == 1L) {
                                 Assert.assertTrue(countDownLatchOnCompletion2.count == 1L)
                                 countDownLatchOnPrepared2.countDown()
                             }
@@ -127,11 +129,11 @@ class PlayerHolderTest {
                     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                         super.onMediaItemTransition(mediaItem, reason)
                         if (reason == MEDIA_ITEM_TRANSITION_REASON_AUTO) {
-                            if(countDownLatchOnPrepared.count == 0L && countDownLatchOnPrepared2.count == 1L) {
+                            if (countDownLatchOnPrepared.count == 0L && countDownLatchOnPrepared2.count == 1L) {
                                 Assert.assertTrue(countDownLatchOnPrepared2.count == 1L)
                                 Assert.assertTrue(countDownLatchOnCompletion2.count == 1L)
                                 countDownLatchOnCompletion.countDown()
-                            } else if(countDownLatchOnPrepared2.count == 0L){
+                            } else if (countDownLatchOnPrepared2.count == 0L) {
                                 countDownLatchOnCompletion2.countDown()
                             }
                         }
@@ -145,7 +147,7 @@ class PlayerHolderTest {
                 listOf(shortestSong)
             )
             UiThreadStatement.runOnUiThread {
-                playerHolder.clearPrepareAndPlay(
+                playerHolder.clearAndPlay(
                     application,
                     shortestSong
                 )
@@ -154,7 +156,7 @@ class PlayerHolderTest {
 
             // Start a second song and wait for it to complete
             UiThreadStatement.runOnUiThread {
-                playerHolder.clearPrepareAndPlay(
+                playerHolder.clearAndPlay(
                     application,
                     song2
                 )
@@ -189,7 +191,7 @@ class PlayerHolderTest {
 
         // Play the song and wait for it to start
         UiThreadStatement.runOnUiThread {
-            playerHolder.clearPrepareAndPlay(
+            playerHolder.clearAndPlay(
                 application,
                 shortestSong
             )
@@ -231,7 +233,7 @@ class PlayerHolderTest {
 
         // Play a song and wait for it to start
         UiThreadStatement.runOnUiThread {
-            playerHolder.clearPrepareAndPlay(
+            playerHolder.clearAndPlay(
                 application,
                 shortestSong
             )

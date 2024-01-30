@@ -42,13 +42,12 @@ class PlayerHolder(
      * @param id The music file's [MediaStore.Audio.Media] id.
      *
      */
-    fun clearPrepareAndPlay(
+    fun clearAndPlay(
         context: Context,
         id: Long,
     ) {
         val mediaItem = mediaItemCreator.getMediaItem(context, id)
         player.setMediaItem(mediaItem)
-        player.prepare()
         player.play()
     }
 
