@@ -17,12 +17,12 @@ import kotlin.coroutines.CoroutineContext
 
 @Singleton
 class MediaBrowserProvider @Inject constructor(
+    private val scope: CoroutineScope,
     @ApplicationContext applicationContext: Context
 ) {
 
     private lateinit var mediaBrowser: MediaBrowser
     private val job: Job
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     init {
         job = scope.launch(Dispatchers.Default) {

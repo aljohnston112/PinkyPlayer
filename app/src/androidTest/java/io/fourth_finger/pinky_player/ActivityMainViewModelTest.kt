@@ -23,6 +23,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
+import javax.inject.Inject
 
 @HiltAndroidTest
 class ActivityMainViewModelTest {
@@ -38,16 +39,19 @@ class ActivityMainViewModelTest {
         Manifest.permission.READ_EXTERNAL_STORAGE
     )
 
+    @Inject
+    lateinit var musicRepository: MusicRepository
+
+    private lateinit var viewModel: ActivityMainViewModel
     private val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
-    private val musicRepository = MusicRepository()
-    private val viewModel = ActivityMainViewModel(
-        musicRepository,
-        MediaItemCreator(musicRepository)
-    )
 
     @Before
     fun init() {
         hiltRule.inject()
+        viewModel = ActivityMainViewModel(
+            musicRepository,
+            MediaItemCreator(musicRepository)
+        )
     }
 
     @Test
@@ -96,7 +100,10 @@ class ActivityMainViewModelTest {
         // Setup the media browser listener
         val countDownLatchPlay = CountDownLatch(1)
         val countDownLatchPause = CountDownLatch(1)
-        val mediaBrowserProvider = MediaBrowserProvider(application)
+        val mediaBrowserProvider = MediaBrowserProvider(
+            this,
+            application
+        )
         val mediaBrowser = mediaBrowserProvider.await()
         mediaBrowser.addListener(
             object : Player.Listener {
@@ -134,7 +141,10 @@ class ActivityMainViewModelTest {
         val countDownLatchPlay = CountDownLatch(1)
         val countDownLatchPause = CountDownLatch(1)
         val countDownLatchPlay2 = CountDownLatch(1)
-        val mediaBrowserProvider = MediaBrowserProvider(application)
+        val mediaBrowserProvider = MediaBrowserProvider(
+            this,
+            application
+        )
         val mediaBrowser = mediaBrowserProvider.await()
         mediaBrowser.addListener(
             object : Player.Listener {
@@ -180,7 +190,10 @@ class ActivityMainViewModelTest {
 
         // Setup the media browser listener
         val countDownLatch = CountDownLatch(1)
-        val mediaBrowserProvider = MediaBrowserProvider(application)
+        val mediaBrowserProvider = MediaBrowserProvider(
+            this,
+            application
+        )
         val mediaBrowser = mediaBrowserProvider.await()
         val music = musicRepository.loadMusicFiles(application.contentResolver)
         val musicId = music[0].id

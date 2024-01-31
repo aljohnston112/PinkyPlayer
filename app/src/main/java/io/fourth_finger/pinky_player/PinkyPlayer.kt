@@ -15,7 +15,8 @@ import io.fourth_finger.probability_map.ProbabilityMap
 @OptIn(UnstableApi::class)
 class PinkyPlayer(
     private var context: Context?,
-    private val mediaItemCreator: MediaItemCreator
+    private val mediaItemCreator: MediaItemCreator,
+    private val playlistProvider: PlaylistProvider
 ) : ForwardingPlayer(
     ExoPlayer.Builder(context!!)
         .setSkipSilenceEnabled(true)
@@ -24,14 +25,22 @@ class PinkyPlayer(
 ) {
     // TODO add audio focus parameter
 
-    private lateinit var _playlist: ProbabilityMap<MusicFile>
+    private val listener = object : Player.Listener {
 
-    init {
-        prepare()
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            super.onMediaItemTransition(mediaItem, reason)
+            if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
+                playlistProvider.invokeOnLoad {
+                    addMediaItem(getNextSong(it))
+                }
+            }
+        }
+
     }
 
-    fun setPlaylist(playlist: ProbabilityMap<MusicFile>) {
-        _playlist = playlist
+    init {
+        addListener(listener)
+        prepare()
     }
 
     override fun getAvailableCommands(): Player.Commands {
@@ -59,15 +68,29 @@ class PinkyPlayer(
     }
 
     override fun setMediaItems(mediaItems: MutableList<MediaItem>, resetPosition: Boolean) {
-        val songs = mediaItems.toMutableList()
-        if(mediaItems.size == 1 && ::_playlist.isInitialized) {
-            val next = mediaItemCreator.getMediaItem(
-                context!!,
-                _playlist.sample().id
-            )
-            songs.add(next)
+        playlistProvider.invokeOnLoad {
+            val songs = mediaItems.toMutableList()
+            if (mediaItems.size == 1) {
+                addSong(it, songs)
+            }
+            super.setMediaItems(songs, resetPosition)
         }
-        super.setMediaItems(songs, resetPosition)
+    }
+
+    private fun addSong(
+        playlist: ProbabilityMap<MusicFile>,
+        songs: MutableList<MediaItem>,
+    ) {
+        songs.add(getNextSong(playlist))
+    }
+
+    private fun getNextSong(
+        playlist: ProbabilityMap<MusicFile>
+    ): MediaItem {
+        return mediaItemCreator.getMediaItem(
+            context!!,
+            playlist.sample().id
+        )
     }
 
     override fun seekToNext() {
@@ -75,28 +98,22 @@ class PinkyPlayer(
     }
 
     override fun seekToNextMediaItem() {
-        if(::_playlist.isInitialized) {
-            val next = mediaItemCreator.getMediaItem(
-                context!!,
-                _playlist.sample().id
-            )
-            replaceMediaItem(mediaItemCount - 1, next)
+        playlistProvider.invokeOnLoad {
+            val next = getNextSong(it)
+            addMediaItem(next)
             seekTo(
                 currentMediaItemIndex + 1,
                 C.TIME_UNSET
             )
-            val afterNext = mediaItemCreator.getMediaItem(
-                context!!,
-                _playlist.sample().id
-            )
+            val afterNext = getNextSong(it)
             addMediaItem(afterNext)
         }
     }
 
     override fun release() {
         super.release()
+        removeListener(listener)
         context = null
     }
-
 
 }
