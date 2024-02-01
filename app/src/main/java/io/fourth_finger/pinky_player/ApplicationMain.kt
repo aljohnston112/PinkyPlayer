@@ -20,8 +20,6 @@ object CoroutineScopeModule {
 
 }
 
-
-
 /**
  * The main [Application].
  */

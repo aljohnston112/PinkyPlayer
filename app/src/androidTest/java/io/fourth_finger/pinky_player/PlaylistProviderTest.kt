@@ -39,7 +39,7 @@ class PlaylistProviderTest {
             val countDownLatch = CountDownLatch(1)
             testDispatcher = UnconfinedTestDispatcher(testScheduler)
             UiThreadStatement.runOnUiThread {
-                playlistProvider = PlaylistProvider(this, musicRepository)
+                playlistProvider = PlaylistProvider(this, musicRepository.musicFiles)
                 countDownLatch.countDown()
             }
             countDownLatch.await()

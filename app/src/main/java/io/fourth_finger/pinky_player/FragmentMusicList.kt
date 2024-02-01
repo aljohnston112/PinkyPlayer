@@ -11,6 +11,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,7 +36,11 @@ class FragmentMusicList : Fragment() {
     private var _binding: FragmentMusicListBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: ActivityMainViewModel by activityViewModels()
+    private var _searchView: SearchView? = null
+    private val searchView get() = _searchView!!
+
+    private val activityMainViewModel: ActivityMainViewModel by activityViewModels()
+    private val viewModel: ViewModelFragmentMusicList by viewModels()
 
     private val menuProvider = object : MenuProvider {
 
@@ -51,11 +56,20 @@ class FragmentMusicList : Fragment() {
                 if (job.isActive) {
                     job.cancel()
                 }
-                job = viewLifecycleOwner.lifecycleScope.launch {
-                    val songs = withContext(Dispatchers.IO) { getSongsWithText(newText) }
-                    (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
-                        songs
-                    )
+                if (newText != "") {
+                    viewModel.newSearch(newText)
+                    job = viewLifecycleOwner.lifecycleScope.launch {
+                        val songs = withContext(Dispatchers.Default) { getSongsWithText(newText) }
+                        (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
+                            songs
+                        )
+                    }
+                } else {
+                    job = viewLifecycleOwner.lifecycleScope.launch {
+                        (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
+                            activityMainViewModel.musicFiles.value!!
+                        )
+                    }
                 }
                 return true
             }
@@ -65,18 +79,29 @@ class FragmentMusicList : Fragment() {
         override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
             menuInflater.inflate(R.menu.fragment_song_list_menu, menu)
             val searchItem = menu.findItem(R.id.action_search)
-            val searchView = searchItem?.actionView as SearchView
+            _searchView = searchItem?.actionView as SearchView
             searchView.setOnQueryTextListener(queryTextListener)
+            setSavedSearchText(searchItem, searchView)
         }
 
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
             return false
         }
 
+
+    }
+
+    private fun setSavedSearchText(searchItem: MenuItem, searchView: SearchView) {
+        viewModel.getSavedSearchText()?.let {
+            searchView.isIconified = true
+            searchItem.expandActionView()
+            searchView.setQuery(it, true)
+            searchView.isFocusable = true
+        }
     }
 
     private fun getSongsWithText(newText: String): List<MusicFile> {
-        val allMusic = viewModel.musicFiles.value!!
+        val allMusic = activityMainViewModel.musicFiles.value!!
         val sifted: MutableList<MusicFile> = mutableListOf()
         for (song in allMusic) {
             if (song.fullPath.lowercase().contains(newText.lowercase())) {
@@ -118,7 +143,7 @@ class FragmentMusicList : Fragment() {
             // Callback for when a song item is tapped
                 songID ->
             mediaBrowserProvider.invokeOnConnection(Dispatchers.Main.immediate) { mediaBrowser ->
-                viewModel.songClicked(requireContext(), songID, mediaBrowser)
+                activityMainViewModel.songClicked(requireContext(), songID, mediaBrowser)
             }
         }
         binding.recyclerView.adapter = adapter
@@ -128,7 +153,7 @@ class FragmentMusicList : Fragment() {
         binding.recyclerView.layoutManager = linearLayoutManager
 
         // Set up music list updates
-        viewModel.musicFiles.observe(viewLifecycleOwner) { musicFiles ->
+        activityMainViewModel.musicFiles.observe(viewLifecycleOwner) { musicFiles ->
             musicFiles?.let {
                 binding.recyclerView.post {
                     adapter.updateMusicList(musicFiles.toList())
@@ -137,12 +162,14 @@ class FragmentMusicList : Fragment() {
         }
         // [FragmentTitle] must guarantee permissions are granted before launching this Fragment
         // Permission must be granted before [loadMusic] is run
-        viewModel.loadMusic(requireActivity().contentResolver)
+        activityMainViewModel.loadMusic(requireActivity().contentResolver)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         requireActivity().removeMenuProvider(menuProvider)
+        searchView.setOnQueryTextListener(null)
+        _searchView = null
         binding.recyclerView.adapter = null
         _binding = null
     }

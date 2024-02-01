@@ -116,4 +116,8 @@ class PinkyPlayer(
         context = null
     }
 
+    fun setMediaItem(musicFile: MusicFile) {
+        setMediaItem(mediaItemCreator.getMediaItem(context!!, musicFile.id))
+    }
+
 }

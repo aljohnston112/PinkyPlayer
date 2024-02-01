@@ -1,5 +1,10 @@
 package io.fourth_finger.pinky_player
 
+import androidx.lifecycle.LiveData
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import io.fourth_finger.music_repository.MusicFile
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.probability_map.ProbabilityMap
@@ -10,10 +15,23 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
+@Module
+@InstallIn(SingletonComponent::class)
+object MusicFileLiveDataModule {
+
+    @Provides
+    fun provideMusicFileLiveData(
+        musicRepository: MusicRepository
+    ): LiveData<List<MusicFile>> {
+        return musicRepository.musicFiles
+    }
+
+}
+
 @Singleton
 class PlaylistProvider @Inject constructor(
     private val scope: CoroutineScope,
-    musicRepository: MusicRepository,
+    musicFileLiveData: LiveData<List<MusicFile>>
 ) {
 
     private var playlist: ProbabilityMap<MusicFile>? = null
@@ -53,7 +71,7 @@ class PlaylistProvider @Inject constructor(
 
 
     init {
-        musicRepository.musicFiles.observeForever(musicObserver)
+        musicFileLiveData.observeForever(musicObserver)
     }
 
     fun invokeOnLoad(
