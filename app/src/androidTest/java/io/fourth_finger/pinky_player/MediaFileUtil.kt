@@ -8,6 +8,18 @@ class MediaFileUtil {
 
     companion object {
 
+        suspend fun getMusicIdOfTwoShortDurationSongs(
+            musicRepository: MusicRepository,
+            doNotConsider: List<Long> = listOf()
+        ): List<Long> {
+            val musicIds = mutableListOf<Long>()
+            val id = getMusicIdOfShortDurationSong(musicRepository)
+            musicIds.add(id)
+            val id2 = getMusicIdOfShortDurationSong(musicRepository, musicIds + doNotConsider)
+            musicIds.add(id2)
+            return musicIds
+        }
+
         suspend fun getMusicIdOfShortDurationSong(
             musicRepository: MusicRepository,
             doNotConsider: List<Long> = listOf()

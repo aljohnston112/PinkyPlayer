@@ -1,6 +1,10 @@
 package io.fourth_finger.settings_repository
 
 import android.content.Context
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 /**
  * A repository for app settings.
@@ -9,10 +13,11 @@ import android.content.Context
  */
 class SettingsRepository(context: Context) {
 
-    private val settingsDataSource = SettingsDataSource()
+    private val settingsDataSource = SettingsDataSource(context)
 
-    var settings = settingsDataSource.loadSettings(context) ?: Settings(skipMultiplier = 10)
-        private set
+    var settings = settingsDataSource.songSkipMultiplier.map { songSkipMultiplier ->
+        Settings(songSkipMultiplier)
+    }
 
     /**
      * Saves the given settings.
@@ -20,9 +25,14 @@ class SettingsRepository(context: Context) {
      * @param context
      * @param settings The settings to save.
      */
-    fun saveSettings(context: Context, settings: Settings) {
-        this.settings = settings
-        settingsDataSource.saveSettings(context, settings)
+    suspend fun saveSettings(
+        context: Context,
+        settings: Settings,
+        dispatcher: CoroutineDispatcher = Dispatchers.Default
+    ) {
+        withContext(dispatcher) {
+            settingsDataSource.saveSettings(context, settings)
+        }
     }
 
 }

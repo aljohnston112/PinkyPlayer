@@ -3,7 +3,7 @@ package io.fourth_finger.pinky_player
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 
-class ViewModelFragmentMusicList(
+class FragmentMusicListViewModel(
     private val state: SavedStateHandle
 ) : ViewModel() {
 

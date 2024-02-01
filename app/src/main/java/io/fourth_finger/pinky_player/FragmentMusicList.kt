@@ -40,7 +40,7 @@ class FragmentMusicList : Fragment() {
     private val searchView get() = _searchView!!
 
     private val activityMainViewModel: ActivityMainViewModel by activityViewModels()
-    private val viewModel: ViewModelFragmentMusicList by viewModels()
+    private val viewModel: FragmentMusicListViewModel by viewModels()
 
     private val menuProvider = object : MenuProvider {
 

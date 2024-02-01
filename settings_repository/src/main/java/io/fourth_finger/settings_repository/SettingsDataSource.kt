@@ -1,13 +1,26 @@
 package io.fourth_finger.settings_repository
 
 import android.content.Context
-import io.fourth_finger.file_util.FileUtil
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 /**
  * A data source for app settings
  */
-internal class SettingsDataSource {
+internal class SettingsDataSource(context: Context) {
 
+    private val SONG_SKIP_MULTIPLIER = longPreferencesKey("SONG_SKIP_MULTIPLIER")
+
+    val songSkipMultiplier: Flow<Long> = context.dataStore.data.map {
+        it[SONG_SKIP_MULTIPLIER] ?: 3
+    }
     /**
      * Saves the given settings.
      * Any past settings will be overwritten.
@@ -15,34 +28,10 @@ internal class SettingsDataSource {
      * @param context
      * @param settings The settings to save.
      */
-    fun saveSettings(context: Context, settings: Settings) {
-        FileUtil.save(
-            settings,
-            context,
-            SETTINGS_FILE_NAME,
-            SAVE_FILE_VERIFICATION_NUMBER
-        )
-    }
-
-    /**
-     * Tries to load settings.
-     *
-     * @param context
-     * @return The loaded settings, or null if there was a problem loading them.
-     */
-    fun loadSettings(context: Context): Settings? {
-        return FileUtil.load(
-            context,
-            SETTINGS_FILE_NAME,
-            SAVE_FILE_VERIFICATION_NUMBER
-        )
-    }
-
-    companion object {
-
-        private const val SETTINGS_FILE_NAME = "SETTINGS"
-        private const val SAVE_FILE_VERIFICATION_NUMBER = 4596834290567902435L
-
+    suspend fun saveSettings(context: Context, settings: Settings) {
+        context.dataStore.edit {
+            it[SONG_SKIP_MULTIPLIER] = settings.skipMultiplier
+        }
     }
 
 }

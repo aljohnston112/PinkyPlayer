@@ -44,6 +44,34 @@ class ProbabilityMapTest {
     }
 
     @Test
+    fun testSample2() {
+        val numberOfSamples = 1000000
+        probabilityMap = ProbabilityMap(listOf("A", "B"))
+        probabilityMap.reduceProbability("A", 10)
+        val expectedProbabilities = mapOf(
+            "A" to 1.0 / 11.0,
+            "B" to 10.0 / 11.0,
+        )
+
+        val observedCounts = mutableMapOf<String, Long>()
+
+        repeat(numberOfSamples) {
+            val sampledElement = probabilityMap.sample()
+            observedCounts[sampledElement] = (observedCounts[sampledElement] ?: 0L) + 1
+        }
+
+        expectedProbabilities.forEach { (element, expectedProbability) ->
+            val observedProbability = observedCounts[element]!!.toDouble() / numberOfSamples.toDouble()
+            val deviation = abs((expectedProbability - observedProbability))
+            val epsilon = 0.01
+            assertTrue(
+                "Deviation for $element should be within $epsilon, but was $deviation",
+                deviation <= epsilon
+            )
+        }
+    }
+
+    @Test
     fun testReduceProbability(){
         probabilityMap.reduceProbability("A", 10)
         val numberOfSamples = 1000000
