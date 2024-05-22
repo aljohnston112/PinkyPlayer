@@ -39,7 +39,7 @@ class MusicSearchUseCase {
 
     @get:Rule(order = 2)
     val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        Manifest.permission.READ_EXTERNAL_STORAGE
+        Manifest.permission.READ_MEDIA_AUDIO
     )
 
     @get:Rule(order = 3)
@@ -74,7 +74,7 @@ class MusicSearchUseCase {
                 )
 
             // Get songs containing the search text in their full path
-            val music = musicRepository.getCachedMusicFiles()!!
+            val music = musicRepository.getCachedMusicFiles()
             val siftedMusic = mutableListOf<MusicFile>()
             for (song in music) {
                 if (song.fullPath.lowercase().contains(searchText)) {

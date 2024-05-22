@@ -27,14 +27,20 @@ class FragmentTitle : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentTitleBinding.inflate(inflater, container, false)
+        _binding = FragmentTitleBinding.inflate(
+            inflater,
+            container,
+            false
+        )
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         // Set up navigation buttons
         viewModel.havePermission.observe(viewLifecycleOwner) {
+
             // Must guarantee permissions are granted before launching [FragmentMusicList]
             if (it) {
                 binding.buttonSongs.setOnClickListener{

@@ -37,6 +37,9 @@ class ActivityMainViewModel @Inject constructor(
      * Lets the user know that permission is needed to access the music files.
      */
     fun displayPermissionNeeded(view: View) {
+
+        // TODO Make a DialogFragment instead
+
         Snackbar.make(
             view,
             R.string.permission_needed,
@@ -55,16 +58,6 @@ class ActivityMainViewModel @Inject constructor(
         contentResolver: ContentResolver,
     ): Job {
         _havePermission.postValue(true)
-        return loadMusicFiles(contentResolver)
-    }
-
-    /**
-     * Loads music files into [musicFiles].
-     * If [loadMusic] has not been called then there will be no music.
-     *
-     * @return The job that loads the music files.
-     */
-    private fun loadMusicFiles(contentResolver: ContentResolver): Job {
         return viewModelScope.launch {
             musicRepository.loadMusicFiles(contentResolver)
         }
@@ -83,7 +76,10 @@ class ActivityMainViewModel @Inject constructor(
         controller: MediaController
     ) {
         controller.setMediaItem(
-            mediaItemCreator.getMediaItem(context, id)
+            mediaItemCreator.getMediaItem(
+                context,
+                id
+            )
         )
         controller.play()
     }
@@ -94,14 +90,22 @@ class ActivityMainViewModel @Inject constructor(
      * @param controller The [MediaController] connected to the [ServiceMediaLibrary].
      *
      */
-    fun onPlayPauseClicked(
-        controller: MediaController
-    ) {
+    fun onPlayPauseClicked(controller: MediaController) {
         if (controller.isPlaying) {
             controller.pause()
         } else {
             controller.play()
         }
+    }
+
+    /**
+     * Seeks to the next song.
+     *
+     * @param controller The [MediaController] connected to the [ServiceMediaLibrary].
+     *
+     */
+    fun onNextClicked(controller: MediaController) {
+        controller.seekToNextMediaItem()
     }
 
 }

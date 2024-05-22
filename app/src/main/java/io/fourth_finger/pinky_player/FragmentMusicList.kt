@@ -160,7 +160,8 @@ class FragmentMusicList : Fragment() {
                 }
             }
         }
-        // [FragmentTitle] must guarantee permissions are granted before launching this Fragment
+        // [FragmentTitle] must guarantee permissions are granted
+        // before launching this Fragment
         // Permission must be granted before [loadMusic] is run
         activityMainViewModel.loadMusic(requireActivity().contentResolver)
     }

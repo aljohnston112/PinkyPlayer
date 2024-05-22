@@ -51,15 +51,16 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
     testImplementation("junit:junit:4.13.2")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.2")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     androidTestImplementation ("androidx.test:runner:1.5.2")
+
     androidTestUtil("androidx.test:orchestrator:1.4.2")
 
 }

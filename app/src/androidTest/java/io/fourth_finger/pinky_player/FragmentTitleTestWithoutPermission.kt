@@ -51,7 +51,7 @@ class FragmentTitleTestWithoutPermission {
         // Make sure permission has not been granted
         val permissionStatus = ContextCompat.checkSelfPermission(
             application,
-            Manifest.permission.READ_EXTERNAL_STORAGE
+            Manifest.permission.READ_MEDIA_AUDIO
         )
         assert(permissionStatus == PackageManager.PERMISSION_DENIED)
     }

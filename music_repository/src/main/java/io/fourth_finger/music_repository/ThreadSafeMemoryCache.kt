@@ -34,12 +34,15 @@ class ThreadSafeMemoryCache<T> {
     /**
      * Gets the data in cache.
      *
-     * @return The data in this cache or
-     *         null if no data has been stored in this cache.
+     * @return The data in this cache.
+     * @throws NoSuchElementException if no data has been stored in this cache.
      */
-    suspend fun getData(): T? {
-        return dataMutex.withLock {
-            data
+    suspend fun getData(): T {
+        dataMutex.withLock {
+            if (!hasData()) {
+                throw NoSuchElementException()
+            }
+            return data!!
         }
     }
 

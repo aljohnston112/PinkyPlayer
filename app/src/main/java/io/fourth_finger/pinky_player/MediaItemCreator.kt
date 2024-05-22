@@ -22,11 +22,19 @@ class MediaItemCreator @Inject constructor(
      * @param id The music file's [MediaStore.Audio.Media] id.
      * @return The constructed [MediaItem].
      */
-    fun getMediaItem(context: Context, id: Long): MediaItem {
+    fun getMediaItem(
+        context: Context,
+        id: Long
+    ): MediaItem {
         return MediaItem.Builder()
             .setMediaId(id.toString())
             .setUri(musicRepository.getUri(id))
-            .setMediaMetadata(metaDataCreator.getMetaData(context, id))
+            .setMediaMetadata(
+                metaDataCreator.getMetaData(
+                    context,
+                    id
+                )
+            )
             .build()
     }
 

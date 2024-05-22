@@ -36,7 +36,7 @@ class ActivityMainViewModelTest {
 
     @get:Rule(order = 2)
     val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        Manifest.permission.READ_EXTERNAL_STORAGE
+        Manifest.permission.READ_MEDIA_AUDIO
     )
 
     @Inject
@@ -101,8 +101,8 @@ class ActivityMainViewModelTest {
         val countDownLatchPlay = CountDownLatch(1)
         val countDownLatchPause = CountDownLatch(1)
         val mediaBrowserProvider = MediaBrowserProvider(
-            this,
-            application
+            application,
+            this
         )
         val mediaBrowser = mediaBrowserProvider.await()
         mediaBrowser.addListener(
@@ -142,8 +142,8 @@ class ActivityMainViewModelTest {
         val countDownLatchPause = CountDownLatch(1)
         val countDownLatchPlay2 = CountDownLatch(1)
         val mediaBrowserProvider = MediaBrowserProvider(
-            this,
-            application
+            application,
+            this
         )
         val mediaBrowser = mediaBrowserProvider.await()
         mediaBrowser.addListener(
@@ -191,8 +191,8 @@ class ActivityMainViewModelTest {
         // Setup the media browser listener
         val countDownLatch = CountDownLatch(1)
         val mediaBrowserProvider = MediaBrowserProvider(
-            this,
-            application
+            application,
+            this
         )
         val mediaBrowser = mediaBrowserProvider.await()
         val music = musicRepository.loadMusicFiles(application.contentResolver)

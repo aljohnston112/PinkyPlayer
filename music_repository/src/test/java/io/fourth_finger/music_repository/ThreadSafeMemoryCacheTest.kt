@@ -1,12 +1,14 @@
 package io.fourth_finger.music_repository
 
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert
 import org.junit.Test
 
 class ThreadSafeMemoryCacheTest {
 
     @Test
-    fun hasData_returnsFalseWhenNoData(){
+    fun hasData_returnsFalseWhenNoData() {
         val threadSafeMemoryCache = ThreadSafeMemoryCache<Int>()
         assert(!threadSafeMemoryCache.hasData())
     }
@@ -28,7 +30,11 @@ class ThreadSafeMemoryCacheTest {
     @Test
     fun getData_returnsNullWhenNoData() = runTest {
         val threadSafeMemoryCache = ThreadSafeMemoryCache<Int>()
-        assert(threadSafeMemoryCache.getData() == null)
+        Assert.assertThrows(NoSuchElementException::class.java) {
+            runBlocking {
+                threadSafeMemoryCache.getData()
+            }
+        }
     }
 
 }

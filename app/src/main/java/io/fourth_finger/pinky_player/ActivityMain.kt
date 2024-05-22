@@ -32,17 +32,35 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ActivityMain : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-
     @Inject
     lateinit var mediaBrowserProvider: MediaBrowserProvider
 
+    private lateinit var binding: ActivityMainBinding
+
     private val viewModel: ActivityMainViewModel by viewModels()
+
+    private val menuProvider = object : MenuProvider {
+
+        override fun onCreateMenu(
+            menu: Menu,
+            menuInflater: MenuInflater
+        ) {
+            menuInflater.inflate(
+                R.menu.actvity_main_menu,
+                menu
+            )
+        }
+
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+            return false
+        }
+
+    }
 
     /**
      * Handles UI updates in response to player updates
      */
-    private val listener = object : Player.Listener {
+    private val playerListener = object : Player.Listener {
 
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
@@ -62,31 +80,13 @@ class ActivityMain : AppCompatActivity() {
 
     }
 
-    private val menuProvider = object : MenuProvider {
-
-        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-            menuInflater.inflate(R.menu.actvity_main_menu, menu)
-        }
-
-        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-            return false
-        }
-
-    }
-
-    /**
-     * Sets up the onClickListener for the play/pause button
-     */
-    private fun setUpOnClickListener() {
-        binding.buttonPlayPause.setOnClickListener {
-            mediaBrowserProvider.invokeOnConnection(Dispatchers.Main.immediate) { mediaBrowser ->
-                viewModel.onPlayPauseClicked(mediaBrowser)
-            }
-        }
-        binding.buttonNext.setOnClickListener {
-            mediaBrowserProvider.invokeOnConnection(Dispatchers.Main.immediate) { mediaBrowser ->
-                mediaBrowser.seekToNextMediaItem()
-            }
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            viewModel.loadMusic(contentResolver)
+        } else {
+            viewModel.displayPermissionNeeded(binding.root)
         }
     }
 
@@ -100,11 +100,6 @@ class ActivityMain : AppCompatActivity() {
         binding.controls.visibility = View.VISIBLE
     }
 
-
-    /**
-     *  Makes sure the proper permissions are granted and
-     *  then loads the music files from the MediaStore.
-     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -121,6 +116,22 @@ class ActivityMain : AppCompatActivity() {
         )
     }
 
+    override fun onStart() {
+        super.onStart()
+        requestPermissionsAndLoadMusicFiles()
+        mediaBrowserProvider.invokeOnConnection(
+            Dispatchers.Main.immediate
+        ) { mediaBrowser ->
+            mediaBrowser.addListener(playerListener)
+        }
+        setUpOnClickListener()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mediaBrowserProvider.getOrNull()?.removeListener(playerListener)
+    }
+
     /**
      *  Makes sure the proper permissions are granted and
      *  then loads the music files from the MediaStore.
@@ -128,11 +139,9 @@ class ActivityMain : AppCompatActivity() {
     private fun requestPermissionsAndLoadMusicFiles() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermission(READ_MEDIA_AUDIO)
+            requestPermission(POST_NOTIFICATIONS)
         } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
             requestPermission(READ_EXTERNAL_STORAGE)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requestPermission(POST_NOTIFICATIONS)
         }
     }
 
@@ -143,15 +152,7 @@ class ActivityMain : AppCompatActivity() {
      */
     private fun requestPermission(permission: String) {
 
-        val requestPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                viewModel.loadMusic(contentResolver)
-            } else {
-                viewModel.displayPermissionNeeded(binding.root)
-            }
-        }
+        // TODO handle notification permission
 
         when {
             ContextCompat.checkSelfPermission(
@@ -173,20 +174,23 @@ class ActivityMain : AppCompatActivity() {
     }
 
     /**
-     * Gets the application's [MediaBrowser] and adds a listener to it.
+     * Sets up the onClickListener for the play/pause button
      */
-    override fun onStart() {
-        super.onStart()
-        requestPermissionsAndLoadMusicFiles()
-        mediaBrowserProvider.invokeOnConnection(Dispatchers.Main.immediate) { mediaBrowser ->
-            mediaBrowser.addListener(listener)
+    private fun setUpOnClickListener() {
+        binding.buttonPlayPause.setOnClickListener {
+            mediaBrowserProvider.invokeOnConnection(
+                Dispatchers.Main.immediate
+            ) { mediaBrowser ->
+                viewModel.onPlayPauseClicked(mediaBrowser)
+            }
         }
-        setUpOnClickListener()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mediaBrowserProvider.getOrNull()?.removeListener(listener)
+        binding.buttonNext.setOnClickListener {
+            mediaBrowserProvider.invokeOnConnection(
+                Dispatchers.Main.immediate
+            ) { mediaBrowser ->
+                viewModel.onNextClicked(mediaBrowser)
+            }
+        }
     }
 
     override fun onDestroy() {

@@ -38,7 +38,7 @@ class PlayMusicUseCase {
 
     @get:Rule(order = 2)
     val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        Manifest.permission.READ_EXTERNAL_STORAGE
+        Manifest.permission.READ_MEDIA_AUDIO
     )
 
     @get:Rule(order = 3)
@@ -120,7 +120,7 @@ class PlayMusicUseCase {
             val countDownLatchPlay = CountDownLatch(1)
             val countDownLatchPlay2 = CountDownLatch(1)
             val mediaBrowser = mediaBrowserProvider.await()
-            val musicId = musicRepository.getCachedMusicFiles()!![0].id
+            val musicId = musicRepository.getCachedMusicFiles()[0].id
             mediaBrowser.addListener(
                 object : Player.Listener {
 

@@ -24,7 +24,7 @@ class MediaFileUtil {
             musicRepository: MusicRepository,
             doNotConsider: List<Long> = listOf()
         ): Long {
-            val music = musicRepository.getCachedMusicFiles()!!
+            val music = musicRepository.getCachedMusicFiles()
             var shortestMusic = music[0].id
 
             val context = InstrumentationRegistry.getInstrumentation().targetContext

@@ -15,7 +15,7 @@ class MusicDataSourceTest {
 
     @get:Rule
     val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        Manifest.permission.READ_EXTERNAL_STORAGE
+        Manifest.permission.READ_MEDIA_AUDIO
     )
 
     private val context = InstrumentationRegistry.getInstrumentation().context

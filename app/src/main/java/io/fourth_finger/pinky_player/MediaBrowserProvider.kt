@@ -17,22 +17,23 @@ import kotlin.coroutines.CoroutineContext
 
 @Singleton
 class MediaBrowserProvider @Inject constructor(
-    private val scope: CoroutineScope,
-    @ApplicationContext applicationContext: Context
+    @ApplicationContext applicationContext: Context,
+    private val scope: CoroutineScope
 ) {
 
     private lateinit var mediaBrowser: MediaBrowser
-    private val job: Job
 
-    init {
-        job = scope.launch(Dispatchers.Default) {
-            val sessionToken = SessionToken(
+    private val job: Job = scope.launch(Dispatchers.Default) {
+        mediaBrowser = MediaBrowser.Builder(
+            applicationContext,
+            SessionToken(
                 applicationContext,
-                ComponentName(applicationContext, ServiceMediaLibrary::class.java)
+                ComponentName(
+                    applicationContext,
+                    ServiceMediaLibrary::class.java
+                )
             )
-            mediaBrowser = MediaBrowser.Builder(applicationContext, sessionToken)
-                .buildAsync().await()
-        }
+        ).buildAsync().await()
     }
 
     suspend fun await(): MediaBrowser {

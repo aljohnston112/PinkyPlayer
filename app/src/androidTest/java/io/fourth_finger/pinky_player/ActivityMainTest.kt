@@ -160,7 +160,7 @@ class ActivityMainTest {
         // Permission must not be granted
         var permissionStatus = ContextCompat.checkSelfPermission(
             application,
-            Manifest.permission.READ_EXTERNAL_STORAGE
+            Manifest.permission.READ_MEDIA_AUDIO
         )
         assert(permissionStatus != PackageManager.PERMISSION_GRANTED)
 
@@ -173,7 +173,7 @@ class ActivityMainTest {
         // Make sure the correct permission was granted
         permissionStatus = ContextCompat.checkSelfPermission(
             application,
-            Manifest.permission.READ_EXTERNAL_STORAGE
+            Manifest.permission.READ_MEDIA_AUDIO
         )
         assert(permissionStatus == PackageManager.PERMISSION_GRANTED)
     }
@@ -188,7 +188,7 @@ class ActivityMainTest {
         // Make sure permission has not been granted
         val permissionStatus = ContextCompat.checkSelfPermission(
             application,
-            Manifest.permission.READ_EXTERNAL_STORAGE
+            Manifest.permission.READ_MEDIA_AUDIO
         )
         assert(permissionStatus == PackageManager.PERMISSION_DENIED)
 
@@ -217,7 +217,7 @@ class ActivityMainTest {
                     Build.VERSION.SDK_INT == 23 -> "Allow"
                     Build.VERSION.SDK_INT <= 28 -> "ALLOW"
                     Build.VERSION.SDK_INT == 29 -> "Allow only while using the app"
-                    Build.VERSION.SDK_INT == 31 -> "Allow"
+                    Build.VERSION.SDK_INT >= 31 -> "Allow"
                     else -> "While using the app"
                 }
             )
@@ -237,7 +237,7 @@ class ActivityMainTest {
                     Build.VERSION.SDK_INT == 23 -> "Don't allow"
                     Build.VERSION.SDK_INT <= 28 -> "DON'T ALLOW"
                     Build.VERSION.SDK_INT == 29 -> "Don't allow"
-                    Build.VERSION.SDK_INT == 31 -> "Don\u2019t allow"
+                    Build.VERSION.SDK_INT >= 31 -> "Don\u2019t allow"
                     else -> "Don't allow"
                 }
             )

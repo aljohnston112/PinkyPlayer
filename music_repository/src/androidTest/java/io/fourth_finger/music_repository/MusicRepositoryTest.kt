@@ -2,7 +2,9 @@ package io.fourth_finger.music_repository
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertThrows
 import org.junit.Rule
 import org.junit.Test
 
@@ -48,9 +50,13 @@ class MusicRepositoryTest {
         val actualMusicFiles = MusicDataSource().getMusicFromMediaStore(contentResolver)!!
 
         val musicRepository = MusicRepository()
-        assert(musicRepository.getCachedMusicFiles() == null)
+        assertThrows(NoSuchElementException::class.java){
+            runBlocking {
+                musicRepository.getCachedMusicFiles()
+            }
+        }
         musicRepository.loadMusicFiles(contentResolver)
-        val musicFiles = musicRepository.getCachedMusicFiles()!!
+        val musicFiles = musicRepository.getCachedMusicFiles()
 
         // Assert there are music files
         assert(musicFiles.isNotEmpty())

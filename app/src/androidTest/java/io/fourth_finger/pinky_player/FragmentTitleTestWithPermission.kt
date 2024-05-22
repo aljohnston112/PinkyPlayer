@@ -31,7 +31,7 @@ class FragmentTitleTestWithPermission {
 
     @get:Rule(order = 1)
     val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        Manifest.permission.READ_EXTERNAL_STORAGE
+        Manifest.permission.READ_MEDIA_AUDIO
     )
 
     @get:Rule(order = 2)

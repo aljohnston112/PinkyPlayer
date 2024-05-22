@@ -26,7 +26,11 @@ class MetaDataCreator @Inject constructor(
      * @param mediaId The id of the music file to get the metadata from.
      * @return The [MediaMetadata] of the music file with the given mediaId.
      */
-    fun getMetaData(context: Context, mediaId: Long): MediaMetadata {
+    fun getMetaData(
+        context: Context,
+        mediaId: Long
+    ): MediaMetadata {
+
         // Music title
         val musicFile = musicRepository.getMusicFile(mediaId)
         if (musicFile != null) {
@@ -34,18 +38,20 @@ class MetaDataCreator @Inject constructor(
         }
 
         // Bitmap
-        val resources = context.resources
-        val resourceId = R.drawable.ic_baseline_music_note_24
-        val drawableUri = Uri.Builder()
-            .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-            .authority(resources.getResourcePackageName(resourceId))
-            .appendPath(resources.getResourceTypeName(resourceId))
-            .appendPath(resources.getResourceEntryName(resourceId))
-            .build()
         musicRepository.getUri(mediaId)?.let { uri ->
             metaDataBuilder.setArtworkUri(uri)
             uri
-        } ?: metaDataBuilder.setArtworkUri(drawableUri)
+        } ?: {
+            val resources = context.resources
+            val resourceId = R.drawable.ic_baseline_music_note_24
+            val drawableUri = Uri.Builder()
+                .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                .authority(resources.getResourcePackageName(resourceId))
+                .appendPath(resources.getResourceTypeName(resourceId))
+                .appendPath(resources.getResourceEntryName(resourceId))
+                .build()
+            metaDataBuilder.setArtworkUri(drawableUri)
+        }
 
         return metaDataBuilder.build()
     }
