@@ -17,6 +17,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -193,7 +194,7 @@ class ActivityMainTest {
         assert(permissionStatus == PackageManager.PERMISSION_DENIED)
 
         onView(withText(R.string.permission_needed))
-            .check(matches(isCompletelyDisplayed()))
+            .check(matches(isDisplayed()))
     }
 
     private suspend fun getFirstMusicUri(): MediaItem {

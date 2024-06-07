@@ -7,7 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.session.MediaController
+import androidx.media3.common.Player
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.fourth_finger.music_repository.MusicFile
@@ -24,14 +24,48 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ActivityMainViewModel @Inject constructor(
+    private val mediaBrowserProvider: MediaBrowserProvider,
     private val musicRepository: MusicRepository,
     private val mediaItemCreator: MediaItemCreator
 ) : ViewModel() {
 
-    val musicFiles: LiveData<List<MusicFile>> = musicRepository.musicFiles
+    @Inject
+    lateinit var musicFiles: LiveData<List<MusicFile>>
 
     private val _havePermission = MutableLiveData(false)
     val havePermission: LiveData<Boolean> = _havePermission
+
+    private val _playing = MutableLiveData(false)
+    val playing = _playing as LiveData<Boolean>
+
+    /**
+     * Handles UI updates in response to player updates
+     */
+    private val playerListener = object : Player.Listener {
+
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            super.onPlaybackStateChanged(playbackState)
+            if (playbackState == Player.STATE_ENDED) {
+                _playing.postValue(false)
+            }
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            super.onIsPlayingChanged(isPlaying)
+            if (isPlaying) {
+                _playing.postValue(true)
+            } else {
+                _playing.postValue(false)
+            }
+        }
+
+    }
+
+    fun start() {
+        viewModelScope.launch {
+            mediaBrowserProvider.await().addListener(playerListener)
+        }
+    }
 
     /**
      * Lets the user know that permission is needed to access the music files.
@@ -54,9 +88,7 @@ class ActivityMainViewModel @Inject constructor(
      * @param contentResolver The ContentResolver to query for music files.
      * @return The job that loads the music files.
      */
-    fun loadMusic(
-        contentResolver: ContentResolver,
-    ): Job {
+    fun loadMusic(contentResolver: ContentResolver): Job {
         _havePermission.postValue(true)
         return viewModelScope.launch {
             musicRepository.loadMusicFiles(contentResolver)
@@ -68,44 +100,49 @@ class ActivityMainViewModel @Inject constructor(
      *
      * @param context
      * @param id The id of the [MusicFile] corresponding to the music file to play.
-     * @param controller The [MediaController] connected to the [ServiceMediaLibrary].
      */
     fun songClicked(
         context: Context,
-        id: Long,
-        controller: MediaController
+        id: Long
     ) {
-        controller.setMediaItem(
-            mediaItemCreator.getMediaItem(
-                context,
-                id
+        viewModelScope.launch {
+            val mediaBrowser = mediaBrowserProvider.await()
+            mediaBrowser.setMediaItem(
+                mediaItemCreator.getMediaItem(
+                    context,
+                    id
+                )
             )
-        )
-        controller.play()
+            mediaBrowser.play()
+        }
     }
 
     /**
      * Pauses or plays the current song.
-     *
-     * @param controller The [MediaController] connected to the [ServiceMediaLibrary].
-     *
      */
-    fun onPlayPauseClicked(controller: MediaController) {
-        if (controller.isPlaying) {
-            controller.pause()
-        } else {
-            controller.play()
+    fun onPlayPauseClicked() {
+        viewModelScope.launch {
+            val mediaBrowser = mediaBrowserProvider.await()
+            if (mediaBrowser.isPlaying) {
+                mediaBrowser.pause()
+            } else {
+                mediaBrowser.play()
+            }
         }
     }
 
     /**
      * Seeks to the next song.
-     *
-     * @param controller The [MediaController] connected to the [ServiceMediaLibrary].
-     *
      */
-    fun onNextClicked(controller: MediaController) {
-        controller.seekToNextMediaItem()
+    fun onNextClicked() {
+        viewModelScope.launch {
+            val mediaBrowser = mediaBrowserProvider.await()
+            mediaBrowser.seekToNextMediaItem()
+        }
+    }
+
+    fun stop() {
+        mediaBrowserProvider.getOrNull()?.removeListener(playerListener)
     }
 
 }

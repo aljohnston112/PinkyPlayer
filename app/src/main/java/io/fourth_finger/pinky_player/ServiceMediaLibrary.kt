@@ -7,6 +7,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
 /**
@@ -20,6 +21,9 @@ class ServiceMediaLibrary : MediaLibraryService() {
 
     @Inject
     lateinit var playlistProvider: PlaylistProvider
+
+    @Inject
+    lateinit var applicationScope: CoroutineScope
 
     private lateinit var player: PinkyPlayer
 
@@ -62,7 +66,12 @@ class ServiceMediaLibrary : MediaLibraryService() {
      */
     @OptIn(UnstableApi::class)
     private fun setUpMediaSession() {
-        player = PinkyPlayer(this, mediaItemCreator, playlistProvider)
+        player = PinkyPlayer(
+            applicationScope,
+            this,
+            mediaItemCreator,
+            playlistProvider
+        )
         player.addListener(listener)
         mediaSession = MediaLibrarySession.Builder(
             this,

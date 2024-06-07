@@ -39,7 +39,7 @@ class PlaylistProviderTest {
             val countDownLatch = CountDownLatch(1)
             testDispatcher = UnconfinedTestDispatcher(testScheduler)
             UiThreadStatement.runOnUiThread {
-                playlistProvider = PlaylistProvider(this, musicRepository.musicFiles)
+                playlistProvider = PlaylistProvider(this, musicRepository)
                 countDownLatch.countDown()
             }
             countDownLatch.await()
@@ -60,23 +60,6 @@ class PlaylistProviderTest {
         val playlist = playlistProvider.getOrNull()!!
         for (song in music) {
             assertTrue(playlist.contains(song))
-        }
-    }
-
-    @Test
-    fun invokeOnLoad_whenNoMusicLoaded_doesNotInvokeCallback() {
-        playlistProvider.invokeOnLoad {
-            assertTrue(false)
-        }
-    }
-
-    @Test
-    fun invokeOnLoad_whenMusicLoaded_invokesCallback() = runTest {
-        val music = musicRepository.loadMusicFiles(application.contentResolver)
-        playlistProvider.invokeOnLoad {
-            for (song in music) {
-                assertTrue(it.contains(song))
-            }
         }
     }
 

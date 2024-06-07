@@ -1,7 +1,6 @@
 package io.fourth_finger.pinky_player
 
 import android.Manifest
-import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_AUDIO
 import android.app.Activity
@@ -18,12 +17,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
-import androidx.media3.common.Player
-import androidx.media3.common.Player.STATE_ENDED
-import androidx.media3.session.MediaBrowser
 import dagger.hilt.android.AndroidEntryPoint
 import io.fourth_finger.pinky_player.databinding.ActivityMainBinding
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
 /**
@@ -57,29 +52,6 @@ class ActivityMain : AppCompatActivity() {
 
     }
 
-    /**
-     * Handles UI updates in response to player updates
-     */
-    private val playerListener = object : Player.Listener {
-
-        override fun onPlaybackStateChanged(playbackState: Int) {
-            super.onPlaybackStateChanged(playbackState)
-            if (playbackState == STATE_ENDED) {
-                setPlayButton()
-            }
-        }
-
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-            super.onIsPlayingChanged(isPlaying)
-            if (isPlaying) {
-                setPauseButton()
-            } else {
-                setPlayButton()
-            }
-        }
-
-    }
-
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -91,12 +63,12 @@ class ActivityMain : AppCompatActivity() {
     }
 
     private fun setPlayButton() {
-        binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+        binding.buttonPlayPause.setBackgroundResource(R.drawable.ic_baseline_play_arrow_24)
         binding.controls.visibility = View.VISIBLE
     }
 
     private fun setPauseButton() {
-        binding.buttonPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
+        binding.buttonPlayPause.setBackgroundResource(R.drawable.ic_baseline_pause_24)
         binding.controls.visibility = View.VISIBLE
     }
 
@@ -118,18 +90,16 @@ class ActivityMain : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        requestPermissionsAndLoadMusicFiles()
-        mediaBrowserProvider.invokeOnConnection(
-            Dispatchers.Main.immediate
-        ) { mediaBrowser ->
-            mediaBrowser.addListener(playerListener)
+        viewModel.start()
+        viewModel.playing.observe(this) {isPlaying ->
+            if(isPlaying){
+                setPauseButton()
+            } else {
+                setPlayButton()
+            }
         }
-        setUpOnClickListener()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mediaBrowserProvider.getOrNull()?.removeListener(playerListener)
+        requestPermissionsAndLoadMusicFiles()
+        setUpOnClickListeners()
     }
 
     /**
@@ -139,7 +109,6 @@ class ActivityMain : AppCompatActivity() {
     private fun requestPermissionsAndLoadMusicFiles() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermission(READ_MEDIA_AUDIO)
-            requestPermission(POST_NOTIFICATIONS)
         } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
             requestPermission(READ_EXTERNAL_STORAGE)
         }
@@ -174,23 +143,20 @@ class ActivityMain : AppCompatActivity() {
     }
 
     /**
-     * Sets up the onClickListener for the play/pause button
+     * Sets up the onClickListeners for the media playback buttons
      */
-    private fun setUpOnClickListener() {
+    private fun setUpOnClickListeners() {
         binding.buttonPlayPause.setOnClickListener {
-            mediaBrowserProvider.invokeOnConnection(
-                Dispatchers.Main.immediate
-            ) { mediaBrowser ->
-                viewModel.onPlayPauseClicked(mediaBrowser)
-            }
+            viewModel.onPlayPauseClicked()
         }
         binding.buttonNext.setOnClickListener {
-            mediaBrowserProvider.invokeOnConnection(
-                Dispatchers.Main.immediate
-            ) { mediaBrowser ->
-                viewModel.onNextClicked(mediaBrowser)
-            }
+            viewModel.onNextClicked()
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.stop()
     }
 
     override fun onDestroy() {

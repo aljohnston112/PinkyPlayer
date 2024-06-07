@@ -18,7 +18,7 @@ import kotlin.coroutines.CoroutineContext
 @Singleton
 class MediaBrowserProvider @Inject constructor(
     @ApplicationContext applicationContext: Context,
-    private val scope: CoroutineScope
+    scope: CoroutineScope
 ) {
 
     private lateinit var mediaBrowser: MediaBrowser
@@ -39,17 +39,6 @@ class MediaBrowserProvider @Inject constructor(
     suspend fun await(): MediaBrowser {
         job.join()
         return mediaBrowser
-    }
-
-    fun invokeOnConnection(
-        dispatcher: CoroutineContext,
-        callback: (MediaBrowser) -> Unit
-    ) {
-        job.invokeOnCompletion {
-            scope.launch(dispatcher) {
-                callback(mediaBrowser)
-            }
-        }
     }
 
     fun getOrNull(): MediaBrowser? {

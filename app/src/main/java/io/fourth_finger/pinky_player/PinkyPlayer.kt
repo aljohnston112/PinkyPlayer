@@ -11,14 +11,18 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.SeekParameters
 import io.fourth_finger.music_repository.MusicFile
 import io.fourth_finger.probability_map.ProbabilityMap
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
 class PinkyPlayer(
-    private var context: Context?,
+    private var scope: CoroutineScope,
+    private var context: Context,
     private val mediaItemCreator: MediaItemCreator,
     private val playlistProvider: PlaylistProvider
 ) : ForwardingPlayer(
-    ExoPlayer.Builder(context!!)
+    ExoPlayer.Builder(context)
         .setSkipSilenceEnabled(true)
         .setSeekParameters(SeekParameters.EXACT)
         .build()
@@ -29,9 +33,11 @@ class PinkyPlayer(
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             super.onMediaItemTransition(mediaItem, reason)
-            if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
-                playlistProvider.invokeOnLoad {
-                    addMediaItem(getNextSong(it))
+            scope.launch(Dispatchers.Main.immediate) {
+                if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
+                    addMediaItem(
+                        getNextSong(playlistProvider.await())
+                    )
                 }
             }
         }
@@ -56,22 +62,44 @@ class PinkyPlayer(
     }
 
     override fun setMediaItem(mediaItem: MediaItem) {
-        setMediaItems(mutableListOf(mediaItem), true)
+        setMediaItems(
+            mutableListOf(mediaItem),
+            true
+        )
     }
 
-    override fun setMediaItem(mediaItem: MediaItem, resetPosition: Boolean) {
-        setMediaItems(mutableListOf(mediaItem), resetPosition)
+    override fun setMediaItem(
+        mediaItem: MediaItem,
+        resetPosition: Boolean
+    ) {
+        setMediaItems(
+            mutableListOf(mediaItem),
+            resetPosition
+        )
     }
 
-    override fun setMediaItem(mediaItem: MediaItem, startPositionMs: Long) {
-        super.setMediaItems(mutableListOf(mediaItem), 0, startPositionMs)
+    override fun setMediaItem(
+        mediaItem: MediaItem,
+        startPositionMs: Long
+    ) {
+        super.setMediaItems(
+            mutableListOf(mediaItem),
+            0,
+            startPositionMs
+        )
     }
 
-    override fun setMediaItems(mediaItems: MutableList<MediaItem>, resetPosition: Boolean) {
-        playlistProvider.invokeOnLoad {
+    override fun setMediaItems(
+        mediaItems: MutableList<MediaItem>,
+        resetPosition: Boolean
+    ) {
+        scope.launch(Dispatchers.Main.immediate) {
             val songs = mediaItems.toMutableList()
             if (mediaItems.size == 1) {
-                addSong(it, songs)
+                addSong(
+                    playlistProvider.await(),
+                    songs
+                )
             }
             super.setMediaItems(songs, resetPosition)
         }
@@ -88,7 +116,7 @@ class PinkyPlayer(
         playlist: ProbabilityMap<MusicFile>
     ): MediaItem {
         return mediaItemCreator.getMediaItem(
-            context!!,
+            context,
             playlist.sample().id
         )
     }
@@ -98,14 +126,15 @@ class PinkyPlayer(
     }
 
     override fun seekToNextMediaItem() {
-        playlistProvider.invokeOnLoad {
-            val next = getNextSong(it)
+        scope.launch(Dispatchers.Main.immediate) {
+            val playlist  = playlistProvider.await()
+            val next = getNextSong(playlist)
             addMediaItem(next)
             seekTo(
                 currentMediaItemIndex + 1,
                 C.TIME_UNSET
             )
-            val afterNext = getNextSong(it)
+            val afterNext = getNextSong(playlist)
             addMediaItem(afterNext)
         }
     }
@@ -113,11 +142,10 @@ class PinkyPlayer(
     override fun release() {
         super.release()
         removeListener(listener)
-        context = null
     }
 
     fun setMediaItem(musicFile: MusicFile) {
-        setMediaItem(mediaItemCreator.getMediaItem(context!!, musicFile.id))
+        setMediaItem(mediaItemCreator.getMediaItem(context, musicFile.id))
     }
 
 }

@@ -30,9 +30,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FragmentMusicList : Fragment() {
 
-    @Inject
-    lateinit var mediaBrowserProvider: MediaBrowserProvider
-
     private var _binding: FragmentMusicListBinding? = null
     private val binding get() = _binding!!
 
@@ -138,13 +135,12 @@ class FragmentMusicList : Fragment() {
      * Sets up the RecyclerView.
      */
     private fun setUpRecyclerView() {
-        // Set up the adapter
-        val adapter = MusicFileAdapter(emptyList()) {
+        val adapter = MusicFileAdapter(emptyList()) { songID ->
             // Callback for when a song item is tapped
-                songID ->
-            mediaBrowserProvider.invokeOnConnection(Dispatchers.Main.immediate) { mediaBrowser ->
-                activityMainViewModel.songClicked(requireContext(), songID, mediaBrowser)
-            }
+                activityMainViewModel.songClicked(
+                    requireContext(),
+                    songID
+                )
         }
         binding.recyclerView.adapter = adapter
         val linearLayoutManager = LinearLayoutManager(context)

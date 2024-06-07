@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_SEEK
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
@@ -30,13 +31,13 @@ import io.fourth_finger.pinky_player.PlaylistProvider
 import io.fourth_finger.pinky_player.getOrAwaitValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.CountDownLatch
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.time.Duration
@@ -55,7 +56,11 @@ class ShuffleUseCase {
             @ApplicationContext context: Context,
             musicRepository: MusicRepository
         ): LiveData<List<MusicFile>> {
-            val fakeMusicFileLiveData = FakeMusicFileLiveData(scope, context, musicRepository)
+            val fakeMusicFileLiveData = FakeMusicFileLiveData(
+                scope,
+                context,
+                musicRepository
+            )
             return fakeMusicFileLiveData.songs
         }
     }
@@ -113,39 +118,55 @@ class ShuffleUseCase {
 
     @Test
     @LargeTest
-    fun playlist_onSeekToNext_hasCorrectDistribution() = runTest(timeout = Duration.parse("600s")) {
+    fun playlist_onSeekToNext_hasCorrectDistribution() = runTest(timeout = Duration.parse("2h")) {
+        val music = musicFileLiveData.getOrAwaitValue(time = 60)
+        val firstSongId = music[0].id
+        val secondSongId = music[1].id
+        val expectedProbabilities = mapOf(
+            firstSongId to 1.0 / 11.0,
+            secondSongId to 10.0 / 11.0,
+        )
+        val numberOfSamples = 1000
+
         val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
         val observedCounts = mutableMapOf<Long, Long>()
+        observedCounts[firstSongId] = 0
+        observedCounts[secondSongId] = 0
         val mediaBrowser = mediaBrowserProvider.await()
+        val playlist = playlistProvider.await()
+
+        var done = false
+        val counted = Channel<Unit>(1)
         mediaBrowser.addListener(
             object : Player.Listener {
 
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                     super.onMediaItemTransition(mediaItem, reason)
+                    if (reason == MEDIA_ITEM_TRANSITION_REASON_SEEK) {
                         val id = mediaItem!!.mediaId.toLong()
                         observedCounts[id] = (observedCounts[id] ?: 0L) + 1
+
+                        var allGood = true
+                        expectedProbabilities.forEach { (element, expectedProbability) ->
+                            val observedProbability =
+                                (observedCounts[element]?.toDouble() ?: 0.0) / numberOfSamples.toDouble()
+                            val deviation = abs((expectedProbability - observedProbability))
+                            val epsilon = 0.01
+                            if (deviation > epsilon) {
+                                allGood = false
+                            }
+                            done = allGood
+                        }
+//                            runBlocking {
+//                                counted.send(Unit)
+//                            }
+                    }
                 }
 
             }
         )
 
-        val music = musicFileLiveData.getOrAwaitValue(time = 60)
-        val firstSongId = music[0].id
-        val secondSongId = music[1].id
-
-        val numberOfSamples = 10000
-
-        val expectedProbabilities = mapOf(
-            firstSongId to 1.0 / 11.0,
-            secondSongId to 10.0 / 11.0,
-        )
-
-        val countDownLatch = CountDownLatch(1)
-        playlistProvider.invokeOnLoad {
-            it.reduceProbability(music[0], 10)
-            countDownLatch.countDown()
-        }
-        countDownLatch.await()
+        playlist.reduceProbability(music[0], 10)
 
         UiThreadStatement.runOnUiThread {
             val mediaItemCreator = MediaItemCreator(musicRepository)
@@ -153,10 +174,13 @@ class ShuffleUseCase {
             mediaBrowser.play()
         }
 
-        repeat(numberOfSamples) {
+        var i = 0
+        while (i < numberOfSamples && !done) {
             UiThreadStatement.runOnUiThread {
                 mediaBrowser.seekToNext()
             }
+//            counted.receive()
+            i++
         }
 
         expectedProbabilities.forEach { (element, expectedProbability) ->

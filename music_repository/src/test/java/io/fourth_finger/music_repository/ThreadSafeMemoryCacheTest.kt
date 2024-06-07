@@ -28,7 +28,7 @@ class ThreadSafeMemoryCacheTest {
     }
 
     @Test
-    fun getData_returnsNullWhenNoData() = runTest {
+    fun getData_throwsWhenNoData() = runTest {
         val threadSafeMemoryCache = ThreadSafeMemoryCache<Int>()
         Assert.assertThrows(NoSuchElementException::class.java) {
             runBlocking {

@@ -36,14 +36,14 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/button_play_pause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/play_pause"
             android:minWidth="48dp"
             android:minHeight="48dp"
-            android:src="@drawable/ic_baseline_pause_24"
+            android:background="@drawable/ic_baseline_pause_24"
             android:backgroundTint="@color/colorPrimary"
             app:iconPadding="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -51,14 +51,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/button_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/next"
             android:minWidth="48dp"
             android:minHeight="48dp"
-            android:src="@drawable/baseline_skip_next_24"
+            android:background="@drawable/baseline_skip_next_24"
             android:backgroundTint="@color/colorPrimary"
             app:iconPadding="0dp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -12,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.CountDownLatch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,13 +31,15 @@ object MusicFileLiveDataModule {
 
 @Singleton
 class PlaylistProvider @Inject constructor(
-    private val scope: CoroutineScope,
-    musicFileLiveData: LiveData<List<MusicFile>>
+    scope: CoroutineScope,
+    musicRepository: MusicRepository
 ) {
 
     private var playlist: ProbabilityMap<MusicFile>? = null
 
     private val callbacks = mutableListOf<(ProbabilityMap<MusicFile>) -> Unit>()
+
+    private val musicLoadedLatch = CountDownLatch(1)
 
     private val musicObserver: (List<MusicFile>?) -> Unit = { newMusic ->
         newMusic?.let {
@@ -65,25 +68,21 @@ class PlaylistProvider @Inject constructor(
                         }
                     }
                 }
+                musicLoadedLatch.countDown()
             }
         }
     }
 
 
     init {
-        musicFileLiveData.observeForever(musicObserver)
+        musicRepository.musicFiles.observeForever(musicObserver)
     }
 
-    fun invokeOnLoad(
-        callback: (ProbabilityMap<MusicFile>) -> Unit
-    ) {
-        if (playlist != null) {
-            scope.launch(Dispatchers.Main) {
-                callback(playlist!!)
-            }
-        } else {
-            callbacks.add(callback)
+    suspend fun await(): ProbabilityMap<MusicFile> {
+        withContext(Dispatchers.IO) {
+            musicLoadedLatch.await()
         }
+        return playlist!!
     }
 
     fun getOrNull(): ProbabilityMap<MusicFile>? {

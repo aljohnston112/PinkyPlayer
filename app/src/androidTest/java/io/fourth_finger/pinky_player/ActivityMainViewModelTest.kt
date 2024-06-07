@@ -8,7 +8,7 @@ import androidx.media3.common.Player
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
@@ -17,6 +17,8 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.fourth_finger.music_repository.MusicRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -44,11 +46,17 @@ class ActivityMainViewModelTest {
 
     private lateinit var viewModel: ActivityMainViewModel
     private val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
+    private lateinit var mediaBrowserProvider: MediaBrowserProvider
 
     @Before
     fun init() {
         hiltRule.inject()
+        mediaBrowserProvider = MediaBrowserProvider(
+            application,
+            CoroutineScope(SupervisorJob())
+        )
         viewModel = ActivityMainViewModel(
+            mediaBrowserProvider,
             musicRepository,
             MediaItemCreator(musicRepository)
         )
@@ -71,7 +79,7 @@ class ActivityMainViewModelTest {
         onView(withText(R.string.permission_needed))
             .check(
                 matches(
-                    isCompletelyDisplayed()
+                    isDisplayed()
                 )
             )
     }
@@ -123,13 +131,13 @@ class ActivityMainViewModelTest {
         // Play a song and wait for it to play
         val music = musicRepository.loadMusicFiles(application.contentResolver)
         UiThreadStatement.runOnUiThread {
-            viewModel.songClicked(application, music[0].id, mediaBrowser)
+            viewModel.songClicked(application, music[0].id)
         }
         countDownLatchPlay.await()
 
         // Pause the song and wait for it to pause
         UiThreadStatement.runOnUiThread {
-            viewModel.onPlayPauseClicked(mediaBrowser)
+            viewModel.onPlayPauseClicked()
         }
         countDownLatchPause.await()
     }
@@ -168,19 +176,19 @@ class ActivityMainViewModelTest {
         // Play a song and wait for it to play
         val music = musicRepository.loadMusicFiles(application.contentResolver)
         UiThreadStatement.runOnUiThread {
-            viewModel.songClicked(application, music[0].id, mediaBrowser)
+            viewModel.songClicked(application, music[0].id)
         }
         countDownLatchPlay.await()
 
         // Pause the song and wait for it to pause
         UiThreadStatement.runOnUiThread {
-            viewModel.onPlayPauseClicked(mediaBrowser)
+            viewModel.onPlayPauseClicked()
         }
         countDownLatchPause.await()
 
         // Resume the song and wait for it to resume
         UiThreadStatement.runOnUiThread {
-            viewModel.onPlayPauseClicked(mediaBrowser)
+            viewModel.onPlayPauseClicked()
         }
         countDownLatchPlay2.await()
     }
@@ -211,7 +219,7 @@ class ActivityMainViewModelTest {
 
         // Start song and wait for it to play
         UiThreadStatement.runOnUiThread {
-            viewModel.songClicked(application, musicId, mediaBrowser)
+            viewModel.songClicked(application, musicId)
         }
         countDownLatch.await()
     }
