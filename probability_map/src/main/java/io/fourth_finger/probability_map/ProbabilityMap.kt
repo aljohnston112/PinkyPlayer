@@ -61,24 +61,36 @@ class ProbabilityMap<T>(elements: List<T>) {
     }
 
     /**
-     * Reduces the probability of an element.
+     * Scales the probability of an element.
      *
-     * @param element The element to reduce the probability of.
-     * @param scale A number to scale the probabilities of the other elements by.
+     * @param element The element to scale the probability of.
+     * @param numerator The numerator of the probability to scale the element by.
+     * @param denominator The denominator of the probability to scale the element by.
      */
-    fun reduceProbability(element: T, scale: Long) {
-        require(scale > 0) { "Scale must be greater than 0." }
+    fun scaleProbability(
+        element: T,
+        numerator: Int,
+        denominator: Int
+    ) {
+        require(numerator > 0) { "numerator must be greater than 0." }
+        require(denominator > 0) { "denominator must be greater than 0." }
 
-        val bigDivisor = BigInteger.valueOf(scale)
+        val elementMultiplier = BigInteger.valueOf(numerator.toLong() * (getElements().size - 1))
+        val nonElementMultiplier = BigInteger.valueOf((denominator.toLong() * (getElements().size)) - numerator)
         for (key in elementProbabilities.keys) {
+            val oldProbability = elementProbabilities[key]!!
+
             if (key != element) {
-                val oldProbability = elementProbabilities[key]!!
-                val newProbability = oldProbability.multiply(bigDivisor)
+                val newProbability = oldProbability.multiply(nonElementMultiplier)
+                elementProbabilities[key] = newProbability
+                totalSum = totalSum.subtract(oldProbability).add(newProbability)
+            } else {
+                val newProbability = oldProbability.multiply(elementMultiplier)
                 elementProbabilities[key] = newProbability
                 totalSum = totalSum.subtract(oldProbability).add(newProbability)
             }
         }
-        maxProbability *= bigDivisor
+        maxProbability *= elementMultiplier
 
     }
 

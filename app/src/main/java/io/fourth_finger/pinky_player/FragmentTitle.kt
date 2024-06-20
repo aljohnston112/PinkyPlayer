@@ -50,7 +50,7 @@ class FragmentTitle : Fragment() {
                 }
             } else {
                 binding.buttonSongs.setOnClickListener{
-                    viewModel.displayPermissionNeeded(binding.root)
+                    viewModel.displayPermissionNeeded(requireActivity())
                 }
             }
         }

@@ -43,7 +43,7 @@ class MediaFileUtil {
                         shortestDuration = duration
                         shortestMusic = m.id
                     }
-                    if (duration < 10000) {
+                    if (duration < 1000) {
                         break
                     }
                 }

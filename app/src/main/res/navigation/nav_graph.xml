@@ -26,6 +26,6 @@
         android:id="@+id/fragmentSettings"
         android:name="io.fourth_finger.pinky_player.FragmentSettings"
         android:label="FragmentSettings"
-        tools:layout="@layout/fragment_settings"/>
+        />
 
 </navigation>

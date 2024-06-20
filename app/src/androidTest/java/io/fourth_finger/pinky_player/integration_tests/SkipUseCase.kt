@@ -45,7 +45,7 @@ import kotlin.time.Duration
 
 @UninstallModules(MusicFileLiveDataModule::class)
 @HiltAndroidTest
-class ShuffleUseCase {
+class SkipUseCase {
 
     @Module
     @InstallIn(SingletonComponent::class)
@@ -170,8 +170,14 @@ class ShuffleUseCase {
 
         UiThreadStatement.runOnUiThread {
             val mediaItemCreator = MediaItemCreator(musicRepository)
-            mediaBrowser.setMediaItem(mediaItemCreator.getMediaItem(application, firstSongId))
+            mediaBrowser.setMediaItems(
+                listOf(
+                    mediaItemCreator.getMediaItem(application, firstSongId),
+                    mediaItemCreator.getMediaItem(application, firstSongId)
+                )
+            )
             mediaBrowser.play()
+            mediaBrowser.seekToNext()
         }
 
         countDownLatch.await()

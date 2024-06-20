@@ -54,7 +54,6 @@ class MusicRepository @Inject constructor() {
             val music = musicCache.getData()
             _musicFiles.postValue(music)
             music
-
         }
     }
 

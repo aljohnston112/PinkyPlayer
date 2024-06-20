@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SeekBarPreference
+        android:key="@string/probability_down_key"
+        android:title="@string/probability_down_setting_title"
+        android:summary="@string/probability_down_setting_summary"
+        app:min="1"
+        android:max="99"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        />
+
+    <SwitchPreference
+        android:key="@string/respect_audio_focus_key"
+        android:title="@string/respect_audio_focus_title"
+        android:summary="@string/respect_audio_focus_summary"
+        />
+
+</androidx.preference.PreferenceScreen>

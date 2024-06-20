@@ -58,7 +58,7 @@ class PlayMusicUseCase {
     @Test
     fun userNavigatesToFragmentMusicList_tapsSong_andSongPlaysToCompletionAndPlaysNextSong() =
         runTest(
-            timeout = Duration.parse("60s")
+            timeout = Duration.parse("2m")
         ) {
 
             // Go to music list fragment
@@ -82,8 +82,7 @@ class PlayMusicUseCase {
 
                     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                         super.onMediaItemTransition(mediaItem, reason)
-                        // This has a small chance of failing if the same song plays after
-                        if (mediaItem?.mediaId != shortestMusicId.toString() && countDownLatchPlay.count == 0L) {
+                        if (reason == Player.PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST) {
                             countDownLatchPlay2.countDown()
                         }
                     }

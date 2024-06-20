@@ -1,15 +1,16 @@
 package io.fourth_finger.pinky_player
 
 import android.Manifest
-import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.core.app.launchActivity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.rule.GrantPermissionRule
@@ -18,7 +19,9 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.fourth_finger.music_repository.MusicRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -60,28 +63,31 @@ class ActivityMainViewModelTest {
             musicRepository,
             MediaItemCreator(musicRepository)
         )
+        viewModel.musicFiles = musicRepository.musicFiles
     }
 
     @Test
-    fun displayPermissionNeeded_displaysToast() {
+    fun displayPermissionNeeded_displaysDialog() {
+        launchActivity<ActivityMain>().use {
+            it.moveToState(Lifecycle.State.RESUMED)
 
-        // Start ActivityMain
-        val intent = Intent(application, ActivityMain::class.java)
-        intent.flags = intent.flags or FLAG_ACTIVITY_NEW_TASK
-        application.startActivity(intent)
-
-        // Try to display the toast
-        onView(isRoot())
-            .check { rootView, _ ->
-                viewModel.displayPermissionNeeded(rootView)
+            val countDownLatch = CountDownLatch(1)
+            it.onActivity { activityMain ->
+                viewModel.displayPermissionNeeded(activityMain)
+                activityMain.lifecycleScope.launch(Dispatchers.IO) {
+                    onView(withText(R.string.permission_needed))
+                        .inRoot(isDialog())
+                        .check(
+                            matches(
+                                isDisplayed()
+                            )
+                        )
+                    countDownLatch.countDown()
+                }
             }
+            countDownLatch.await()
+        }
 
-        onView(withText(R.string.permission_needed))
-            .check(
-                matches(
-                    isDisplayed()
-                )
-            )
     }
 
     @Test

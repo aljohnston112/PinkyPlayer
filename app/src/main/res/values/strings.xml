@@ -1,29 +1,26 @@
 <resources>
     <string name="app_name">Pinky Player</string>
 
-    <string name="permission_needed">Access to storage is needed to access music files and access to posting notifications are needed for the notification to work correctly</string>
+    <string name="permission_needed">Access to storage is used by PinkyPlayer to access music files.
+    If you want PinkyPlayer to access your music, you can go to the settings by clicking the Settings button.
+    </string>
     <string name="play_pause">Play/Pause</string>
     <string name="songs">Songs</string>
     <string name="play">Play</string>
     <string name="pause">Pause</string>
-    <string name="app_despcription">Intelligent Music Player</string>
+    <string name="app_description">Intelligent Music Player</string>
     <string name="playToStart">Play a song to start</string>
     <string name="search">Search</string>
     <string name="settings">Settings</string>
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
 
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="next">Next</string>
+    <string name="probability_down_key">probability_down_key</string>
+    <string name="probability_down_setting_title">Item Suppression Factor</string>
+    <string name="probability_down_setting_summary">Between 1% and 99%</string>
+    <string name="respect_audio_focus_key">respect_audio_focus_key</string>
+    <string name="respect_audio_focus_title">Respect Audio Focus</string>
+    <string name="respect_audio_focus_summary">Let other apps play sound over this one</string>
+    <string name="cancel">Cancel</string>
+    <string name="permission_needed_title">Permission Needed</string>
 
 </resources>

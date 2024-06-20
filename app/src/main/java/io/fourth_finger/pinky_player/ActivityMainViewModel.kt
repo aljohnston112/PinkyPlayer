@@ -2,13 +2,12 @@ package io.fourth_finger.pinky_player
 
 import android.content.ContentResolver
 import android.content.Context
-import android.view.View
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Player
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.fourth_finger.music_repository.MusicFile
 import io.fourth_finger.music_repository.MusicRepository
@@ -70,15 +69,11 @@ class ActivityMainViewModel @Inject constructor(
     /**
      * Lets the user know that permission is needed to access the music files.
      */
-    fun displayPermissionNeeded(view: View) {
-
-        // TODO Make a DialogFragment instead
-
-        Snackbar.make(
-            view,
-            R.string.permission_needed,
-            16000
-        ).show()
+    fun displayPermissionNeeded(activity: FragmentActivity) {
+        DialogPermission().show(
+            activity.supportFragmentManager,
+            activity.resources.getString(R.string.permission_needed_title)
+            )
     }
 
     /**
@@ -136,8 +131,11 @@ class ActivityMainViewModel @Inject constructor(
      */
     fun onNextClicked() {
         viewModelScope.launch {
-            val mediaBrowser = mediaBrowserProvider.await()
-            mediaBrowser.seekToNextMediaItem()
+            // TODO Look into hiding the next button
+            if(musicFiles.value?.isEmpty() == false) {
+                val mediaBrowser = mediaBrowserProvider.await()
+                mediaBrowser.seekToNextMediaItem()
+            }
         }
     }
 

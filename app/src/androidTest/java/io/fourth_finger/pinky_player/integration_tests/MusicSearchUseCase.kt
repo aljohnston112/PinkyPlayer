@@ -7,6 +7,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions.scrollTo
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -106,6 +107,31 @@ class MusicSearchUseCase {
                     )
             }
 
+        }
+
+    @Test
+    fun userPerformsTextSearchInFragmentMusicList_ActivityRestarted_TextIsStillThere() =
+        runTest {
+
+            // Go to the music list fragment
+            onView(withId(R.id.button_songs))
+                .perform(click())
+
+            // Type text into the search view
+            onView(withId(R.id.action_search))
+                .perform(click())
+            val searchText = "floaroma"
+            // The id approach here was recommended by Google
+            onView(withId(androidx.appcompat.R.id.search_src_text))
+                .perform(
+                    typeText(searchText),
+                    closeSoftKeyboard()
+                )
+
+            activityScenarioRule.scenario.recreate()
+
+            onView(withId(androidx.appcompat.R.id.search_src_text))
+                .check(matches(withText(searchText)))
         }
 
 }

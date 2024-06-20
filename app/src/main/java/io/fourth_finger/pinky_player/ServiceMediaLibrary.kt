@@ -6,8 +6,14 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
+import io.fourth_finger.settings_repository.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -25,11 +31,29 @@ class ServiceMediaLibrary : MediaLibraryService() {
     @Inject
     lateinit var applicationScope: CoroutineScope
 
-    private lateinit var player: PinkyPlayer
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
+
+    private var player: PinkyPlayer? = null
 
     private var mediaSession: MediaLibrarySession? = null
 
     private val callback = object : MediaLibrarySession.Callback {
+
+        @OptIn(UnstableApi::class)
+        override fun onPlaybackResumption(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo
+        ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
+            // TODO once there is queue functionality
+            return Futures.immediateFuture(
+                MediaSession.MediaItemsWithStartPosition(
+                    emptyList(),
+                    0,
+                    0
+                )
+            )
+        }
 
         @OptIn(UnstableApi::class)
         override fun onConnect(
@@ -61,23 +85,46 @@ class ServiceMediaLibrary : MediaLibraryService() {
 
     }
 
+    private val onSongSkipped: suspend (Long) -> Unit =
+        { mediaId: Long ->
+            val probabilityDown = settingsRepository.probabilityDown.first()
+            val playlist = playlistProvider.await()
+            val mediaItem = playlist.getElements().first { it.id == mediaId }
+            playlist.scaleProbability(
+                mediaItem,
+                probabilityDown,
+                100
+            )
+        }
+
+
     /**
      * Sets up the [MediaSession].
      */
     @OptIn(UnstableApi::class)
     private fun setUpMediaSession() {
-        player = PinkyPlayer(
+        val player = PinkyPlayer(
             applicationScope,
-            this,
+            this@ServiceMediaLibrary,
             mediaItemCreator,
-            playlistProvider
+            playlistProvider,
+            onSongSkipped,
+            false
         )
         player.addListener(listener)
+        this@ServiceMediaLibrary.player = player
         mediaSession = MediaLibrarySession.Builder(
-            this,
+            this@ServiceMediaLibrary,
             player,
             callback
         ).build()
+        applicationScope.launch(Dispatchers.IO) {
+            settingsRepository.respectAudioFocus.collect {
+                applicationScope.launch(Dispatchers.Main.immediate) {
+                    player.setRespectAudioFocus(it)
+                }
+            }
+        }
     }
 
     override fun onCreate() {
@@ -96,10 +143,8 @@ class ServiceMediaLibrary : MediaLibraryService() {
 
     @OptIn(UnstableApi::class)
     override fun onDestroy() {
-        if (::player.isInitialized) {
-            player.removeListener(listener)
-            player.release()
-        }
+        player?.removeListener(listener)
+        player?.release()
         mediaSession?.release()
         mediaSession = null
         super.onDestroy()

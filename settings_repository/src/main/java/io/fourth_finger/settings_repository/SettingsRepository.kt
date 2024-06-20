@@ -1,23 +1,27 @@
 package io.fourth_finger.settings_repository
 
 import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * A repository for app settings.
  *
  * @param context
  */
-class SettingsRepository(context: Context) {
+@Singleton
+class SettingsRepository @Inject constructor(
+    @ApplicationContext context: Context
+) {
 
     private val settingsDataSource = SettingsDataSource(context)
 
-    var settings = settingsDataSource.songSkipMultiplier.map { songSkipMultiplier ->
-        Settings(songSkipMultiplier)
-    }
+    val probabilityDown = settingsDataSource.songSkipMultiplier
+    val respectAudioFocus = settingsDataSource.respectAudioFocus
 
     /**
      * Saves the given settings.
@@ -28,10 +32,13 @@ class SettingsRepository(context: Context) {
     suspend fun saveSettings(
         context: Context,
         settings: Settings,
-        dispatcher: CoroutineDispatcher = Dispatchers.Default
+        dispatcher: CoroutineDispatcher = Dispatchers.IO
     ) {
         withContext(dispatcher) {
-            settingsDataSource.saveSettings(context, settings)
+            settingsDataSource.saveSettings(
+                context,
+                settings
+            )
         }
     }
 

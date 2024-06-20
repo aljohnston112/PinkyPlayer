@@ -4,11 +4,13 @@ import android.Manifest
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import dagger.hilt.android.testing.HiltTestApplication
 import io.fourth_finger.music_repository.MusicRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.job
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -30,16 +32,21 @@ class PlaylistProviderTest {
     )
 
     private val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
+
     private val musicRepository = MusicRepository()
     private lateinit var playlistProvider: PlaylistProvider
     private lateinit var testDispatcher: TestDispatcher
+    private val scope = CoroutineScope(SupervisorJob())
 
-    init{
+    init {
         runTest {
             val countDownLatch = CountDownLatch(1)
             testDispatcher = UnconfinedTestDispatcher(testScheduler)
             UiThreadStatement.runOnUiThread {
-                playlistProvider = PlaylistProvider(this, musicRepository)
+                playlistProvider = PlaylistProvider(
+                    scope,
+                    musicRepository.musicFiles
+                )
                 countDownLatch.countDown()
             }
             countDownLatch.await()
@@ -51,12 +58,12 @@ class PlaylistProviderTest {
         assertNull(playlistProvider.getOrNull())
     }
 
-    // TODO This test does not work for some reason
     @Test
     fun getOrNull_whenMusicLoaded_returnsPlaylist() = runTest {
         val music = musicRepository.loadMusicFiles(application.contentResolver)
-        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-        testDispatcher.scheduler.advanceUntilIdle()
+        scope.coroutineContext.job.children.forEach {
+            it.join()
+        }
         val playlist = playlistProvider.getOrNull()!!
         for (song in music) {
             assertTrue(playlist.contains(song))

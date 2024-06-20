@@ -58,7 +58,7 @@ class ActivityMain : AppCompatActivity() {
         if (isGranted) {
             viewModel.loadMusic(contentResolver)
         } else {
-            viewModel.displayPermissionNeeded(binding.root)
+            viewModel.displayPermissionNeeded(this)
         }
     }
 
@@ -91,8 +91,8 @@ class ActivityMain : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         viewModel.start()
-        viewModel.playing.observe(this) {isPlaying ->
-            if(isPlaying){
+        viewModel.playing.observe(this) { isPlaying ->
+            if (isPlaying) {
                 setPauseButton()
             } else {
                 setPlayButton()
@@ -121,8 +121,6 @@ class ActivityMain : AppCompatActivity() {
      */
     private fun requestPermission(permission: String) {
 
-        // TODO handle notification permission
-
         when {
             ContextCompat.checkSelfPermission(
                 this,
@@ -132,7 +130,7 @@ class ActivityMain : AppCompatActivity() {
             }
 
             shouldShowRequestPermissionRationale(permission) -> {
-                viewModel.displayPermissionNeeded(binding.root)
+                viewModel.displayPermissionNeeded(this)
             }
 
             else -> {

@@ -2,8 +2,6 @@ package io.fourth_finger.settings_repository
 
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -15,18 +13,44 @@ class SettingsRepositoryTest {
     private val settingsRepository = SettingsRepository(context)
 
     @Test
-    fun loadSettings_withNoSavedSettings_returnsDefaultSettings() = runTest(timeout = Duration.parse("60s")) {
-        val initialSettings = settingsRepository.settings.first()
-        assertEquals(initialSettings, Settings(skipMultiplier = 3L))
-    }
+    fun loadSettings_withNoSavedSettings_returnsDefaultSettings() =
+        runTest(timeout = Duration.parse("60s")) {
+            val initialProbabilityDown = settingsRepository.probabilityDown.first()
+            assertEquals(
+                initialProbabilityDown,
+                66
+            )
+
+            val initialRespectAudioFocus = settingsRepository.respectAudioFocus.first()
+            assertEquals(
+                initialRespectAudioFocus,
+                false
+            )
+        }
 
     @Test
-    fun saveSettings_followedByLoadSettings_returnsSavedSettings() = runTest(timeout = Duration.parse("60s")) {
-        val initialSettings = Settings(skipMultiplier = 5L)
-        settingsRepository.saveSettings(context, initialSettings)
+    fun saveSettings_followedByLoadSettings_returnsSavedSettings() =
+        runTest(timeout = Duration.parse("60s")) {
+            val initialSettings = Settings(
+                5,
+                true
+            )
+            settingsRepository.saveSettings(
+                context,
+                initialSettings
+            )
 
-        val loadedSettings = settingsRepository.settings.first()
-        assertEquals(initialSettings, loadedSettings)
-    }
+            val loadedProbabilityDown = settingsRepository.probabilityDown.first()
+            assertEquals(
+                loadedProbabilityDown,
+                5
+            )
+
+            val loadedRespectAudioFocus = settingsRepository.respectAudioFocus.first()
+            assertEquals(
+                loadedRespectAudioFocus,
+                true
+            )
+        }
 
 }

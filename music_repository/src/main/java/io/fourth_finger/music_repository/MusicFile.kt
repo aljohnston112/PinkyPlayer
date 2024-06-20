@@ -20,16 +20,11 @@ data class MusicFile(
 
     override fun equals(other: Any?): Boolean {
         return other is MusicFile &&
-                id == other.id &&
-                relativePath == other.relativePath &&
-                displayName == other.displayName
+                id == other.id
     }
 
     override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + relativePath.hashCode()
-        result = 31 * result + displayName.hashCode()
-        return result
+        return id.hashCode()
     }
 
 }

@@ -32,50 +32,45 @@ object MusicFileLiveDataModule {
 @Singleton
 class PlaylistProvider @Inject constructor(
     scope: CoroutineScope,
-    musicRepository: MusicRepository
+    musicFiles: LiveData<List<MusicFile>>
 ) {
 
     private var playlist: ProbabilityMap<MusicFile>? = null
-
-    private val callbacks = mutableListOf<(ProbabilityMap<MusicFile>) -> Unit>()
 
     private val musicLoadedLatch = CountDownLatch(1)
 
     private val musicObserver: (List<MusicFile>?) -> Unit = { newMusic ->
         newMusic?.let {
-            scope.launch(Dispatchers.Default) {
-                if (playlist == null) {
-                    playlist = ProbabilityMap(newMusic)
-                    for (callback in callbacks) {
-                        withContext(Dispatchers.Main) {
-                            callback(playlist!!)
-                        }
-                    }
-                } else {
-                    playlist?.let {
-                        // Add new songs to the playlist
-                        for (newSong in newMusic) {
-                            if (!it.contains(newSong)) {
-                                it.addElement(newSong)
+            if(newMusic.isNotEmpty()) {
+                scope.launch(Dispatchers.Default) {
+                    if (playlist == null) {
+                        playlist = ProbabilityMap(newMusic)
+                    } else {
+                        playlist?.let {
+                            // Add new songs to the playlist
+                            for (newSong in newMusic) {
+                                if (!it.contains(newSong)) {
+                                    it.addElement(newSong)
+                                }
                             }
-                        }
 
-                        // Remove missing songs from the playlist
-                        for (oldSong in it.getElements().toList()) {
-                            if (!newMusic.contains(oldSong)) {
-                                it.removeElement(oldSong)
+                            // Remove missing songs from the playlist
+                            for (oldSong in it.getElements().toList()) {
+                                if (!newMusic.contains(oldSong)) {
+                                    it.removeElement(oldSong)
+                                }
                             }
                         }
                     }
+                    musicLoadedLatch.countDown()
                 }
-                musicLoadedLatch.countDown()
             }
         }
     }
 
 
     init {
-        musicRepository.musicFiles.observeForever(musicObserver)
+        musicFiles.observeForever(musicObserver)
     }
 
     suspend fun await(): ProbabilityMap<MusicFile> {

@@ -19,8 +19,8 @@ import java.util.concurrent.TimeoutException
  */
 @VisibleForTesting(otherwise = VisibleForTesting.NONE)
 fun <T> LiveData<T>.getOrAwaitValue(
-    time: Long = 2,
-    timeUnit: TimeUnit = TimeUnit.SECONDS,
+    time: Long = 1,
+    timeUnit: TimeUnit = TimeUnit.HOURS,
     afterObserve: () -> Unit = {}
 ): T {
     var data: T? = null

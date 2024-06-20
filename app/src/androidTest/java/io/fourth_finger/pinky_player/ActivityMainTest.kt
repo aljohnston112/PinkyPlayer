@@ -3,7 +3,6 @@ package io.fourth_finger.pinky_player
 import android.Manifest
 import android.content.ComponentName
 import android.content.pm.PackageManager
-import android.os.Build
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.concurrent.futures.await
 import androidx.core.content.ContextCompat
@@ -24,15 +23,17 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiObject
-import androidx.test.uiautomator.UiSelector
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.fourth_finger.music_repository.MusicRepository
+import io.fourth_finger.pinky_player.UIAutomatorUtil.Companion.getPermissionUIAllowButton
+import io.fourth_finger.pinky_player.UIAutomatorUtil.Companion.getPermissionUIDenyButton
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.core.AllOf.allOf
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -105,7 +106,7 @@ class ActivityMainTest {
                 .check(
                     matches(
                         allOf(
-                            DrawableMatcher(R.drawable.ic_baseline_pause_24),
+                            MatcherDrawable(R.drawable.ic_baseline_pause_24),
                             isCompletelyDisplayed()
                         )
                     )
@@ -148,7 +149,7 @@ class ActivityMainTest {
                     matches(
                         allOf(
                             isCompletelyDisplayed(),
-                            DrawableMatcher(R.drawable.ic_baseline_play_arrow_24)
+                            MatcherDrawable(R.drawable.ic_baseline_play_arrow_24)
                         )
                     )
                 )
@@ -180,7 +181,7 @@ class ActivityMainTest {
     }
 
     @Test
-    fun whenPermissionDenied_userToastShows() {
+    fun whenPermissionDenied_permissionDialogShows() {
         // TODO this only works for API 31
 
         val denyPermissions = getPermissionUIDenyButton()
@@ -197,6 +198,33 @@ class ActivityMainTest {
             .check(matches(isDisplayed()))
     }
 
+    @Test
+    fun whenPermissionDeniedAndUserClicksSettingsInPermissionDialog_AppSettingsOpen() {
+        // TODO this only works for API 31
+
+        val denyPermissions = getPermissionUIDenyButton()
+        denyPermissions.click()
+
+        // Make sure permission has not been granted
+        val permissionStatus = ContextCompat.checkSelfPermission(
+            application,
+            Manifest.permission.READ_MEDIA_AUDIO
+        )
+        assert(permissionStatus == PackageManager.PERMISSION_DENIED)
+
+        onView(withText(R.string.permission_needed))
+            .check(matches(isDisplayed()))
+
+        onView(withText((R.string.settings)))
+            .perform(click())
+
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val appInfoView = device.findObject(
+            By.text("App info")
+        )
+        assertTrue(appInfoView != null)
+    }
+
     private suspend fun getFirstMusicUri(): MediaItem {
         val musicRepository = MusicRepository()
         val music = musicRepository.loadMusicFiles(application.contentResolver)
@@ -205,44 +233,5 @@ class ActivityMainTest {
             .build()
     }
 
-    /**
-     * Gets the permission dialog button for allowing permissions.
-     */
-    private fun getPermissionUIAllowButton(): UiObject {
-        val uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        return uiDevice.findObject(
-            UiSelector().clickable(true).checkable(false).text(
-                // TODO
-                // Only know that 31 is correct; the rest was copied from a random SO post.
-                when {
-                    Build.VERSION.SDK_INT == 23 -> "Allow"
-                    Build.VERSION.SDK_INT <= 28 -> "ALLOW"
-                    Build.VERSION.SDK_INT == 29 -> "Allow only while using the app"
-                    Build.VERSION.SDK_INT >= 31 -> "Allow"
-                    else -> "While using the app"
-                }
-            )
-        )
-    }
-
-    /**
-     * Gets the permission dialog button for allowing permissions.
-     */
-    private fun getPermissionUIDenyButton(): UiObject {
-        val uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        return uiDevice.findObject(
-            UiSelector().clickable(true).checkable(false).text(
-                // TODO
-                // Only know that 31 is correct; the rest was copied from a random SO post.
-                when {
-                    Build.VERSION.SDK_INT == 23 -> "Don't allow"
-                    Build.VERSION.SDK_INT <= 28 -> "DON'T ALLOW"
-                    Build.VERSION.SDK_INT == 29 -> "Don't allow"
-                    Build.VERSION.SDK_INT >= 31 -> "Don\u2019t allow"
-                    else -> "Don't allow"
-                }
-            )
-        )
-    }
 
 }

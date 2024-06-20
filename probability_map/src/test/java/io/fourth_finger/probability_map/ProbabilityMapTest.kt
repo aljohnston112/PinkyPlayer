@@ -44,13 +44,13 @@ class ProbabilityMapTest {
     }
 
     @Test
-    fun testSample2() {
+    fun testSample_AfterReducingProbability() {
         val numberOfSamples = 1000000
         probabilityMap = ProbabilityMap(listOf("A", "B"))
-        probabilityMap.reduceProbability("A", 10)
+        probabilityMap.scaleProbability("A", 99, 100)
         val expectedProbabilities = mapOf(
-            "A" to 1.0 / 11.0,
-            "B" to 10.0 / 11.0,
+            "A" to 99.0 / 200.0,
+            "B" to 101.0 / 200.0,
         )
 
         val observedCounts = mutableMapOf<String, Long>()
@@ -73,13 +73,13 @@ class ProbabilityMapTest {
 
     @Test
     fun testReduceProbability(){
-        probabilityMap.reduceProbability("A", 10)
+        probabilityMap.scaleProbability("A", 2, 5)
         val numberOfSamples = 1000000
 
         val expectedProbabilities = mapOf(
-            "A" to 1.0 / 21.0,
-            "B" to 10.0 / 21.0,
-            "C" to 10.0 / 21.0
+            "A" to 2.0 / 15.0,
+            "B" to 13.0 / 30.0,
+            "C" to 13.0 / 30.0
         )
 
         val observedCounts = mutableMapOf<String, Long>()
