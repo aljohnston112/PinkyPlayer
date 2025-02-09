@@ -8,8 +8,10 @@ import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.MediaFileUtil.Companion.getMusicIdOfTwoShortDurationSongs
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 
 fun provideFakeMusicDataSourceWithTwoShortestSongs(): MusicDataSource {
@@ -32,8 +34,10 @@ fun provideFakeMusicDataSourceWithTwoShortestSongs(): MusicDataSource {
                 )
                 shortestMusic.clear()
                 shortestMusic.addAll(
-                    getMusicIdOfTwoShortDurationSongs(musicRepository).map {
-                        musicRepository.getMusicItem(it)!!
+                    withContext(Dispatchers.Default) {
+                        getMusicIdOfTwoShortDurationSongs(musicRepository).map {
+                            musicRepository.getMusicItem(it)!!
+                        }
                     }
                 )
                 shortestMusic.toList()

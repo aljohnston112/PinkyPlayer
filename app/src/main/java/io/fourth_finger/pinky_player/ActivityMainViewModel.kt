@@ -28,7 +28,7 @@ class ActivityMainViewModel @Inject constructor(
     private val mediaBrowserProvider: MediaBrowserProvider,
     private val musicRepository: MusicRepository,
     private val mediaItemCreator: MediaItemCreator,
-    private val playlistProvider: MainPlaylistProvider
+    private val playlistProvider: PlaylistProvider
 ) : ViewModel() {
 
     val musicItems = musicRepository.musicItems

@@ -10,7 +10,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.SeekParameters
-import io.fourth_finger.music_repository.MusicFile
+import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.probability_map.ProbabilityMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -115,14 +115,14 @@ class PinkyPlayer(
     }
 
     private fun addSong(
-        playlist: ProbabilityMap<MusicFile>,
+        playlist: ProbabilityMap<MusicItem>,
         songs: MutableList<MediaItem>,
     ) {
         songs.add(getNextSong(playlist))
     }
 
     private fun getNextSong(
-        playlist: ProbabilityMap<MusicFile>
+        playlist: ProbabilityMap<MusicItem>
     ): MediaItem {
         return mediaItemCreator.getMediaItem(
             context,
@@ -160,7 +160,7 @@ class PinkyPlayer(
         removeListener(listener)
     }
 
-    fun setMediaItem(musicFile: MusicFile) {
+    fun setMediaItem(musicFile: MusicItem) {
         setMediaItem(mediaItemCreator.getMediaItem(context, musicFile.id))
     }
 

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.fourth_finger.playlist_repository.PlaylistRepository
 import io.fourth_finger.settings_repository.Settings
 import io.fourth_finger.settings_repository.SettingsRepository
 import kotlinx.coroutines.flow.first
@@ -13,7 +14,6 @@ import javax.inject.Inject
 @HiltViewModel
 class FragmentSettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
-
 ): ViewModel() {
 
     val probabilityDown = settingsRepository.probabilityDown

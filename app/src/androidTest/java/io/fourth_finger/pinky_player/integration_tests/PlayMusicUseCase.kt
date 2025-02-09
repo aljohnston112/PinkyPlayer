@@ -199,7 +199,7 @@ class PlayMusicUseCase {
             )
 
             // Click the song and wait for it to load
-            val shortestMusic = musicRepository.getMusicFile(shortestMusicId)!!
+            val shortestMusic = musicRepository.getMusicItem(shortestMusicId)!!
             onView(withId(R.id.recycler_view))
                 .perform(
                     RecyclerViewActions.actionOnItem<MusicFileAdapter.ViewHolder>(
@@ -257,7 +257,7 @@ class PlayMusicUseCase {
             )
 
             // Click the song and wait for it to load
-            val song = musicRepository.getMusicFile(musicId)!!
+            val song = musicRepository.getMusicItem(musicId)!!
             onView(withId(R.id.recycler_view))
                 .perform(
                     RecyclerViewActions.actionOnItem<MusicFileAdapter.ViewHolder>(

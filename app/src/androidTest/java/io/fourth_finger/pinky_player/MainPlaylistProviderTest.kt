@@ -36,7 +36,7 @@ class MainPlaylistProviderTest {
     private val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
 
     private val musicRepository = MusicRepository(MusicDataSourceImpl())
-    private lateinit var mainPlaylistProvider: MainPlaylistProvider
+    private lateinit var playlistProvider: PlaylistProvider
     private lateinit var testDispatcher: TestDispatcher
     private val scope = CoroutineScope(SupervisorJob())
 
@@ -45,7 +45,7 @@ class MainPlaylistProviderTest {
             val countDownLatch = CountDownLatch(1)
             testDispatcher = UnconfinedTestDispatcher(testScheduler)
             UiThreadStatement.runOnUiThread {
-                mainPlaylistProvider = MainPlaylistProvider(
+                playlistProvider = PlaylistProvider(
                     scope,
                     musicRepository
                 )
@@ -57,7 +57,7 @@ class MainPlaylistProviderTest {
 
     @Test
     fun getOrNull_whenNoMusicLoaded_returnsNull() {
-        assertNull(mainPlaylistProvider.getOrNull())
+        assertNull(playlistProvider.getOrNull())
     }
 
     @Test
@@ -75,7 +75,7 @@ class MainPlaylistProviderTest {
         scope.coroutineContext.job.children.forEach {
             it.join()
         }
-        val playlist = mainPlaylistProvider.getOrNull()!!
+        val playlist = playlistProvider.getOrNull()!!
         for (song in music) {
             assertTrue(playlist.contains(song))
         }

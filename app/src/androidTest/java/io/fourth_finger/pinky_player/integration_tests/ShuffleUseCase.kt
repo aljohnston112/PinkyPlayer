@@ -76,7 +76,7 @@ class ShuffleUseCase {
     @Test
     @LargeTest
     fun playlist_onCompletion_hasDefaultDistribution() =
-        runTest(timeout = Duration.parse("30m")) {
+        runTest(timeout = Duration.parse("2m")) {
             val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
             musicRepository.loadMusicFiles(
                 application.contentResolver

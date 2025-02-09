@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "io.fourth_finger.playlist_repository"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 21
@@ -27,12 +27,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "21"
     }
 
 }
@@ -44,8 +44,8 @@ dependencies {
     )
 
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.datastore:datastore:1.1.1")
+    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.datastore:datastore:1.1.2")
 
     implementation("com.google.android.material:material:1.12.0")
 

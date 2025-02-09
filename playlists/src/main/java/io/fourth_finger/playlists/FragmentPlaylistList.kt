@@ -61,7 +61,6 @@ class FragmentPlaylistList : Fragment() {
             return false
         }
 
-
     }
 
     private fun setSavedSearchText(searchItem: MenuItem, searchView: SearchView) {

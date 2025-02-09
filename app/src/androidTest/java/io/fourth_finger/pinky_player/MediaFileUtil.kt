@@ -28,7 +28,7 @@ class MediaFileUtil {
             doNotConsider: List<Long> = listOf(),
             durationMS: Int = 100
         ): Long = coroutineScope {
-            val music = musicRepository.getCachedMusicFiles()
+            val music = musicRepository.getCachedMusicItems()
             val context = InstrumentationRegistry.getInstrumentation().targetContext
 
             val deferredResults = music.mapNotNull { musicFile ->

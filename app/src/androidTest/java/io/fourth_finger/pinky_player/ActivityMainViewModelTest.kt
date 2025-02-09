@@ -14,12 +14,10 @@ import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
-import io.fourth_finger.music_repository.MusicDataSource
 import io.fourth_finger.music_repository.MusicDataSourceImpl
 import io.fourth_finger.music_repository.MusicRepository
 import kotlinx.coroutines.CoroutineScope
@@ -52,7 +50,7 @@ class ActivityMainViewModelTest {
     lateinit var musicRepository: MusicRepository
 
     @Inject
-    lateinit var playlistProvider: MainPlaylistProvider
+    lateinit var playlistProvider: PlaylistProvider
 
     private lateinit var viewModel: ActivityMainViewModel
     private lateinit var fragmentMusicListViewModel: FragmentMusicListViewModel

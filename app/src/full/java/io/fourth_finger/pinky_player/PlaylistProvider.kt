@@ -12,22 +12,22 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MainPlaylistProvider @Inject constructor(
+class PlaylistProvider @Inject constructor(
     scope: CoroutineScope,
     musicRepository: MusicRepository
 ) {
 
-    private var playlist: ProbabilityMap<MusicItem>? = null
+    private var mainPlaylist: ProbabilityMap<MusicItem>? = null
 
     private val musicLoadedLatch = CountDownLatch(1)
 
     private val musicObserver: (List<MusicItem>) -> Unit = { newMusic ->
         if (newMusic.isNotEmpty()) {
             scope.launch(Dispatchers.Default) {
-                if (playlist == null) {
-                    playlist = ProbabilityMap(newMusic)
+                if (mainPlaylist == null) {
+                    mainPlaylist = ProbabilityMap(newMusic)
                 } else {
-                    playlist?.let {
+                    mainPlaylist?.let {
                         // Add new songs to the playlist
                         for (newSong in newMusic) {
                             if (!it.contains(newSong)) {
@@ -57,11 +57,11 @@ class MainPlaylistProvider @Inject constructor(
         withContext(Dispatchers.IO) {
             musicLoadedLatch.await()
         }
-        return playlist!!
+        return mainPlaylist!!
     }
 
     fun getOrNull(): ProbabilityMap<MusicItem>? {
-        return playlist
+        return mainPlaylist
     }
 
 }

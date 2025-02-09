@@ -16,16 +16,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import io.fourth_finger.music_repository.MusicFile
+import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.pinky_player.databinding.FragmentMusicListBinding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 /**
- * A [Fragment] that displays a list of [MusicFile]s.
+ * A [Fragment] that displays a list of [MusicItem]s.
  */
 @AndroidEntryPoint
 class FragmentMusicList : Fragment() {
@@ -43,14 +40,24 @@ class FragmentMusicList : Fragment() {
 
         private val queryTextListener = object : SearchView.OnQueryTextListener {
 
+            private var job: Job = Job()
+
             override fun onQueryTextSubmit(query: String): Boolean {
                 return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-
-                if (newText != "") {
+                if (job.isActive) {
+                    job.cancel()
+                }
+                if (newText.isNotEmpty()) {
                     viewModel.newSearch(newText)
+                } else {
+                    job = viewLifecycleOwner.lifecycleScope.launch {
+                        (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
+                            activityMainViewModel.musicItems.value!!
+                        )
+                    }
                 }
                 return true
             }
@@ -68,7 +75,6 @@ class FragmentMusicList : Fragment() {
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
             return false
         }
-
 
     }
 
@@ -116,13 +122,19 @@ class FragmentMusicList : Fragment() {
             )
         }
         binding.recyclerView.adapter = adapter
+        viewModel.musicItems.observe(viewLifecycleOwner){ songs ->
+            (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
+                songs
+            )
+        }
+
         val linearLayoutManager = LinearLayoutManager(context)
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
         linearLayoutManager.recycleChildrenOnDetach = true
         binding.recyclerView.layoutManager = linearLayoutManager
 
         // Set up music list updates
-        activityMainViewModel.musicFiles.observe(viewLifecycleOwner) { musicFiles ->
+        activityMainViewModel.musicItems.observe(viewLifecycleOwner) { musicFiles ->
             musicFiles?.let {
                 binding.recyclerView.post {
                     adapter.updateMusicList(musicFiles.toList())
@@ -138,7 +150,7 @@ class FragmentMusicList : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         requireActivity().removeMenuProvider(menuProvider)
-        if(_searchView != null) {
+        if (_searchView != null) {
             searchView.setOnQueryTextListener(null)
         }
         _searchView = null
