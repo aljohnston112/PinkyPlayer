@@ -120,7 +120,7 @@ class ActivityMain : AppCompatActivity() {
     private fun requestPermissionsAndLoadMusicFiles() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermission(READ_MEDIA_AUDIO)
-        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+        } else {
             requestPermission(READ_EXTERNAL_STORAGE)
         }
     }

@@ -23,7 +23,9 @@ import io.fourth_finger.pinky_player.MusicFileAdapter
 import io.fourth_finger.pinky_player.R
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -170,16 +172,13 @@ class PlayMusicUseCase {
             val countDownLatchPlay = CountDownLatch(1)
             val countDownLatchPlay2 = CountDownLatch(1)
             val mediaBrowser = mediaBrowserProvider.await()
-
-            musicRepository.loadMusicFiles(
-                InstrumentationRegistry.getInstrumentation().targetContext.contentResolver
-            )
-
-            val shortestMusicId = MediaFileUtil.getMusicIdOfShortDurationSong(
-                musicRepository,
-                listOf(),
-                12000
-            )
+            val shortestMusicId = withContext(Dispatchers.Default) {
+                MediaFileUtil.getMusicIdOfSongWithDurationUnder(
+                    musicRepository,
+                    emptyList(),
+                    2000
+                )
+            }
             mediaBrowser.addListener(
                 object : Player.Listener {
 
@@ -200,7 +199,7 @@ class PlayMusicUseCase {
             )
 
             // Click the song and wait for it to load
-            val shortestMusic = musicRepository.getMusicItem(shortestMusicId)!!
+            val shortestMusic = musicRepository.getMusicFile(shortestMusicId)!!
             onView(withId(R.id.recycler_view))
                 .perform(
                     RecyclerViewActions.actionOnItem<MusicFileAdapter.ViewHolder>(
@@ -258,7 +257,7 @@ class PlayMusicUseCase {
             )
 
             // Click the song and wait for it to load
-            val song = musicRepository.getMusicItem(musicId)!!
+            val song = musicRepository.getMusicFile(musicId)!!
             onView(withId(R.id.recycler_view))
                 .perform(
                     RecyclerViewActions.actionOnItem<MusicFileAdapter.ViewHolder>(

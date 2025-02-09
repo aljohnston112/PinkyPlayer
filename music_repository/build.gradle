@@ -7,11 +7,11 @@ plugins {
 
 android {
     namespace 'io.fourth_finger.music_repository'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         minSdk 21
-        targetSdk 34
+        targetSdk 35
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
@@ -32,12 +32,11 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
-
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = '21'
     }
 
 }
@@ -48,7 +47,9 @@ dependencies {
             project(":shared_resources"),
     )
 
-    implementation 'androidx.lifecycle:lifecycle-livedata-core-ktx:2.8.2'
+    implementation 'androidx.lifecycle:lifecycle-livedata-core-ktx:2.8.7'
+
+    implementation 'androidx.lifecycle:lifecycle-livedata-core-ktx:2.8.7'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC'
 
     implementation "com.google.dagger:hilt-android:2.51.1"
@@ -59,14 +60,14 @@ dependencies {
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1'
 
     androidTestImplementation "androidx.arch.core:core-testing:2.2.0"
-    androidTestImplementation 'androidx.test:rules:1.6.1'
+    androidTestImplementation "androidx.test:rules:1.6.1"
 
     androidTestImplementation 'com.google.dagger:hilt-android-testing:2.51.1'
     kspAndroidTest 'com.google.dagger:hilt-android-compiler:2.51.1'
 
     androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1'
 
-    androidTestUtil 'androidx.test:orchestrator:1.5.0'
+    androidTestUtil 'androidx.test:orchestrator:1.5.1'
 
 }
 

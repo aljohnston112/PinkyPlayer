@@ -13,13 +13,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import io.fourth_finger.music_repository.MusicItem
+import io.fourth_finger.music_repository.MusicFile
 import io.fourth_finger.pinky_player.databinding.FragmentMusicListBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
- * A [Fragment] that displays a list of [MusicItem]s.
+ * A [Fragment] that displays a list of [MusicFile]s.
  */
 @AndroidEntryPoint
 class FragmentMusicList : Fragment() {
@@ -116,10 +122,10 @@ class FragmentMusicList : Fragment() {
         binding.recyclerView.layoutManager = linearLayoutManager
 
         // Set up music list updates
-        viewModel.musicItems.observe(viewLifecycleOwner) { musicItems ->
-            musicItems?.let {
+        activityMainViewModel.musicFiles.observe(viewLifecycleOwner) { musicFiles ->
+            musicFiles?.let {
                 binding.recyclerView.post {
-                    adapter.updateMusicList(musicItems)
+                    adapter.updateMusicList(musicFiles.toList())
                 }
             }
         }
@@ -132,7 +138,9 @@ class FragmentMusicList : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         requireActivity().removeMenuProvider(menuProvider)
-        _searchView?.setOnQueryTextListener(null)
+        if(_searchView != null) {
+            searchView.setOnQueryTextListener(null)
+        }
         _searchView = null
         binding.recyclerView.adapter = null
         _binding = null

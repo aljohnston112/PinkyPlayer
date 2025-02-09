@@ -352,7 +352,7 @@ class SettingsUseCase {
                 runBlocking {
                     mediaBrowser = it.mediaBrowserProvider.await()
 
-                    mediaBrowser?.addListener(
+                    mediaBrowser.addListener(
                         object : Player.Listener {
 
                             override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -378,13 +378,13 @@ class SettingsUseCase {
                     val music = musicRepository.musicItems.getOrAwaitValue(time = 60)
                     val firstSongId = music[0].id
                     val mediaItemCreator = MediaItemCreator(musicRepository)
-                    mediaBrowser?.setMediaItem(
+                    mediaBrowser.setMediaItem(
                         mediaItemCreator.getMediaItem(
                             application,
                             firstSongId
                         )
                     )
-                    mediaBrowser?.play()
+                    mediaBrowser.play()
                 }
             }
 

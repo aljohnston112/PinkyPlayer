@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "io.fourth_finger.file_util"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "io.fourth_finger.file_util"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -40,20 +40,20 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
-
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "21"
     }
 
 }
 
 dependencies {
 
+    implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.core:core-ktx:1.15.0")
 
     implementation("com.google.android.material:material:1.12.0")
 
@@ -61,6 +61,6 @@ dependencies {
 
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestUtil("androidx.test:orchestrator:1.5.1")
 
-    androidTestUtil("androidx.test:orchestrator:1.5.0")
 }
