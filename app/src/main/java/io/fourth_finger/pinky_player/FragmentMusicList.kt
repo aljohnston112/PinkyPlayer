@@ -13,19 +13,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import io.fourth_finger.music_repository.MusicFile
+import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.pinky_player.databinding.FragmentMusicListBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 /**
- * A [Fragment] that displays a list of [MusicFile]s.
+ * A [Fragment] that displays a list of [MusicItem]s.
  */
 @AndroidEntryPoint
 class FragmentMusicList : Fragment() {
@@ -43,30 +37,14 @@ class FragmentMusicList : Fragment() {
 
         private val queryTextListener = object : SearchView.OnQueryTextListener {
 
-            private var job: Job = Job()
-
             override fun onQueryTextSubmit(query: String): Boolean {
                 return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                if (job.isActive) {
-                    job.cancel()
-                }
+
                 if (newText != "") {
                     viewModel.newSearch(newText)
-                    job = viewLifecycleOwner.lifecycleScope.launch {
-                        val songs = withContext(Dispatchers.Default) { getSongsWithText(newText) }
-                        (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
-                            songs
-                        )
-                    }
-                } else {
-                    job = viewLifecycleOwner.lifecycleScope.launch {
-                        (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
-                            activityMainViewModel.musicFiles.value!!
-                        )
-                    }
                 }
                 return true
             }
@@ -95,17 +73,6 @@ class FragmentMusicList : Fragment() {
             searchView.setQuery(it, true)
             searchView.isFocusable = true
         }
-    }
-
-    private fun getSongsWithText(newText: String): List<MusicFile> {
-        val allMusic = activityMainViewModel.musicFiles.value!!
-        val sifted: MutableList<MusicFile> = mutableListOf()
-        for (song in allMusic) {
-            if (song.fullPath.lowercase().contains(newText.lowercase())) {
-                sifted.add(song)
-            }
-        }
-        return sifted
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -137,10 +104,10 @@ class FragmentMusicList : Fragment() {
     private fun setUpRecyclerView() {
         val adapter = MusicFileAdapter(emptyList()) { songID ->
             // Callback for when a song item is tapped
-                activityMainViewModel.songClicked(
-                    requireContext(),
-                    songID
-                )
+            activityMainViewModel.songClicked(
+                requireContext(),
+                songID
+            )
         }
         binding.recyclerView.adapter = adapter
         val linearLayoutManager = LinearLayoutManager(context)
@@ -149,10 +116,10 @@ class FragmentMusicList : Fragment() {
         binding.recyclerView.layoutManager = linearLayoutManager
 
         // Set up music list updates
-        activityMainViewModel.musicFiles.observe(viewLifecycleOwner) { musicFiles ->
-            musicFiles?.let {
+        viewModel.musicItems.observe(viewLifecycleOwner) { musicItems ->
+            musicItems?.let {
                 binding.recyclerView.post {
-                    adapter.updateMusicList(musicFiles.toList())
+                    adapter.updateMusicList(musicItems)
                 }
             }
         }
@@ -165,7 +132,7 @@ class FragmentMusicList : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         requireActivity().removeMenuProvider(menuProvider)
-        searchView.setOnQueryTextListener(null)
+        _searchView?.setOnQueryTextListener(null)
         _searchView = null
         binding.recyclerView.adapter = null
         _binding = null

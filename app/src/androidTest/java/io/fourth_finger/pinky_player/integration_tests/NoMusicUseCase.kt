@@ -2,8 +2,6 @@ package io.fourth_finger.pinky_player.integration_tests
 
 import android.Manifest
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.PerformException
 import androidx.test.espresso.action.ViewActions.click
@@ -18,11 +16,12 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
-import io.fourth_finger.music_repository.MusicFile
+import io.fourth_finger.music_repository.MusicDataSource
+import io.fourth_finger.music_repository.MusicDataSourceModule
 import io.fourth_finger.pinky_player.ActivityMain
 import io.fourth_finger.pinky_player.MusicFileAdapter
-import io.fourth_finger.pinky_player.MusicFileLiveDataModule
 import io.fourth_finger.pinky_player.R
+import io.fourth_finger.pinky_player.hilt.provideFakeMusicDataSourceWithNoSongs
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -30,30 +29,31 @@ import org.junit.Rule
 import org.junit.Test
 import kotlin.time.Duration
 
-@UninstallModules(MusicFileLiveDataModule::class)
+@UninstallModules(MusicDataSourceModule::class)
 @HiltAndroidTest
 class NoMusicUseCase {
 
     @Module
     @InstallIn(SingletonComponent::class)
-    object FakeMusicFileLiveDataModule {
+    class FakeMusicDataSourceModule {
 
         @Provides
-        fun provideMusicFileLiveData(): LiveData<List<MusicFile>> {
-            return MutableLiveData(emptyList())
+        fun provideFakeMusicDataSource(): MusicDataSource {
+            return provideFakeMusicDataSourceWithNoSongs()
         }
+
     }
 
     @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val rule = InstantTaskExecutorRule()
+
+    @get:Rule(order = 2)
     val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         Manifest.permission.READ_MEDIA_AUDIO
     )
-
-    @get:Rule(order = 1)
-    var hiltRule = HiltAndroidRule(this)
-
-    @get:Rule(order = 2)
-    val rule = InstantTaskExecutorRule()
 
     @get:Rule(order = 3)
     var activityScenarioRule = activityScenarioRule<ActivityMain>()
@@ -65,9 +65,7 @@ class NoMusicUseCase {
 
     @Test
     fun userNavigatesToFragmentMusicList_MusicListIsEmpty() =
-        runTest(
-            timeout = Duration.parse("60s")
-        ) {
+        runTest {
             // Go to music list fragment
             onView(ViewMatchers.withId(R.id.button_songs))
                 .perform(click())
@@ -85,10 +83,8 @@ class NoMusicUseCase {
         }
 
     @Test
-    fun userClicksNextButton_doesNotCrash() = runTest(
-        timeout = Duration.parse("60s")
-    ) {
-        onView(ViewMatchers.withId(R.id.button_next))
+    fun userClicksPlayButton_doesNotCrash() = runTest {
+        onView(ViewMatchers.withId(R.id.button_play_pause))
             .perform(click())
     }
 

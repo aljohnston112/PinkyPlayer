@@ -32,7 +32,7 @@ class MetaDataCreator @Inject constructor(
     ): MediaMetadata {
 
         // Music title
-        val musicFile = musicRepository.getMusicFile(mediaId)
+        val musicFile = musicRepository.getMusicItem(mediaId)
         if (musicFile != null) {
             metaDataBuilder.setTitle(musicFile.relativePath + musicFile.displayName)
         }

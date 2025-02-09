@@ -6,27 +6,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import io.fourth_finger.music_repository.MusicFile
+import io.fourth_finger.music_repository.MusicItem
 import kotlin.properties.Delegates
 
 /**
- * A [RecyclerView.Adapter] for [MusicFile]s.
+ * A [RecyclerView.Adapter] for [MusicItem]s.
  *
- * @param music The list of [MusicFile]s to display.
+ * @param music The list of [MusicItem]s to display.
  * @param onSongClickListener The callback to be invoked when a song is clicked.
  */
 class MusicFileAdapter(
-    private var music: List<MusicFile>,
+    private var music: List<MusicItem>,
     private val onSongClickListener: (Long) -> Unit
 ) : RecyclerView.Adapter<MusicFileAdapter.ViewHolder>() {
 
     /**
-     * Updates the adapter with a new list of [MusicFile]s.
+     * Updates the adapter with a new list of [MusicItem]s.
      *
-     * @param music The new list of [MusicFile]s.
+     * @param music The new list of [MusicItem]s.
      */
     @SuppressLint("NotifyDataSetChanged")
-    fun updateMusicList(music: List<MusicFile>) {
+    fun updateMusicList(music: List<MusicItem>) {
         this.music = music
         notifyDataSetChanged()
     }
@@ -43,10 +43,7 @@ class MusicFileAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.id = music[position].id
-        holder.textView.text = buildString {
-            append(music[position].relativePath)
-            append(music[position].displayName)
-        }
+        holder.textView.text = music[position].fullPath
         holder.textView.setOnClickListener {
             onSongClickListener(holder.id)
         }
@@ -60,7 +57,7 @@ class MusicFileAdapter(
     override fun getItemCount() = music.size
 
     /**
-     * A [RecyclerView.ViewHolder] for [MusicFile]s.
+     * A [RecyclerView.ViewHolder] for [MusicItem]s.
      *
      * @param view The item holder [View].
      */
@@ -70,7 +67,6 @@ class MusicFileAdapter(
 
         val textView: TextView = view.findViewById(R.id.textView)
         var id by Delegates.notNull<Long>()
-
 
     }
 

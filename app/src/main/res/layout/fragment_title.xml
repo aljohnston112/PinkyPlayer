@@ -10,6 +10,18 @@
     <com.google.android.material.button.MaterialButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/button_playlists"
+        android:text="@string/playlists"
+        app:backgroundTint="@color/colorPrimary"
+        android:textColor="@color/colorOnPrimary"
+        app:layout_constraintBottom_toTopOf="@id/button_songs"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/button_songs"
         android:text="@string/songs"
         app:backgroundTint="@color/colorPrimary"
@@ -17,7 +29,7 @@
         app:layout_constraintBottom_toTopOf="@id/button_settings"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/button_playlists" />
 
     <com.google.android.material.button.MaterialButton
         android:layout_width="wrap_content"

@@ -31,8 +31,8 @@ class FragmentTitleTestWithoutPermission {
     @get:Rule(order = 1)
     val rule = InstantTaskExecutorRule()
 
-    private val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
-    private val navController = TestNavHostController(application)
+    private val context = ApplicationProvider.getApplicationContext<HiltTestApplication>()
+    private val navController = TestNavHostController(context)
 
     @Before
     fun init() {
@@ -50,7 +50,7 @@ class FragmentTitleTestWithoutPermission {
 
         // Make sure permission has not been granted
         val permissionStatus = ContextCompat.checkSelfPermission(
-            application,
+            context,
             Manifest.permission.READ_MEDIA_AUDIO
         )
         assert(permissionStatus == PackageManager.PERMISSION_DENIED)

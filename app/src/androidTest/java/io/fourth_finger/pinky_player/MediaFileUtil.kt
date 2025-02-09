@@ -2,6 +2,7 @@ package io.fourth_finger.pinky_player
 
 import android.media.MediaMetadataRetriever
 import androidx.test.platform.app.InstrumentationRegistry
+import io.fourth_finger.music_repository.MusicDataSource
 import io.fourth_finger.music_repository.MusicRepository
 
 class MediaFileUtil {
@@ -22,9 +23,10 @@ class MediaFileUtil {
 
         suspend fun getMusicIdOfShortDurationSong(
             musicRepository: MusicRepository,
-            doNotConsider: List<Long> = listOf()
+            doNotConsider: List<Long> = listOf(),
+            durationMillis: Int = 1000
         ): Long {
-            val music = musicRepository.getCachedMusicFiles()
+            val music = musicRepository.getCachedMusicItems()
             var shortestMusic = music[0].id
 
             val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -43,7 +45,7 @@ class MediaFileUtil {
                         shortestDuration = duration
                         shortestMusic = m.id
                     }
-                    if (duration < 1000) {
+                    if (duration < durationMillis) {
                         break
                     }
                 }

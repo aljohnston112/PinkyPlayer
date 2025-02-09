@@ -5,6 +5,8 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/fragmentTitle">
 
+    <include app:graph="@navigation/playlist_navigation" />
+
     <fragment
         android:id="@+id/fragmentMusicList"
         android:name="io.fourth_finger.pinky_player.FragmentMusicList"
@@ -14,18 +16,20 @@
         android:id="@+id/fragmentTitle"
         android:name="io.fourth_finger.pinky_player.FragmentTitle"
         android:label="fragment_title"
-        tools:layout="@layout/fragment_title" >
+        tools:layout="@layout/fragment_title">
         <action
             android:id="@+id/action_fragmentTitle_to_fragmentMusicList"
             app:destination="@id/fragmentMusicList" />
         <action
             android:id="@+id/action_fragmentTitle_to_fragmentSettings"
             app:destination="@id/fragmentSettings" />
+        <action
+            android:id="@+id/action_fragmentTitle_to_playlists"
+            app:destination="@id/playlist_navigation" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSettings"
         android:name="io.fourth_finger.pinky_player.FragmentSettings"
-        android:label="FragmentSettings"
-        />
+        android:label="FragmentSettings" />
 
 </navigation>

@@ -61,6 +61,7 @@
             android:background="@drawable/baseline_skip_next_24"
             android:backgroundTint="@color/colorPrimary"
             app:iconPadding="0dp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/button_play_pause"

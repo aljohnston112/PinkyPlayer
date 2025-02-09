@@ -10,7 +10,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.SeekParameters
-import io.fourth_finger.music_repository.MusicFile
+import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.probability_map.ProbabilityMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +21,7 @@ class PinkyPlayer(
     private var scope: CoroutineScope,
     private var context: Context,
     private val mediaItemCreator: MediaItemCreator,
-    private val playlistProvider: PlaylistProvider,
+    private val mainPlaylistProvider: MainPlaylistProvider,
     private val onSongSkipped: suspend (mediaId: Long) -> Unit,
     respectAudioFocus: Boolean
 ) : ForwardingPlayer(
@@ -45,7 +45,7 @@ class PinkyPlayer(
             super.onMediaItemTransition(mediaItem, reason)
             scope.launch(Dispatchers.Main.immediate) {
                 if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
-                    val song = getNextSong(playlistProvider.await())
+                    val song = getNextSong(mainPlaylistProvider.await())
                     addMediaItem(song)
                 }
             }
@@ -106,7 +106,7 @@ class PinkyPlayer(
             val songs = mediaItems.toMutableList()
             if (mediaItems.size == 1) {
                 addSong(
-                    playlistProvider.await(),
+                    mainPlaylistProvider.await(),
                     songs
                 )
             }
@@ -115,14 +115,14 @@ class PinkyPlayer(
     }
 
     private fun addSong(
-        playlist: ProbabilityMap<MusicFile>,
+        playlist: ProbabilityMap<MusicItem>,
         songs: MutableList<MediaItem>,
     ) {
         songs.add(getNextSong(playlist))
     }
 
     private fun getNextSong(
-        playlist: ProbabilityMap<MusicFile>
+        playlist: ProbabilityMap<MusicItem>
     ): MediaItem {
         return mediaItemCreator.getMediaItem(
             context,
@@ -146,7 +146,7 @@ class PinkyPlayer(
                 currentMediaItemIndex + 1,
                 C.TIME_UNSET
             )
-            val playlist = playlistProvider.await()
+            val playlist = mainPlaylistProvider.await()
 
             val next = getNextSong(playlist)
             addMediaItem(next)
@@ -160,8 +160,8 @@ class PinkyPlayer(
         removeListener(listener)
     }
 
-    fun setMediaItem(musicFile: MusicFile) {
-        setMediaItem(mediaItemCreator.getMediaItem(context, musicFile.id))
+    fun setMediaItem(musicItem: MusicItem) {
+        setMediaItem(mediaItemCreator.getMediaItem(context, musicItem.id))
     }
 
     fun setRespectAudioFocus(respectAudioFocus: Boolean) {

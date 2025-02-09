@@ -28,6 +28,7 @@ import androidx.test.uiautomator.UiDevice
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
+import io.fourth_finger.music_repository.MusicDataSourceImpl
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.UIAutomatorUtil.Companion.getPermissionUIAllowButton
 import io.fourth_finger.pinky_player.UIAutomatorUtil.Companion.getPermissionUIDenyButton
@@ -52,7 +53,7 @@ class ActivityMainTest {
     @get:Rule(order = 2)
     var activityScenarioRule = activityScenarioRule<ActivityMain>()
 
-    private val application: HiltTestApplication = ApplicationProvider.getApplicationContext()
+    private val context: HiltTestApplication = ApplicationProvider.getApplicationContext()
 
     private lateinit var mediaBrowser: MediaBrowser
 
@@ -60,10 +61,16 @@ class ActivityMainTest {
     fun init() = runTest {
         hiltRule.inject()
         val sessionToken = SessionToken(
-            application,
-            ComponentName(application, ServiceMediaLibrary::class.java)
+            context,
+            ComponentName(
+                context,
+                ServiceMediaLibrary::class.java
+            )
         )
-        mediaBrowser = MediaBrowser.Builder(application, sessionToken).buildAsync().await()
+        mediaBrowser = MediaBrowser.Builder(
+            context,
+            sessionToken
+        ).buildAsync().await()
     }
 
     @Test
@@ -161,7 +168,7 @@ class ActivityMainTest {
 
         // Permission must not be granted
         var permissionStatus = ContextCompat.checkSelfPermission(
-            application,
+            context,
             Manifest.permission.READ_MEDIA_AUDIO
         )
         assert(permissionStatus != PackageManager.PERMISSION_GRANTED)
@@ -174,7 +181,7 @@ class ActivityMainTest {
 
         // Make sure the correct permission was granted
         permissionStatus = ContextCompat.checkSelfPermission(
-            application,
+            context,
             Manifest.permission.READ_MEDIA_AUDIO
         )
         assert(permissionStatus == PackageManager.PERMISSION_GRANTED)
@@ -189,7 +196,7 @@ class ActivityMainTest {
 
         // Make sure permission has not been granted
         val permissionStatus = ContextCompat.checkSelfPermission(
-            application,
+            context,
             Manifest.permission.READ_MEDIA_AUDIO
         )
         assert(permissionStatus == PackageManager.PERMISSION_DENIED)
@@ -207,7 +214,7 @@ class ActivityMainTest {
 
         // Make sure permission has not been granted
         val permissionStatus = ContextCompat.checkSelfPermission(
-            application,
+            context,
             Manifest.permission.READ_MEDIA_AUDIO
         )
         assert(permissionStatus == PackageManager.PERMISSION_DENIED)
@@ -226,8 +233,8 @@ class ActivityMainTest {
     }
 
     private suspend fun getFirstMusicUri(): MediaItem {
-        val musicRepository = MusicRepository()
-        val music = musicRepository.loadMusicFiles(application.contentResolver)
+        val musicRepository = MusicRepository(MusicDataSourceImpl())
+        val music = musicRepository.loadMusicFiles(context.contentResolver)
         return MediaItem.Builder()
             .setUri(musicRepository.getUri(music[0].id))
             .build()

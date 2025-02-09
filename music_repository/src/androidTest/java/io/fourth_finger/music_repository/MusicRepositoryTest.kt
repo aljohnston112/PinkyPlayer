@@ -29,7 +29,7 @@ class MusicRepositoryTest {
     private val contentResolver = context.contentResolver
 
     /**
-     * Tests that the [MusicFile]s returned by [MusicRepository.loadMusicFiles] match those
+     * Tests that the [MusicItem]s returned by [MusicRepository.loadMusicFiles] match those
      * loaded by the [MediaStore].
      * This test will fail if there are no music files on the test device.
      */
@@ -51,7 +51,7 @@ class MusicRepositoryTest {
 
     /**
      * Tests that the [MusicRepository] caches the results of [MusicRepository.loadMusicFiles] and
-     * they can be retrieved via [MusicRepository.getCachedMusicFiles].
+     * they can be retrieved via [MusicRepository.getCachedMusicItems].
      */
     @Test
     fun loadMusicFiles_ContentResolver_CachesCorrectSongs() = runTest {
@@ -60,11 +60,11 @@ class MusicRepositoryTest {
         val musicRepository = MusicRepository()
         assertThrows(NoSuchElementException::class.java){
             runBlocking {
-                musicRepository.getCachedMusicFiles()
+                musicRepository.getCachedMusicItems()
             }
         }
         musicRepository.loadMusicFiles(contentResolver)
-        val musicFiles = musicRepository.getCachedMusicFiles()
+        val musicFiles = musicRepository.getCachedMusicItems()
 
         // Assert there are music files
         assert(musicFiles.isNotEmpty())
@@ -77,14 +77,14 @@ class MusicRepositoryTest {
     }
 
     /**
-     * Gets a list of [MusicFile]s that represent files
+     * Gets a list of [MusicItem]s that represent files
      * that the [MediaStore] considers music.
      *
-     * @return A [List] of [MusicFile]s that represent files
+     * @return A [List] of [MusicItem]s that represent files
      *         that the [MediaStore] considers music.
      */
-    private fun getAllMusicFiles(): List<MusicFile> {
-        val music: MutableList<MusicFile> = mutableListOf()
+    private fun getAllMusicFiles(): List<MusicItem> {
+        val music: MutableList<MusicItem> = mutableListOf()
 
         // The query parameters
         val projection = arrayOf(
@@ -119,8 +119,8 @@ class MusicRepositoryTest {
                 val displayName = cursor.getString(displayNameColumn)
                 val relativePath = cursor.getString(relativePathColumn)
 
-                val musicFile = MusicFile(id, relativePath, displayName)
-                music.add(musicFile)
+                val musicItem = MusicItem(id, relativePath, displayName)
+                music.add(musicItem)
             }
         }
         return music

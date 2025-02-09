@@ -3,6 +3,7 @@ package io.fourth_finger.pinky_player
 import android.Manifest
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.test.core.app.ApplicationProvider
@@ -13,10 +14,13 @@ import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
+import io.fourth_finger.music_repository.MusicDataSource
+import io.fourth_finger.music_repository.MusicDataSourceImpl
 import io.fourth_finger.music_repository.MusicRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,23 +51,32 @@ class ActivityMainViewModelTest {
     @Inject
     lateinit var musicRepository: MusicRepository
 
+    @Inject
+    lateinit var playlistProvider: MainPlaylistProvider
+
     private lateinit var viewModel: ActivityMainViewModel
-    private val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
+    private lateinit var fragmentMusicListViewModel: FragmentMusicListViewModel
     private lateinit var mediaBrowserProvider: MediaBrowserProvider
+
+    private val context = ApplicationProvider.getApplicationContext<HiltTestApplication>()
 
     @Before
     fun init() {
         hiltRule.inject()
         mediaBrowserProvider = MediaBrowserProvider(
-            application,
+            context,
             CoroutineScope(SupervisorJob())
         )
         viewModel = ActivityMainViewModel(
             mediaBrowserProvider,
             musicRepository,
-            MediaItemCreator(musicRepository)
+            MediaItemCreator(musicRepository),
+            playlistProvider
         )
-        viewModel.musicFiles = musicRepository.musicFiles
+        fragmentMusicListViewModel = FragmentMusicListViewModel(
+            musicRepository,
+            SavedStateHandle()
+        )
     }
 
     @Test
@@ -93,13 +106,13 @@ class ActivityMainViewModelTest {
     @Test
     fun loadMusic_loadsMusic() = runTest {
         // Load music using a repository outside of the ViewModel
-        val music = MusicRepository().loadMusicFiles(application.contentResolver)
+        val music = MusicRepository(MusicDataSourceImpl()).loadMusicFiles(context.contentResolver)
         assert(music.isNotEmpty())
 
         // Have ViewModel load music
         // join is needed to wait for the music to be loaded into the LiveData
-        viewModel.loadMusic(application.contentResolver).join()
-        val loadedMusic = viewModel.musicFiles.getOrAwaitValue()
+        viewModel.loadMusic(context.contentResolver).join()
+        val loadedMusic = viewModel.musicItems.getOrAwaitValue()
 
         assert(music.size == loadedMusic.size)
         for (musicFile in music) {
@@ -115,7 +128,7 @@ class ActivityMainViewModelTest {
         val countDownLatchPlay = CountDownLatch(1)
         val countDownLatchPause = CountDownLatch(1)
         val mediaBrowserProvider = MediaBrowserProvider(
-            application,
+            context,
             this
         )
         val mediaBrowser = mediaBrowserProvider.await()
@@ -135,15 +148,15 @@ class ActivityMainViewModelTest {
         )
 
         // Play a song and wait for it to play
-        val music = musicRepository.loadMusicFiles(application.contentResolver)
+        val music = musicRepository.loadMusicFiles(context.contentResolver)
         UiThreadStatement.runOnUiThread {
-            viewModel.songClicked(application, music[0].id)
+            viewModel.songClicked(context, music[0].id)
         }
         countDownLatchPlay.await()
 
         // Pause the song and wait for it to pause
         UiThreadStatement.runOnUiThread {
-            viewModel.onPlayPauseClicked()
+            viewModel.onPlayPauseClicked(context)
         }
         countDownLatchPause.await()
     }
@@ -156,7 +169,7 @@ class ActivityMainViewModelTest {
         val countDownLatchPause = CountDownLatch(1)
         val countDownLatchPlay2 = CountDownLatch(1)
         val mediaBrowserProvider = MediaBrowserProvider(
-            application,
+            context,
             this
         )
         val mediaBrowser = mediaBrowserProvider.await()
@@ -180,21 +193,21 @@ class ActivityMainViewModelTest {
         )
 
         // Play a song and wait for it to play
-        val music = musicRepository.loadMusicFiles(application.contentResolver)
+        val music = musicRepository.loadMusicFiles(context.contentResolver)
         UiThreadStatement.runOnUiThread {
-            viewModel.songClicked(application, music[0].id)
+            viewModel.songClicked(context, music[0].id)
         }
         countDownLatchPlay.await()
 
         // Pause the song and wait for it to pause
         UiThreadStatement.runOnUiThread {
-            viewModel.onPlayPauseClicked()
+            viewModel.onPlayPauseClicked(context)
         }
         countDownLatchPause.await()
 
         // Resume the song and wait for it to resume
         UiThreadStatement.runOnUiThread {
-            viewModel.onPlayPauseClicked()
+            viewModel.onPlayPauseClicked(context)
         }
         countDownLatchPlay2.await()
     }
@@ -205,11 +218,11 @@ class ActivityMainViewModelTest {
         // Setup the media browser listener
         val countDownLatch = CountDownLatch(1)
         val mediaBrowserProvider = MediaBrowserProvider(
-            application,
+            context,
             this
         )
         val mediaBrowser = mediaBrowserProvider.await()
-        val music = musicRepository.loadMusicFiles(application.contentResolver)
+        val music = musicRepository.loadMusicFiles(context.contentResolver)
         val musicId = music[0].id
         mediaBrowser.addListener(
             object : Player.Listener {
@@ -225,7 +238,7 @@ class ActivityMainViewModelTest {
 
         // Start song and wait for it to play
         UiThreadStatement.runOnUiThread {
-            viewModel.songClicked(application, musicId)
+            viewModel.songClicked(context, musicId)
         }
         countDownLatch.await()
     }

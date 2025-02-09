@@ -1,4 +1,4 @@
-package io.fourth_finger.music_repository
+package io.fourth_finger.shared_resources
 
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest

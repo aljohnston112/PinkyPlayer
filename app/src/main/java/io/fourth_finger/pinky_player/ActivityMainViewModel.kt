@@ -8,9 +8,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Player
+import androidx.media3.common.Player.STATE_READY
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.fourth_finger.music_repository.MusicFile
+import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.music_repository.MusicRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,14 +27,17 @@ import javax.inject.Inject
 class ActivityMainViewModel @Inject constructor(
     private val mediaBrowserProvider: MediaBrowserProvider,
     private val musicRepository: MusicRepository,
-    private val mediaItemCreator: MediaItemCreator
+    private val mediaItemCreator: MediaItemCreator,
+    private val playlistProvider: MainPlaylistProvider
 ) : ViewModel() {
 
-    @Inject
-    lateinit var musicFiles: LiveData<List<MusicFile>>
+    val musicItems = musicRepository.musicItems
 
     private val _havePermission = MutableLiveData(false)
     val havePermission: LiveData<Boolean> = _havePermission
+
+    private val _playbackStarted = MutableLiveData(false)
+    val playbackStarted = _playbackStarted as LiveData<Boolean>
 
     private val _playing = MutableLiveData(false)
     val playing = _playing as LiveData<Boolean>
@@ -73,7 +78,7 @@ class ActivityMainViewModel @Inject constructor(
         DialogPermission().show(
             activity.supportFragmentManager,
             activity.resources.getString(R.string.permission_needed_title)
-            )
+        )
     }
 
     /**
@@ -85,21 +90,62 @@ class ActivityMainViewModel @Inject constructor(
      */
     fun loadMusic(contentResolver: ContentResolver): Job {
         _havePermission.postValue(true)
-        return viewModelScope.launch {
+        return viewModelScope.launch(Dispatchers.IO) {
             musicRepository.loadMusicFiles(contentResolver)
         }
+    }
+
+    /**
+     * Pauses or plays the current song.
+     */
+    fun onPlayPauseClicked(context: Context) {
+        viewModelScope.launch {
+            val mediaBrowser = mediaBrowserProvider.await()
+            if (mediaBrowser.isPlaying) {
+                mediaBrowser.pause()
+            } else if (mediaBrowser.playbackState == STATE_READY) {
+                mediaBrowser.play()
+            } else {
+                _playbackStarted.postValue(true)
+                mediaBrowser.setMediaItem(
+                    mediaItemCreator.getMediaItem(
+                        context,
+                        playlistProvider.await().sample().id
+                    )
+                )
+                mediaBrowser.play()
+            }
+        }
+    }
+
+
+    /**
+     * Seeks to the next song.
+     */
+    fun onNextClicked() {
+        viewModelScope.launch {
+            if (musicItems.value?.isEmpty() == false) {
+                val mediaBrowser = mediaBrowserProvider.await()
+                mediaBrowser.seekToNextMediaItem()
+            }
+        }
+    }
+
+    fun stop() {
+        mediaBrowserProvider.getOrNull()?.removeListener(playerListener)
     }
 
     /**
      * Starts playing a music file.
      *
      * @param context
-     * @param id The id of the [MusicFile] corresponding to the music file to play.
+     * @param id The id of the [MusicItem] corresponding to the music file to play.
      */
     fun songClicked(
         context: Context,
         id: Long
     ) {
+        _playbackStarted.postValue(true)
         viewModelScope.launch {
             val mediaBrowser = mediaBrowserProvider.await()
             mediaBrowser.setMediaItem(
@@ -110,37 +156,6 @@ class ActivityMainViewModel @Inject constructor(
             )
             mediaBrowser.play()
         }
-    }
-
-    /**
-     * Pauses or plays the current song.
-     */
-    fun onPlayPauseClicked() {
-        viewModelScope.launch {
-            val mediaBrowser = mediaBrowserProvider.await()
-            if (mediaBrowser.isPlaying) {
-                mediaBrowser.pause()
-            } else {
-                mediaBrowser.play()
-            }
-        }
-    }
-
-    /**
-     * Seeks to the next song.
-     */
-    fun onNextClicked() {
-        viewModelScope.launch {
-            // TODO Look into hiding the next button
-            if(musicFiles.value?.isEmpty() == false) {
-                val mediaBrowser = mediaBrowserProvider.await()
-                mediaBrowser.seekToNextMediaItem()
-            }
-        }
-    }
-
-    fun stop() {
-        mediaBrowserProvider.getOrNull()?.removeListener(playerListener)
     }
 
 }

@@ -12,6 +12,7 @@ import androidx.test.rule.GrantPermissionRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
+import io.fourth_finger.music_repository.MusicDataSourceImpl
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.hilt.launchFragmentInHiltContainer
 import kotlinx.coroutines.test.runTest
@@ -44,7 +45,7 @@ class FragmentMusicListTest {
 
         // Making sure all the music is there is too slow
         val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
-        val music = MusicRepository().loadMusicFiles(application.contentResolver)
+        val music = MusicRepository(MusicDataSourceImpl()).loadMusicFiles(application.contentResolver)
         val firstMusic = music[0]
         val lastMusic = music[music.size - 1]
         onView(withId(R.id.recycler_view))

@@ -10,7 +10,7 @@ package io.fourth_finger.music_repository
  *                     Does not include the file name.
  * @param displayName The display name of the music file.
  */
-data class MusicFile(
+data class MusicItem(
     val id: Long,
     val relativePath: String,
     val displayName: String
@@ -19,7 +19,7 @@ data class MusicFile(
     val fullPath: String = relativePath + displayName
 
     override fun equals(other: Any?): Boolean {
-        return other is MusicFile &&
+        return other is MusicItem &&
                 id == other.id
     }
 

@@ -29,16 +29,16 @@ class FragmentTitleTestWithPermission {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
+    @get:Rule(order = 2)
+    val rule = InstantTaskExecutorRule()
+
     @get:Rule(order = 1)
     val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         Manifest.permission.READ_MEDIA_AUDIO
     )
 
-    @get:Rule(order = 2)
-    val rule = InstantTaskExecutorRule()
-
-    private val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
-    private val navController = TestNavHostController(application)
+    private val context = ApplicationProvider.getApplicationContext<HiltTestApplication>()
+    private val navController = TestNavHostController(context)
 
     @Before
     fun init() {
@@ -61,7 +61,7 @@ class FragmentTitleTestWithPermission {
                 CreationExtras.Empty
             )[ActivityMainViewModel::class.java]
             lifecycleScope.launch {
-                viewModel.loadMusic(application.contentResolver).join()
+                viewModel.loadMusic(context!!.contentResolver).join()
                 countDownLatch.countDown()
             }
 

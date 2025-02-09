@@ -4,16 +4,16 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
-import io.fourth_finger.music_repository.MusicFile
+import io.fourth_finger.music_repository.MusicItem
 import org.junit.Before
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
 
-class MusicFileAdapterTest {
+class MusicItemAdapterTest {
 
-    private val emptyList = emptyList<MusicFile>()
+    private val emptyList = emptyList<MusicItem>()
     private val singletonList = listOf(
-        MusicFile(0, "/B", "A")
+        MusicItem(0, "/B", "A")
     )
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -62,8 +62,8 @@ class MusicFileAdapterTest {
     fun onBindViewHolder_validPositions_bindsCorrectly() {
         val adapter = MusicFileAdapter(
             listOf(
-                MusicFile(0, "B/","A"),
-                MusicFile(1, "B/","B")
+                MusicItem(0, "B/","A"),
+                MusicItem(1, "B/","B")
             )
         ){ /** onClick **/ }
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub)

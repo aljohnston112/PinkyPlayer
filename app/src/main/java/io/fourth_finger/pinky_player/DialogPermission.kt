@@ -8,13 +8,12 @@ import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 
-
 /**
  * A dialog explaining why permission is need to the user.
  * It has a button to take the user to the app settings and
  * a button to close the dialog.
  */
-class DialogPermission: DialogFragment() {
+class DialogPermission : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
@@ -39,6 +38,5 @@ class DialogPermission: DialogFragment() {
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
     }
-
 
 }

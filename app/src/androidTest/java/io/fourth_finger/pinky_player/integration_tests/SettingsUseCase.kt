@@ -1,7 +1,6 @@
 package io.fourth_finger.pinky_player.integration_tests
 
 import android.Manifest
-import android.content.Context
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -25,26 +24,27 @@ import androidx.test.rule.GrantPermissionRule
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
-import io.fourth_finger.music_repository.MusicFile
+import io.fourth_finger.music_repository.MusicDataSource
+import io.fourth_finger.music_repository.MusicDataSourceModule
+import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.ActivityMain
 import io.fourth_finger.pinky_player.FragmentSettings
 import io.fourth_finger.pinky_player.MediaItemCreator
-import io.fourth_finger.pinky_player.MusicFileLiveDataModule
 import io.fourth_finger.pinky_player.R
 import io.fourth_finger.pinky_player.getOrAwaitValue
+import io.fourth_finger.pinky_player.hilt.provideFakeMusicDataSourceWithTwoShortestSongs
 import io.fourth_finger.settings_repository.SettingsRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -55,27 +55,19 @@ import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.time.Duration
 
-@UninstallModules(MusicFileLiveDataModule::class)
+@UninstallModules(MusicDataSourceModule::class)
 @HiltAndroidTest
 class SettingsUseCase {
 
     @Module
     @InstallIn(SingletonComponent::class)
-    object FakeMusicFileLiveDataModule {
+    class FakeMusicDataSourceModule {
 
         @Provides
-        fun provideMusicFileLiveData(
-            scope: CoroutineScope,
-            @ApplicationContext context: Context,
-            musicRepository: MusicRepository
-        ): LiveData<List<MusicFile>> {
-            val fakeMusicFileLiveData = ShuffleUseCase.FakeMusicFileLiveData(
-                scope,
-                context,
-                musicRepository
-            )
-            return fakeMusicFileLiveData.songs
+        fun provideFakeMusicDataSource(): MusicDataSource {
+            return provideFakeMusicDataSourceWithTwoShortestSongs()
         }
+
     }
 
     @get:Rule(order = 0)
@@ -93,13 +85,11 @@ class SettingsUseCase {
     var activityScenarioRule = activityScenarioRule<ActivityMain>()
 
     @Inject
-    lateinit var musicFileLiveData: LiveData<List<MusicFile>>
-
-    @Inject
     lateinit var musicRepository: MusicRepository
 
     @Inject
     lateinit var settingsRepository: SettingsRepository
+
 
     @Before
     fun init() {
@@ -137,8 +127,8 @@ class SettingsUseCase {
 
     @Test
     fun userGoesToSettings_ChangingProbabilityDown_ChangesPlaylistDistribution() =
-        runTest(timeout = Duration.parse("2h")) {
-            val music = musicFileLiveData.getOrAwaitValue(time = 60)
+        runTest(timeout = Duration.parse("10m")) {
+            val music = musicRepository.musicItems.getOrAwaitValue(time = 60)
             val firstSongId = music[0].id
             val secondSongId = music[1].id
             val expectedProbabilities = mapOf(
@@ -215,10 +205,12 @@ class SettingsUseCase {
                 val mediaItemCreator = MediaItemCreator(musicRepository)
                 val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
                 mediaBrowser?.setMediaItem(mediaItemCreator.getMediaItem(application, firstSongId))
-                mediaBrowser?.play()
                 countDownLatchPlayStarted.countDown()
             }
             countDownLatchPlayStarted.await()
+
+            onView(withId(R.id.button_play_pause)).perform(click())
+
             onView(withId(R.id.button_next)).perform(click())
 
             countDownLatch.await()
@@ -334,7 +326,7 @@ class SettingsUseCase {
 
             val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
             val countDownLatchToggleSwitchAndPlayMusic = CountDownLatch(1)
-            var mediaBrowser: MediaBrowser? = null
+            var mediaBrowser: MediaBrowser?
 
             // Go to the music settings fragment
             onView(withId(R.id.button_settings))
@@ -355,7 +347,6 @@ class SettingsUseCase {
                 )!!
                 assertTrue(!preference.isChecked)
                 preference.performClick()
-
 
                 // Start music playback
                 runBlocking {
@@ -384,7 +375,7 @@ class SettingsUseCase {
                         }
                     )
 
-                    val music = musicFileLiveData.getOrAwaitValue(time = 60)
+                    val music = musicRepository.musicItems.getOrAwaitValue(time = 60)
                     val firstSongId = music[0].id
                     val mediaItemCreator = MediaItemCreator(musicRepository)
                     mediaBrowser?.setMediaItem(

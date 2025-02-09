@@ -1,15 +1,19 @@
 package io.fourth_finger.pinky_player
 
+import android.Manifest
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.rule.GrantPermissionRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.fourth_finger.pinky_player.hilt.launchFragmentInHiltContainer
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -22,8 +26,16 @@ class FragmentTitleTest {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
-    private val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
-    private val navController = TestNavHostController(application)
+    @get:Rule(order = 1)
+    val rule = InstantTaskExecutorRule()
+
+    @get:Rule(order = 2)
+    val mRuntimePermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
+        Manifest.permission.READ_MEDIA_AUDIO
+    )
+
+    private val context = ApplicationProvider.getApplicationContext<HiltTestApplication>()
+    private val navController = TestNavHostController(context)
 
     @Before
     fun init() {
@@ -34,7 +46,10 @@ class FragmentTitleTest {
         launchFragmentInHiltContainer<FragmentTitle> {
             // Setting the graph must be done on the main thread
             navController.setGraph(R.navigation.nav_graph)
-            Navigation.setViewNavController(requireView(), navController)
+            Navigation.setViewNavController(
+                requireView(),
+                navController
+            )
             countDownLatch.countDown()
         }
         countDownLatch.await()

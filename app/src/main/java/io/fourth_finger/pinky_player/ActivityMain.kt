@@ -11,14 +11,17 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.View.VISIBLE
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import io.fourth_finger.pinky_player.databinding.ActivityMainBinding
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -62,16 +65,6 @@ class ActivityMain : AppCompatActivity() {
         }
     }
 
-    private fun setPlayButton() {
-        binding.buttonPlayPause.setBackgroundResource(R.drawable.ic_baseline_play_arrow_24)
-        binding.controls.visibility = View.VISIBLE
-    }
-
-    private fun setPauseButton() {
-        binding.buttonPlayPause.setBackgroundResource(R.drawable.ic_baseline_pause_24)
-        binding.controls.visibility = View.VISIBLE
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -91,6 +84,16 @@ class ActivityMain : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         viewModel.start()
+        viewModel.havePermission.observe(this) { havePermission ->
+            if (havePermission) {
+                binding.controls.visibility = VISIBLE
+            }
+        }
+        viewModel.playbackStarted.observe(this){ playbackStarted ->
+            if (playbackStarted){
+                binding.buttonNext.visibility = VISIBLE
+            }
+        }
         viewModel.playing.observe(this) { isPlaying ->
             if (isPlaying) {
                 setPauseButton()
@@ -100,6 +103,14 @@ class ActivityMain : AppCompatActivity() {
         }
         requestPermissionsAndLoadMusicFiles()
         setUpOnClickListeners()
+    }
+
+    private fun setPlayButton() {
+        binding.buttonPlayPause.setBackgroundResource(R.drawable.ic_baseline_play_arrow_24)
+    }
+
+    private fun setPauseButton() {
+        binding.buttonPlayPause.setBackgroundResource(R.drawable.ic_baseline_pause_24)
     }
 
     /**
@@ -145,7 +156,9 @@ class ActivityMain : AppCompatActivity() {
      */
     private fun setUpOnClickListeners() {
         binding.buttonPlayPause.setOnClickListener {
-            viewModel.onPlayPauseClicked()
+            lifecycleScope.launch {
+                viewModel.onPlayPauseClicked(this@ActivityMain)
+            }
         }
         binding.buttonNext.setOnClickListener {
             viewModel.onNextClicked()

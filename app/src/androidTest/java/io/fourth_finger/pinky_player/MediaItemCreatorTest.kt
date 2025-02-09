@@ -5,6 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.rule.GrantPermissionRule
 import dagger.hilt.android.testing.HiltTestApplication
+import io.fourth_finger.music_repository.MusicDataSourceImpl
 import io.fourth_finger.music_repository.MusicRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
@@ -24,7 +25,7 @@ class MediaItemCreatorTest {
     @Test
     fun getMediaItem_hasCorrectContents() = runTest {
         val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
-        val musicRepository = MusicRepository()
+        val musicRepository = MusicRepository(MusicDataSourceImpl())
         val music = musicRepository.loadMusicFiles(application.contentResolver)[0]
         val mediaItemCreator = MediaItemCreator(musicRepository)
         val mediaItem = mediaItemCreator.getMediaItem(application, music.id)

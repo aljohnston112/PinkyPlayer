@@ -16,7 +16,7 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.rule.GrantPermissionRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import io.fourth_finger.music_repository.MusicFile
+import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.ActivityMain
 import io.fourth_finger.pinky_player.MusicFileAdapter
@@ -35,6 +35,7 @@ class MusicSearchUseCase {
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
 
+
     @get:Rule(order = 1)
     val rule = InstantTaskExecutorRule()
 
@@ -48,7 +49,6 @@ class MusicSearchUseCase {
 
     @Inject
     lateinit var musicRepository: MusicRepository
-
 
     @Before
     fun init() {
@@ -67,6 +67,7 @@ class MusicSearchUseCase {
             onView(withId(R.id.action_search))
                 .perform(click())
             val searchText = "floaroma"
+
             // The id approach here was recommended by Google
             onView(withId(androidx.appcompat.R.id.search_src_text))
                 .perform(
@@ -75,8 +76,8 @@ class MusicSearchUseCase {
                 )
 
             // Get songs containing the search text in their full path
-            val music = musicRepository.getCachedMusicFiles()
-            val siftedMusic = mutableListOf<MusicFile>()
+            val music = musicRepository.getCachedMusicItems()
+            val siftedMusic = mutableListOf<MusicItem>()
             for (song in music) {
                 if (song.fullPath.lowercase().contains(searchText)) {
                     siftedMusic.add(song)
@@ -121,6 +122,7 @@ class MusicSearchUseCase {
             onView(withId(R.id.action_search))
                 .perform(click())
             val searchText = "floaroma"
+
             // The id approach here was recommended by Google
             onView(withId(androidx.appcompat.R.id.search_src_text))
                 .perform(

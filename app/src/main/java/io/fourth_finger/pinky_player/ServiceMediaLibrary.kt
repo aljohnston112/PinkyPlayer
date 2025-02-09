@@ -26,7 +26,7 @@ class ServiceMediaLibrary : MediaLibraryService() {
     lateinit var mediaItemCreator: MediaItemCreator
 
     @Inject
-    lateinit var playlistProvider: PlaylistProvider
+    lateinit var mainPlaylistProvider: MainPlaylistProvider
 
     @Inject
     lateinit var applicationScope: CoroutineScope
@@ -88,7 +88,7 @@ class ServiceMediaLibrary : MediaLibraryService() {
     private val onSongSkipped: suspend (Long) -> Unit =
         { mediaId: Long ->
             val probabilityDown = settingsRepository.probabilityDown.first()
-            val playlist = playlistProvider.await()
+            val playlist = mainPlaylistProvider.await()
             val mediaItem = playlist.getElements().first { it.id == mediaId }
             playlist.scaleProbability(
                 mediaItem,
@@ -107,7 +107,7 @@ class ServiceMediaLibrary : MediaLibraryService() {
             applicationScope,
             this@ServiceMediaLibrary,
             mediaItemCreator,
-            playlistProvider,
+            mainPlaylistProvider,
             onSongSkipped,
             false
         )
