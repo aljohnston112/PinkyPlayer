@@ -3,6 +3,9 @@ package io.fourth_finger.pinky_player
 import android.media.MediaMetadataRetriever
 import androidx.test.platform.app.InstrumentationRegistry
 import io.fourth_finger.music_repository.MusicRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.coroutineScope
 
 class MediaFileUtil {
 
@@ -13,42 +16,48 @@ class MediaFileUtil {
             doNotConsider: List<Long> = listOf()
         ): List<Long> {
             val musicIds = mutableListOf<Long>()
-            val id = getMusicIdOfShortDurationSong(musicRepository)
+            val id = getMusicIdOfSongWithDurationUnder(musicRepository)
             musicIds.add(id)
-            val id2 = getMusicIdOfShortDurationSong(musicRepository, musicIds + doNotConsider)
+            val id2 = getMusicIdOfSongWithDurationUnder(musicRepository, musicIds + doNotConsider)
             musicIds.add(id2)
             return musicIds
         }
 
-        suspend fun getMusicIdOfShortDurationSong(
+        suspend fun getMusicIdOfSongWithDurationUnder(
             musicRepository: MusicRepository,
-            doNotConsider: List<Long> = listOf()
-        ): Long {
+            doNotConsider: List<Long> = listOf(),
+            durationMS: Int = 100
+        ): Long = coroutineScope {
             val music = musicRepository.getCachedMusicFiles()
-            var shortestMusic = music[0].id
-
             val context = InstrumentationRegistry.getInstrumentation().targetContext
-            val mmr = MediaMetadataRetriever()
-            mmr.setDataSource(context, musicRepository.getUri(music[0].id))
-            var durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            var shortestDuration = durationStr!!.toInt()
 
-            for (m in music) {
-                if(m.id !in doNotConsider) {
-                    mmr.setDataSource(context, musicRepository.getUri(m.id))
-                    durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-
-                    val duration = durationStr!!.toInt()
-                    if (duration < shortestDuration) {
-                        shortestDuration = duration
-                        shortestMusic = m.id
+            val deferredResults = music.mapNotNull { musicFile ->
+                if (musicFile.id !in doNotConsider) {
+                    async {
+                        val mmr = MediaMetadataRetriever()
+                        return@async try {
+                            mmr.setDataSource(context, musicRepository.getUri(musicFile.id))
+                            val durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                            val duration = durationStr?.toInt()
+                            if (duration != null && duration < durationMS) {
+                                musicFile.id
+                            } else null
+                        } finally {
+                            mmr.release()
+                        }
                     }
-                    if (duration < 1000) {
-                        break
-                    }
+                } else{
+                    null
                 }
             }
-            return shortestMusic
+
+            try {
+                deferredResults.firstNotNullOfOrNull { it.await() }?.also {
+                    deferredResults.forEach { it.cancel() }
+                } ?: music.first().id
+            } finally {
+                coroutineContext.cancelChildren()
+            }
         }
 
     }

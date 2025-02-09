@@ -19,7 +19,9 @@ import io.fourth_finger.pinky_player.MediaBrowserProvider
 import io.fourth_finger.pinky_player.MediaFileUtil
 import io.fourth_finger.pinky_player.MusicFileAdapter
 import io.fourth_finger.pinky_player.R
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -69,7 +71,13 @@ class PlayMusicUseCase {
             val countDownLatchPlay = CountDownLatch(1)
             val countDownLatchPlay2 = CountDownLatch(1)
             val mediaBrowser = mediaBrowserProvider.await()
-            val shortestMusicId = MediaFileUtil.getMusicIdOfShortDurationSong(musicRepository)
+            val shortestMusicId = withContext(Dispatchers.Default) {
+                MediaFileUtil.getMusicIdOfSongWithDurationUnder(
+                    musicRepository,
+                    emptyList(),
+                    2000
+                )
+            }
             mediaBrowser.addListener(
                 object : Player.Listener {
 

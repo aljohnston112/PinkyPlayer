@@ -44,7 +44,7 @@ class PinkyPlayer(
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             super.onMediaItemTransition(mediaItem, reason)
             scope.launch(Dispatchers.Main.immediate) {
-                if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
+                if (reason == MEDIA_ITEM_TRANSITION_REASON_AUTO) {
                     val song = getNextSong(playlistProvider.await())
                     addMediaItem(song)
                 }
@@ -59,7 +59,7 @@ class PinkyPlayer(
     }
 
     override fun getAvailableCommands(): Player.Commands {
-        return super.getAvailableCommands()
+        return super.availableCommands
             .buildUpon()
             .add(COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
             .add(COMMAND_SEEK_TO_NEXT)
