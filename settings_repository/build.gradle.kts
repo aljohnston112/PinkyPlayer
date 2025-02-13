@@ -14,10 +14,6 @@ android {
 
         consumerProguardFiles("consumer-rules.pro")
 
-        testOptions {
-            execution = "ANDROIDX_TEST_ORCHESTRATOR"
-        }
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments += (
                 mapOf(

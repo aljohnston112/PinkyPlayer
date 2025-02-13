@@ -43,9 +43,7 @@ android {
 
 dependencies {
 
-    implementation(
-            project(":shared_resources"),
-    )
+    implementation(project(":shared_resources"))
 
     implementation 'androidx.lifecycle:lifecycle-livedata-core-ktx:2.8.7'
 

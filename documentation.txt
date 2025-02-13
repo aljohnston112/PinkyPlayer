@@ -1,0 +1,13 @@
+Preferences DataStore
+
+View Binding
+
+ViewModel
+
+Hilt
+    Singletons
+        SettingsRepository
+
+Media 3
+    The MediaBrowser class allows the user to navigate through a media app's content library and
+    select which items to play.

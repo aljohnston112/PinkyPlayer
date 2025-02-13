@@ -1,7 +1,5 @@
 package io.fourth_finger.shared_resources
 
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Test
 
@@ -14,26 +12,24 @@ class ThreadSafeMemoryCacheTest {
     }
 
     @Test
-    fun hasData_returnsTrueWhenHasData() = runTest {
+    fun hasData_returnsTrueWhenHasData() {
         val threadSafeMemoryCache = ThreadSafeMemoryCache<Int>()
         threadSafeMemoryCache.updateData(1)
         assert(threadSafeMemoryCache.hasData())
     }
 
     @Test
-    fun updateData_one_getDataReturnsOne() = runTest {
+    fun updateData_one_getDataReturnsOne() {
         val threadSafeMemoryCache = ThreadSafeMemoryCache<Int>()
         threadSafeMemoryCache.updateData(1)
         assert(threadSafeMemoryCache.getData() == 1)
     }
 
     @Test
-    fun getData_throwsWhenNoData() = runTest {
+    fun getData_throwsWhenNoData() {
         val threadSafeMemoryCache = ThreadSafeMemoryCache<Int>()
-        Assert.assertThrows(NoSuchElementException::class.java) {
-            runBlocking {
-                threadSafeMemoryCache.getData()
-            }
+        Assert.assertThrows(IllegalStateException::class.java) {
+            threadSafeMemoryCache.getData()
         }
     }
 

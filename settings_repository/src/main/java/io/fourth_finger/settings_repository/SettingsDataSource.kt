@@ -19,14 +19,14 @@ internal class SettingsDataSource(context: Context) {
 
     private val SONG_SKIP_MULTIPLIER = intPreferencesKey("SONG_SKIP_MULTIPLIER")
 
-    val songSkipMultiplier: Flow<Int> = context.dataStore.data.map {
-        it[SONG_SKIP_MULTIPLIER] ?: 66
+    val songSkipMultiplier: Flow<Int> = context.dataStore.data.map { preferences ->
+        preferences[SONG_SKIP_MULTIPLIER] ?: 66
     }
 
     private val RESPECT_AUDIO_FOCUS = booleanPreferencesKey("RESPECT_AUDIO_FOCUS")
 
-    val respectAudioFocus: Flow<Boolean> = context.dataStore.data.map {
-        it[RESPECT_AUDIO_FOCUS] ?: false
+    val respectAudioFocus: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[RESPECT_AUDIO_FOCUS] ?: false
     }
 
     /**
@@ -34,15 +34,15 @@ internal class SettingsDataSource(context: Context) {
      * Any past settings will be overwritten.
      *
      * @param context
-     * @param settings The settings to save.
+     * @param newSettings The settings to save.
      */
     suspend fun saveSettings(
         context: Context,
-        settings: Settings
+        newSettings: Settings
     ) {
-        context.dataStore.edit {
-            it[SONG_SKIP_MULTIPLIER] = settings.probabilityDown
-            it[RESPECT_AUDIO_FOCUS] = settings.respectAudioFocus
+        context.dataStore.edit { settings ->
+            settings[SONG_SKIP_MULTIPLIER] = newSettings.probabilityDownMultiplier
+            settings[RESPECT_AUDIO_FOCUS] = newSettings.respectsAudioFocus
         }
     }
 
