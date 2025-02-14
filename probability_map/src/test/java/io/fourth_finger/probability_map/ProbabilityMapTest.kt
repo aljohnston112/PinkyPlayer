@@ -17,7 +17,7 @@ class ProbabilityMapTest {
 
     @Test
     fun testSample() {
-        val numberOfSamples = 1000000
+        val numberOfSamples = 1_000_000
 
         val expectedProbabilities = mapOf(
             "A" to 1.0 / 3.0,
@@ -45,7 +45,7 @@ class ProbabilityMapTest {
 
     @Test
     fun testSample_AfterReducingProbability() {
-        val numberOfSamples = 1000000
+        val numberOfSamples = 1_000_000
         probabilityMap = ProbabilityMap(listOf("A", "B"))
         probabilityMap.scaleProbability("A", 99, 100)
         val expectedProbabilities = mapOf(
@@ -74,7 +74,7 @@ class ProbabilityMapTest {
     @Test
     fun testReduceProbability(){
         probabilityMap.scaleProbability("A", 2, 5)
-        val numberOfSamples = 1000000
+        val numberOfSamples = 1_000_000
 
         val expectedProbabilities = mapOf(
             "A" to 2.0 / 15.0,
@@ -103,7 +103,7 @@ class ProbabilityMapTest {
     @Test
     fun testAddElement(){
         probabilityMap.addElement("D")
-        val numberOfSamples = 1000000
+        val numberOfSamples = 1_000_000
 
         val expectedProbabilities = mapOf(
             "A" to 1.0 / 4.0,
@@ -133,7 +133,7 @@ class ProbabilityMapTest {
     @Test
     fun testRemoveElement(){
         probabilityMap.removeElement("C")
-        val numberOfSamples = 1000000
+        val numberOfSamples = 1_000_000
 
         val expectedProbabilities = mapOf(
             "A" to 1.0 / 2.0,

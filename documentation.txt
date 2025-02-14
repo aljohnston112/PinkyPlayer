@@ -1,13 +1,12 @@
-Preferences DataStore
+Android Frameworks
+    Preferences DataStore
+    View Binding
+    ViewModel
+    Hilt
+        Singletons
+            SettingsRepository
 
-View Binding
-
-ViewModel
-
-Hilt
-    Singletons
-        SettingsRepository
-
-Media 3
-    The MediaBrowser class allows the user to navigate through a media app's content library and
-    select which items to play.
+    Media 3
+        MediaBrowser
+            Allows the user to navigate through a media app's content library and
+            select which items to play.

@@ -28,6 +28,7 @@ class SettingsRepository @Inject constructor(
      *
      * @param context
      * @param settings The settings to save.
+     * @param dispatcher The dispatcher to load the settings on.
      */
     suspend fun saveSettings(
         context: Context,

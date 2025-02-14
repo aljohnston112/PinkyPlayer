@@ -26,7 +26,7 @@ internal class SettingsDataSource(context: Context) {
     private val RESPECT_AUDIO_FOCUS = booleanPreferencesKey("RESPECT_AUDIO_FOCUS")
 
     val respectAudioFocus: Flow<Boolean> = context.dataStore.data.map { preferences ->
-        preferences[RESPECT_AUDIO_FOCUS] ?: false
+        preferences[RESPECT_AUDIO_FOCUS] == true
     }
 
     /**
