@@ -19,7 +19,7 @@ import io.fourth_finger.playlists.databinding.FragmentPlaylistListBinding
 import kotlinx.coroutines.launch
 
 /**
- * A [Fragment] that displays a list of [PlaylistItem]s.
+ * A [Fragment] that displays a list of [io.fourth_finger.playlist_repository.PlaylistItem]s.
  */
 @AndroidEntryPoint
 class FragmentPlaylistList : Fragment() {
@@ -49,12 +49,21 @@ class FragmentPlaylistList : Fragment() {
 
         }
 
-        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-            menuInflater.inflate(R.menu.fragment_playlist_list_menu, menu)
+        override fun onCreateMenu(
+            menu: Menu,
+            menuInflater: MenuInflater
+        ) {
+            menuInflater.inflate(
+                R.menu.fragment_playlist_list_menu,
+                menu
+            )
             val searchItem = menu.findItem(R.id.action_search)
             _searchView = searchItem?.actionView as SearchView
             searchView.setOnQueryTextListener(queryTextListener)
-            setSavedSearchText(searchItem, searchView)
+            setSavedSearchText(
+                searchItem,
+                searchView
+            )
         }
 
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -63,11 +72,18 @@ class FragmentPlaylistList : Fragment() {
 
     }
 
-    private fun setSavedSearchText(searchItem: MenuItem, searchView: SearchView) {
-        viewModel.getSavedSearchText()?.let {
+    private fun setSavedSearchText(
+        searchItem: MenuItem,
+        searchView: SearchView
+    ) {
+        viewModel.getSavedSearchText()?.let { savedSearchText ->
             searchView.isIconified = true
             searchItem.expandActionView()
-            searchView.setQuery(it, true)
+            val submitQuery = true
+            searchView.setQuery(
+                savedSearchText,
+                submitQuery
+            )
             searchView.isFocusable = true
         }
     }
@@ -86,12 +102,23 @@ class FragmentPlaylistList : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentPlaylistListBinding.inflate(inflater, container, false)
+        val attachToParent = false
+        _binding = FragmentPlaylistListBinding.inflate(
+            inflater,
+            container,
+            attachToParent
+        )
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
         setUpRecyclerView()
     }
 
@@ -106,6 +133,8 @@ class FragmentPlaylistList : Fragment() {
                 playlistID
             )
         }
+        adapter.setHasStableIds(true)
+
         binding.recyclerView.adapter = adapter
         val linearLayoutManager = LinearLayoutManager(context)
         linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
@@ -113,13 +142,10 @@ class FragmentPlaylistList : Fragment() {
         binding.recyclerView.layoutManager = linearLayoutManager
 
         // Set up playlist list updates
-
         lifecycleScope.launch {
             viewModel.playlistItems.collect { playlistItems ->
-                playlistItems.let {
-                    binding.recyclerView.post {
-                        adapter.updatePlaylistList(playlistItems)
-                    }
+                binding.recyclerView.post {
+                    adapter.updatePlaylistList(playlistItems)
                 }
             }
         }

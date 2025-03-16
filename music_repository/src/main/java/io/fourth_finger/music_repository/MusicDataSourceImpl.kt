@@ -38,9 +38,7 @@ class MusicDataSourceImpl : MusicDataSource() {
                     musicItemCache.updateData(latestMusic)
                 }
             }
-
-            val music = musicItemCache.getData()
-            music
+            musicItemCache.getData()
         }
     }
 

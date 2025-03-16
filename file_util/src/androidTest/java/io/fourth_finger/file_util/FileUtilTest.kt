@@ -10,23 +10,41 @@ import java.io.Serializable
 
 class FileUtilTest {
 
-    private data class TestData(val name: String, val value: Int) : Serializable
+    private data class TestData(
+        val name: String,
+        val value: Int
+    ) : Serializable
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
     private val fileName = "testFile"
 
     @After
-    fun deleteTestData(){
-        FileUtil.delete(context, fileName)
+    fun deleteTestData() {
+        FileUtil.delete(
+            context,
+            fileName
+        )
     }
 
     @Test
     fun saveAndLoadObject_withSameVerificationNumber_loadsCorrectData() {
         val testData = TestData("Test data", 123)
         val saveFileVerificationNumber = 136034L
-        FileUtil.save(testData, context, fileName, saveFileVerificationNumber)
-        val loadedData = FileUtil.load<TestData>(context, fileName, saveFileVerificationNumber)
-        assertEquals(testData, loadedData)
+        FileUtil.save(
+            testData,
+            context,
+            fileName,
+            saveFileVerificationNumber
+        )
+        val loadedData = FileUtil.load<TestData>(
+            context,
+            fileName,
+            saveFileVerificationNumber
+        )
+        assertEquals(
+            testData,
+            loadedData
+        )
     }
 
     @Test
@@ -34,23 +52,48 @@ class FileUtilTest {
         val testData = TestData("Test data", 1273)
         val testData2 = TestData("Test data2", 1232)
         val saveFileVerificationNumber = 1360834L
-        FileUtil.save(testData, context, fileName, saveFileVerificationNumber)
-        FileUtil.save(testData2, context, fileName, saveFileVerificationNumber)
-        val loadedData = FileUtil.load<TestData>(context, fileName, saveFileVerificationNumber)
-        assertEquals(testData2, loadedData)
+        FileUtil.save(
+            testData,
+            context,
+            fileName,
+            saveFileVerificationNumber
+        )
+        FileUtil.save(
+            testData2,
+            context,
+            fileName,
+            saveFileVerificationNumber
+        )
+        val loadedData = FileUtil.load<TestData>(
+            context,
+            fileName,
+            saveFileVerificationNumber
+        )
+        assertEquals(
+            testData2,
+            loadedData
+        )
     }
 
     @Test
     fun saveAndLoadObject_withDifferentVerificationNumber_returnsNull() {
         val testData = TestData("Test data", 1203)
         val saveFileVerificationNumber = 13603454L
-        FileUtil.save(testData, context, fileName, saveFileVerificationNumber)
+        FileUtil.save(
+            testData,
+            context,
+            fileName,
+            saveFileVerificationNumber
+        )
         val loadedData = FileUtil.load<TestData>(
             context,
             fileName,
             saveFileVerificationNumber + 1
         )
-        assertEquals(loadedData, null)
+        assertEquals(
+            loadedData,
+            null
+        )
     }
 
     @Test
@@ -61,10 +104,22 @@ class FileUtilTest {
             TestData("Item 3", 3)
         )
         val saveFileVerificationNumber = 13603365454L
-        FileUtil.saveList(testDataList, context, fileName, saveFileVerificationNumber)
+        FileUtil.saveList(
+            testDataList,
+            context,
+            fileName,
+            saveFileVerificationNumber
+        )
 
-        val loadedList = FileUtil.loadList<TestData>(context, fileName, saveFileVerificationNumber)
-        assertEquals(testDataList, loadedList)
+        val loadedList = FileUtil.loadList<TestData>(
+            context,
+            fileName,
+            saveFileVerificationNumber
+        )
+        assertEquals(
+            testDataList,
+            loadedList
+        )
     }
 
     @Test
@@ -75,20 +130,41 @@ class FileUtilTest {
             TestData("Item 3", 3)
         )
         val saveFileVerificationNumber = 13603365454L
-        FileUtil.saveList(testDataList, context, fileName, saveFileVerificationNumber)
+        FileUtil.saveList(
+            testDataList,
+            context,
+            fileName,
+            saveFileVerificationNumber
+        )
 
         val loadedList =
-            FileUtil.loadList<TestData>(context, fileName, saveFileVerificationNumber + 1)
+            FileUtil.loadList<TestData>(
+                context,
+                fileName,
+                saveFileVerificationNumber + 1
+            )
         assertEquals(loadedList, null)
     }
 
     @Test
     fun loadFile_afterDeletingSavedFile_returnsNull() {
         val saveFileVerificationNumber = 13603356365454L
-        FileUtil.save(TestData("Test data", 1239), context, fileName, saveFileVerificationNumber)
-        FileUtil.delete(context, fileName)
+        FileUtil.save(
+            TestData("Test data", 1239),
+            context,
+            fileName,
+            saveFileVerificationNumber
+        )
+        FileUtil.delete(
+            context,
+            fileName
+        )
 
-        val loadedData = FileUtil.load<TestData>(context, fileName, saveFileVerificationNumber)
+        val loadedData = FileUtil.load<TestData>(
+            context,
+            fileName,
+            saveFileVerificationNumber
+        )
         assertNull(loadedData)
     }
 

@@ -6,14 +6,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
 import androidx.datastore.dataStore
 import com.google.protobuf.InvalidProtocolBufferException
-import java.io.FileNotFoundException
 import java.io.InputStream
 import java.io.OutputStream
 
 internal object PlaylistSerializer: Serializer<PlaylistsProto> {
 
-    override val defaultValue: PlaylistsProto
-        get() = PlaylistsProto.getDefaultInstance()
+    override val defaultValue: PlaylistsProto = PlaylistsProto.getDefaultInstance()
 
     override suspend fun readFrom(input: InputStream): PlaylistsProto {
         try {
@@ -35,6 +33,6 @@ internal object PlaylistSerializer: Serializer<PlaylistsProto> {
 }
 
 val Context.playlistDataStore: DataStore<PlaylistsProto> by dataStore(
-    fileName = "playlist.proto",
+    fileName = "playlist.pb",
     serializer = PlaylistSerializer
 )

@@ -61,16 +61,16 @@ dependencies {
         project(":playlist_repository"),
     )
 
-    implementation("androidx.activity:activity-ktx:1.10.0")
+    implementation("androidx.activity:activity-ktx:1.10.1")
     implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.fragment:fragment-ktx:1.8.5")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.8.6")
-    implementation("androidx.navigation:navigation-ui-ktx:2.8.6")
+    implementation("androidx.fragment:fragment-ktx:1.8.6")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.8.9")
+    implementation("androidx.navigation:navigation-ui-ktx:2.8.9")
 
     implementation("com.google.android.material:material:1.12.0")
 
     implementation("com.google.dagger:hilt-android:2.51.1")
-    ksp("com.google.dagger:hilt-compiler:2.51.1")
+    ksp("com.google.dagger:hilt-compiler:2.55")
 
     testImplementation("junit:junit:4.13.2")
 

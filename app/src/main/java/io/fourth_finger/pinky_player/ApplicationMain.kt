@@ -1,14 +1,13 @@
 package io.fourth_finger.pinky_player
 
 import android.app.Application
+import android.util.Log
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.components.SingletonComponent
-import io.fourth_finger.music_repository.MusicDataSource
-import io.fourth_finger.music_repository.MusicDataSourceImpl
-import io.fourth_finger.music_repository.MusicRepository
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
@@ -16,9 +15,13 @@ import kotlinx.coroutines.SupervisorJob
 @InstallIn(SingletonComponent::class)
 object CoroutineScopeModule {
 
+    val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+        Log.e("CoroutineException", "Caught exception", exception)
+    }
+
     @Provides
     fun provideCoroutineScope(): CoroutineScope {
-        return CoroutineScope(SupervisorJob())
+        return CoroutineScope(SupervisorJob() + exceptionHandler)
     }
 
 }

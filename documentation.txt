@@ -1,10 +1,16 @@
 Android Frameworks
-    Preferences DataStore
-    View Binding
-    ViewModel
     Hilt
         Singletons
             SettingsRepository
+            PlaylistRepository
+            MusicDataSource
+            MusicRepository
+            MediaBrowserProvider
+            CoroutineScope
+    Preferences DataStore
+    Proto DataStore
+    View Binding
+    ViewModel
 
     Media 3
         MediaBrowser

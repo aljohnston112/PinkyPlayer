@@ -27,7 +27,7 @@ class PlaylistRepository @Inject constructor(
 
     val playlists: Flow<List<Playlist>> = context.playlistDataStore.data.map {
         val playlists = mutableListOf<Playlist>()
-        for(playlist in it.playlistsList){
+        for (playlist in it.playlistsList) {
             playlists.add(
                 Playlist(
                     playlist.hash,

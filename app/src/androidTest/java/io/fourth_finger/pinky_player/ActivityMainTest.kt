@@ -164,8 +164,6 @@ class ActivityMainTest {
 
     @Test
     fun whenNoPermission_AsksForCorrectPermission() {
-        // TODO this only works for API 31
-
         // Permission must not be granted
         var permissionStatus = ContextCompat.checkSelfPermission(
             context,
@@ -189,8 +187,6 @@ class ActivityMainTest {
 
     @Test
     fun whenPermissionDenied_permissionDialogShows() {
-        // TODO this only works for API 31
-
         val denyPermissions = getPermissionUIDenyButton()
         denyPermissions.click()
 
@@ -207,8 +203,6 @@ class ActivityMainTest {
 
     @Test
     fun whenPermissionDeniedAndUserClicksSettingsInPermissionDialog_AppSettingsOpen() {
-        // TODO this only works for API 31
-
         val denyPermissions = getPermissionUIDenyButton()
         denyPermissions.click()
 

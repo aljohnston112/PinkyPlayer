@@ -10,5 +10,5 @@ message PlaylistProto {
 }
 
 message PlaylistsProto {
-    repeated PlaylistProto playlists = 4;
+    repeated PlaylistProto playlists = 1;
 }

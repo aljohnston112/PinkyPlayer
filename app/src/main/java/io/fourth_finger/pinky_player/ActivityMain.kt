@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.View
 import android.view.View.VISIBLE
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -18,10 +17,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import io.fourth_finger.pinky_player.databinding.ActivityMainBinding
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -65,13 +62,6 @@ class ActivityMain : AppCompatActivity() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setUpToolbar()
-    }
-
     private fun setUpToolbar() {
         setSupportActionBar(findViewById(R.id.toolbar))
         addMenuProvider(
@@ -81,48 +71,15 @@ class ActivityMain : AppCompatActivity() {
         )
     }
 
-    override fun onStart() {
-        super.onStart()
-        viewModel.start()
-        viewModel.havePermission.observe(this) { havePermission ->
-            if (havePermission) {
-                binding.controls.visibility = VISIBLE
-            }
-        }
-        viewModel.playbackStarted.observe(this){ playbackStarted ->
-            if (playbackStarted){
-                binding.buttonNext.visibility = VISIBLE
-            }
-        }
-        viewModel.playing.observe(this) { isPlaying ->
-            if (isPlaying) {
-                setPauseButton()
-            } else {
-                setPlayButton()
-            }
-        }
-        requestPermissionsAndLoadMusicFiles()
-        setUpOnClickListeners()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setUpToolbar()
     }
 
-    private fun setPlayButton() {
-        binding.buttonPlayPause.setBackgroundResource(R.drawable.ic_baseline_play_arrow_24)
-    }
-
-    private fun setPauseButton() {
-        binding.buttonPlayPause.setBackgroundResource(R.drawable.ic_baseline_pause_24)
-    }
-
-    /**
-     *  Makes sure the proper permissions are granted and
-     *  then loads the music files from the MediaStore.
-     */
-    private fun requestPermissionsAndLoadMusicFiles() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requestPermission(READ_MEDIA_AUDIO)
-        } else {
-            requestPermission(READ_EXTERNAL_STORAGE)
-        }
+    private fun setPlayPauseButton(drawable: Int) {
+        binding.buttonPlayPause.setBackgroundResource(drawable)
     }
 
     /**
@@ -152,17 +109,51 @@ class ActivityMain : AppCompatActivity() {
     }
 
     /**
+     *  Makes sure the proper permissions are granted and
+     *  then loads the music files from the MediaStore.
+     */
+    private fun requestPermissionsAndLoadMusicFiles() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermission(READ_MEDIA_AUDIO)
+        } else {
+            requestPermission(READ_EXTERNAL_STORAGE)
+        }
+    }
+
+    /**
      * Sets up the onClickListeners for the media playback buttons
      */
     private fun setUpOnClickListeners() {
         binding.buttonPlayPause.setOnClickListener {
-            lifecycleScope.launch {
-                viewModel.onPlayPauseClicked(this@ActivityMain)
-            }
+            viewModel.onPlayPauseClicked(this@ActivityMain)
         }
         binding.buttonNext.setOnClickListener {
             viewModel.onNextClicked()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.start()
+        viewModel.havePermission.observe(this) { havePermission ->
+            if (havePermission) {
+                binding.controls.visibility = VISIBLE
+            }
+        }
+        viewModel.playbackStarted.observe(this){ playbackStarted ->
+            if (playbackStarted){
+                binding.buttonNext.visibility = VISIBLE
+            }
+        }
+        viewModel.playing.observe(this) { isPlaying ->
+            if (isPlaying) {
+                setPlayPauseButton(R.drawable.ic_baseline_pause_24)
+            } else {
+                setPlayPauseButton(R.drawable.ic_baseline_play_arrow_24)
+            }
+        }
+        requestPermissionsAndLoadMusicFiles()
+        setUpOnClickListeners()
     }
 
     override fun onStop() {

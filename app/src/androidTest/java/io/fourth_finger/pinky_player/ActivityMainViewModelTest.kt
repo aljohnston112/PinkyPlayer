@@ -22,7 +22,6 @@ import io.fourth_finger.music_repository.MusicDataSourceImpl
 import io.fourth_finger.music_repository.MusicRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -47,6 +46,9 @@ class ActivityMainViewModelTest {
     )
 
     @Inject
+    lateinit var coroutineScope: CoroutineScope
+
+    @Inject
     lateinit var musicRepository: MusicRepository
 
     @Inject
@@ -58,14 +60,17 @@ class ActivityMainViewModelTest {
 
     private val context = ApplicationProvider.getApplicationContext<HiltTestApplication>()
 
+
     @Before
-    fun init() {
+    fun init() = runTest {
         hiltRule.inject()
         mediaBrowserProvider = MediaBrowserProvider(
             context,
-            CoroutineScope(SupervisorJob())
+            coroutineScope
         )
+        mediaBrowserProvider.await()
         viewModel = ActivityMainViewModel(
+            coroutineScope,
             mediaBrowserProvider,
             musicRepository,
             MediaItemCreator(musicRepository),
@@ -125,10 +130,6 @@ class ActivityMainViewModelTest {
         // Setup the media browser listener
         val countDownLatchPlay = CountDownLatch(1)
         val countDownLatchPause = CountDownLatch(1)
-        val mediaBrowserProvider = MediaBrowserProvider(
-            context,
-            this
-        )
         val mediaBrowser = mediaBrowserProvider.await()
         mediaBrowser.addListener(
             object : Player.Listener {
@@ -166,10 +167,6 @@ class ActivityMainViewModelTest {
         val countDownLatchPlay = CountDownLatch(1)
         val countDownLatchPause = CountDownLatch(1)
         val countDownLatchPlay2 = CountDownLatch(1)
-        val mediaBrowserProvider = MediaBrowserProvider(
-            context,
-            this
-        )
         val mediaBrowser = mediaBrowserProvider.await()
         mediaBrowser.addListener(
             object : Player.Listener {
@@ -215,10 +212,6 @@ class ActivityMainViewModelTest {
 
         // Setup the media browser listener
         val countDownLatch = CountDownLatch(1)
-        val mediaBrowserProvider = MediaBrowserProvider(
-            context,
-            this
-        )
         val mediaBrowser = mediaBrowserProvider.await()
         val music = musicRepository.loadMusicFiles(context.contentResolver)
         val musicId = music[0].id

@@ -37,8 +37,8 @@ class UIAutomatorUtil {
             val uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
             return uiDevice.findObject(
                 UiSelector().clickable(true).checkable(false).text(
-                    // TODO
-                    // Only know that 31 is correct; the rest was copied from a random SO post.
+                    // Only know that 31 and 35 are correct;
+                    // the rest was copied from a random SO post.
                     when {
                         Build.VERSION.SDK_INT == 23 -> "Don't allow"
                         Build.VERSION.SDK_INT <= 28 -> "DON'T ALLOW"

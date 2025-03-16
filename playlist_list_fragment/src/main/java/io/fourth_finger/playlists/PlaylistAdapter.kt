@@ -12,12 +12,12 @@ import kotlin.properties.Delegates
 class PlaylistAdapter(
     private var playlistItems: List<PlaylistItem>,
     private val onPlaylistClickListener: (Int) -> Unit
-): RecyclerView.Adapter<PlaylistAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<PlaylistAdapter.ViewHolder>() {
 
     /**
-     * Updates the adapter with a new list of [PlaylistItem]s.
+     * Updates the adapter with a new list of [io.fourth_finger.playlist_repository.PlaylistItem]s.
      *
-     * @param music The new list of [PlaylistItem]s.
+     * @param music The new list of [io.fourth_finger.playlist_repository.PlaylistItem]s.
      */
     @SuppressLint("NotifyDataSetChanged")
     fun updatePlaylistList(music: List<PlaylistItem>) {
@@ -29,13 +29,15 @@ class PlaylistAdapter(
         parent: ViewGroup,
         viewType: Int
     ): ViewHolder {
+        val attachToRoot = false
         return ViewHolder(
             LayoutInflater.from(parent.context).inflate(
                 R.layout.playlist_holder,
                 parent,
-                false
+                attachToRoot
             )
-        )    }
+        )
+    }
 
     override fun getItemCount() = playlistItems.size
 
@@ -43,25 +45,24 @@ class PlaylistAdapter(
         holder: ViewHolder,
         position: Int
     ) {
-        holder.id = playlistItems[position].id
-        holder.textView.text = playlistItems[position].name
+        val playlistItem = playlistItems[position]
+        holder.id = playlistItem.hash
+        holder.textView.text = playlistItem.name
         holder.textView.setOnClickListener {
             onPlaylistClickListener(holder.id)
         }
     }
 
     /**
-     * A [RecyclerView.ViewHolder] for [PlaylistItem]s.
+     * A [RecyclerView.ViewHolder] for [io.fourth_finger.playlist_repository.PlaylistItem]s.
      *
-     * @param view The item holder [View].
+     * @param view The item holder's [View].
      */
     class ViewHolder(
         view: View
     ) : RecyclerView.ViewHolder(view) {
-
         val textView: TextView = view.findViewById(R.id.textView)
         var id by Delegates.notNull<Int>()
-
     }
 
 }

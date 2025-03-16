@@ -28,6 +28,8 @@ class MusicRepositoryTest {
 
     private val contentResolver = context.contentResolver
 
+    private val musicDataSource = MusicDataSourceImpl()
+
     /**
      * Tests that the [MusicItem]s returned by [MusicRepository.loadMusicFiles] match those
      * loaded by the [MediaStore].
@@ -35,7 +37,8 @@ class MusicRepositoryTest {
      */
     @Test
     fun loadMusicFiles_ContentResolver_ReturnsCorrectSongs() = runTest {
-        val musicFiles = MusicRepository().loadMusicFiles(contentResolver)
+        val musicRepository = MusicRepository(musicDataSource)
+        val musicFiles = musicRepository.loadMusicFiles(contentResolver)
         val actualMusicFiles = getAllMusicFiles()
 
         // Assert there are music files
@@ -55,10 +58,10 @@ class MusicRepositoryTest {
      */
     @Test
     fun loadMusicFiles_ContentResolver_CachesCorrectSongs() = runTest {
-        val actualMusicFiles = MusicRepository().loadMusicFiles(contentResolver)
+        val actualMusicFiles = getAllMusicFiles()
 
-        val musicRepository = MusicRepository()
-        assertThrows(NoSuchElementException::class.java){
+        val musicRepository = MusicRepository(musicDataSource)
+        assertThrows(IllegalStateException::class.java) {
             runBlocking {
                 musicRepository.getCachedMusicItems()
             }

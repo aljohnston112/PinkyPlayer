@@ -12,6 +12,7 @@ import androidx.media3.common.Player.STATE_READY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.music_repository.MusicRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -25,6 +26,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ActivityMainViewModel @Inject constructor(
+    private val applicationScope: CoroutineScope,
     private val mediaBrowserProvider: MediaBrowserProvider,
     private val musicRepository: MusicRepository,
     private val mediaItemCreator: MediaItemCreator,
@@ -90,7 +92,7 @@ class ActivityMainViewModel @Inject constructor(
      */
     fun loadMusic(contentResolver: ContentResolver): Job {
         _havePermission.postValue(true)
-        return viewModelScope.launch(Dispatchers.IO) {
+        return applicationScope.launch {
             musicRepository.loadMusicFiles(contentResolver)
         }
     }
@@ -99,14 +101,16 @@ class ActivityMainViewModel @Inject constructor(
      * Pauses or plays the current song.
      */
     fun onPlayPauseClicked(context: Context) {
-        viewModelScope.launch {
+        applicationScope.launch(Dispatchers.Main) {
             val mediaBrowser = mediaBrowserProvider.await()
             if (mediaBrowser.isPlaying) {
                 mediaBrowser.pause()
             } else if (mediaBrowser.playbackState == STATE_READY) {
                 mediaBrowser.play()
             } else {
-                _playbackStarted.postValue(true)
+                viewModelScope.launch {
+                    _playbackStarted.postValue(true)
+                }
                 mediaBrowser.setMediaItem(
                     mediaItemCreator.getMediaItem(
                         context,
@@ -123,7 +127,7 @@ class ActivityMainViewModel @Inject constructor(
      * Seeks to the next song.
      */
     fun onNextClicked() {
-        viewModelScope.launch {
+        applicationScope.launch(Dispatchers.Main) {
             if (musicItems.value?.isEmpty() == false) {
                 val mediaBrowser = mediaBrowserProvider.await()
                 mediaBrowser.seekToNextMediaItem()
@@ -146,7 +150,7 @@ class ActivityMainViewModel @Inject constructor(
         id: Long
     ) {
         _playbackStarted.postValue(true)
-        viewModelScope.launch {
+        applicationScope.launch(Dispatchers.Main) {
             val mediaBrowser = mediaBrowserProvider.await()
             mediaBrowser.setMediaItem(
                 mediaItemCreator.getMediaItem(

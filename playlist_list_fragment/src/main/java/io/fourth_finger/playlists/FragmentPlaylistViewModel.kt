@@ -17,54 +17,57 @@ import javax.inject.Inject
 @HiltViewModel
 class FragmentPlaylistViewModel @Inject constructor(
     private val playlistRepository: PlaylistRepository,
-    private val state: SavedStateHandle
+    private val savedState: SavedStateHandle
 ) : ViewModel() {
 
     private var searchText = MutableStateFlow("")
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val playlistItems = searchText.flatMapLatest { newText ->
-        playlistRepository.playlistItems.map { playlists ->
+        playlistRepository.playlistItems.map { playlistItems ->
             if (newText.isNotEmpty()) {
-                getPlaylistsWithText(playlists, newText)
+                getPlaylistsItemsWithText(
+                    playlistItems,
+                    newText
+                )
             } else {
-                playlists
+                playlistItems
             }
         }
     }
 
-    private fun getPlaylistsWithText(
+    private fun getPlaylistsItemsWithText(
         allPlaylists: List<PlaylistItem>,
         newText: String
     ): List<PlaylistItem> {
         val sifted: MutableList<PlaylistItem> = mutableListOf()
-        for (playlist in allPlaylists) {
-            if (playlist.name.lowercase().contains(newText.lowercase())) {
-                sifted.add(playlist)
+        for (playlistItems in allPlaylists) {
+            if (playlistItems.name.lowercase().contains(newText.lowercase())) {
+                sifted.add(playlistItems)
             }
         }
         return sifted
     }
 
-    fun getSavedSearchText() = state.get<String>(SEARCH_TEXT_KEY)
+    fun getSavedSearchText() = savedState.get<String>(SEARCH_TEXT_KEY)
 
     fun newSearch(searchText: String) {
-        state[SEARCH_TEXT_KEY] = searchText
-        this.searchText.value  = searchText
+        savedState[SEARCH_TEXT_KEY] = searchText
+        this.searchText.value = searchText
     }
 
     /**
      * TODO
      *
      * @param context
-     * @param id The id of the [PlaylistItem] corresponding to TODO.
+     * @param id The id of the [io.fourth_finger.playlist_repository.PlaylistItem] corresponding to TODO.
      */
     fun playlistItemClicked(
         context: Context,
         id: Int
     ) {
         viewModelScope.launch {
-            // TODO navigate to a Fragment contains a list of songs in the playlist
+            // TODO navigate to a Fragment that contains a list of songs in the playlist
         }
     }
 

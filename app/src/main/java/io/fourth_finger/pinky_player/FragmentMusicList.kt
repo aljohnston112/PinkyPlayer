@@ -123,9 +123,11 @@ class FragmentMusicList : Fragment() {
         }
         binding.recyclerView.adapter = adapter
         viewModel.musicItems.observe(viewLifecycleOwner){ songs ->
-            (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
-                songs
-            )
+            lifecycleScope.launch {
+                (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
+                    songs
+                )
+            }
         }
 
         val linearLayoutManager = LinearLayoutManager(context)

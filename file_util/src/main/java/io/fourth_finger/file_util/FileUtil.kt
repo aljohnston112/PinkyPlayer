@@ -17,58 +17,6 @@ class FileUtil {
         private val fileLock = Any()
 
         /**
-         * Tries to save an object to a file.
-         *
-         * @param toSave The object to save.
-         * @param context
-         * @param fileName The base file name.
-         *                 The file saved may not have that name, but it can be used with [load].
-         * @param saveFileVerificationNumber Used to verify the file during [load].
-         */
-        fun <T : Serializable> save(
-            toSave: T,
-            context: Context,
-            fileName: String,
-            saveFileVerificationNumber: Long,
-        ) {
-            val fileNames = getFileNames(fileName)
-            synchronized(fileLock) {
-                rotateBackupFiles(context, fileNames)
-                context.openFileOutput(fileNames[0], Context.MODE_PRIVATE).use { fileOutputStream ->
-                    ObjectOutputStream(fileOutputStream).use { objectOutputStream ->
-                        objectOutputStream.writeObject(toSave)
-                        objectOutputStream.writeLong(saveFileVerificationNumber)
-                    }
-                }
-            }
-        }
-
-        /**
-         * Rotates the backup files.
-         * The last file in the list is deleted, and then
-         * every other file is renamed to the file after it in the given list.
-         *
-         * @param context
-         * @param fileNames The names of all the backup files.
-         */
-        private fun rotateBackupFiles(context: Context, fileNames: List<String>) {
-            val directory = context.filesDir
-
-            // Delete the oldest file
-            var file = File(directory, fileNames[fileNames.size - 1])
-            if (file.exists()) {
-                file.delete()
-            }
-
-            // Rotate via renaming
-            for (i in ((fileNames.size - 2) downTo (0))) {
-                val file2 = File(directory, fileNames[i])
-                file2.renameTo(file)
-                file = File(directory, fileNames[i])
-            }
-        }
-
-        /**
          * Returns a [List] of strings appending a number 0 through [N_BACKUPS] to [fileName].
          * Ex: A file name of "a" wil result in "a0", "a1", ..., "a[N_BACKUPS - 1]", "a[N_BACKUPS]"
          *
@@ -81,6 +29,76 @@ class FileUtil {
                 list.add(fileName + i.toString())
             }
             return list
+        }
+
+        /**
+         * Rotates the backup files.
+         * The last file in the list is deleted, and then
+         * every file left is renamed to the file after it in the given list.
+         *
+         * @param context
+         * @param fileNames The names of all the backup files.
+         */
+        private fun rotateBackupFiles(
+            context: Context,
+            fileNames: List<String>
+        ) {
+            val directory = context.filesDir
+
+            // Delete the oldest file
+            var file = File(
+                directory,
+                fileNames[fileNames.size - 1]
+            )
+            if (file.exists()) {
+                file.delete()
+            }
+
+            // Rotate via renaming
+            for (i in ((fileNames.size - 2) downTo (0))) {
+                val file2 = File(
+                    directory,
+                    fileNames[i]
+                )
+                file2.renameTo(file)
+                file = File(
+                    directory,
+                    fileNames[i]
+                )
+            }
+        }
+
+        /**
+         * Tries to save an object to a file.
+         *
+         * @param toSave The object to save.
+         * @param context
+         * @param fileName The base file name.
+         *                 The file saved may not have that name, but it can be used with [load].
+         * @param saveFileVerificationNumber Used to verify the file during [load].
+         */
+        fun <T : Serializable> save(
+            toSave: T,
+            context: Context,
+            fileName: String,
+            saveFileVerificationNumber: Long
+        ) {
+            val fileNames = getFileNames(fileName)
+            synchronized(fileLock) {
+                rotateBackupFiles(
+                    context,
+                    fileNames
+                )
+                context.openFileOutput(
+                    fileNames[0],
+                    Context.MODE_PRIVATE
+                ).use { fileOutputStream ->
+                    ObjectOutputStream(fileOutputStream).use { objectOutputStream ->
+                        objectOutputStream.writeObject(toSave)
+                        objectOutputStream.writeLong(saveFileVerificationNumber)
+                    }
+                }
+            }
         }
 
         /**
@@ -100,8 +118,14 @@ class FileUtil {
         ) {
             val fileNames = getFileNames(fileName)
             synchronized(fileLock) {
-                rotateBackupFiles(context, fileNames)
-                context.openFileOutput(fileNames[0], Context.MODE_PRIVATE).use { fileOutputStream ->
+                rotateBackupFiles(
+                    context,
+                    fileNames
+                )
+                context.openFileOutput(
+                    fileNames[0],
+                    Context.MODE_PRIVATE
+                ).use { fileOutputStream ->
                     ObjectOutputStream(fileOutputStream).use { objectOutputStream ->
                         objectOutputStream.writeInt(objectList.size)
                         for (toSave in objectList) {
@@ -111,38 +135,6 @@ class FileUtil {
                     }
                 }
             }
-        }
-
-        /**
-         * Tries to load an object from a file.
-         *
-         * @param context
-         * @param fileName The base file name.
-         *                 The file saved may not have that name, but it can be used here
-         * @param saveFileVerificationNumber Used to verify the loaded file.
-         *
-         * @return The loaded object, or null if loading failed.
-         */
-        fun <T : Serializable> load(
-            context: Context,
-            fileName: String,
-            saveFileVerificationNumber: Long
-        ): T? {
-            val fileNames = getFileNames(fileName)
-            var potentialLoadedObject: T? = null
-            var i = 0
-            var done = false
-            synchronized(fileLock) {
-                while (!done && i < fileNames.size) {
-                    potentialLoadedObject =
-                        attemptLoad(context, fileNames[i], saveFileVerificationNumber)
-                    if (potentialLoadedObject != null) {
-                        done = true
-                    }
-                    i++
-                }
-            }
-            return potentialLoadedObject
         }
 
         /**
@@ -161,7 +153,10 @@ class FileUtil {
         ): T? {
             var longEOF = saveFileVerificationNumber + 1
             var potentialLoadedObject: T? = null
-            val file = File(context.filesDir, fileName)
+            val file = File(
+                context.filesDir,
+                fileName
+            )
             if (file.exists()) {
                 try {
                     context.openFileInput(fileName).use { fileInputStream ->
@@ -181,6 +176,43 @@ class FileUtil {
             }
             if (longEOF != saveFileVerificationNumber) {
                 potentialLoadedObject = null
+            }
+            return potentialLoadedObject
+        }
+
+        /**
+         * Tries to load an object from a file.
+         *
+         * @param context
+         * @param fileName The base file name.
+         *                 This must match the name of the fileName passed to [save];
+         *                 the file name of the saved file may not match.
+         *
+         * @param saveFileVerificationNumber Used to verify the loaded file.
+         *
+         * @return The loaded object, or null if loading failed.
+         */
+        fun <T : Serializable> load(
+            context: Context,
+            fileName: String,
+            saveFileVerificationNumber: Long
+        ): T? {
+            val fileNames = getFileNames(fileName)
+            var potentialLoadedObject: T? = null
+            var i = 0
+            var done = false
+            synchronized(fileLock) {
+                while (!done && i < fileNames.size) {
+                    potentialLoadedObject = attemptLoad(
+                        context,
+                        fileNames[i],
+                        saveFileVerificationNumber
+                    )
+                    if (potentialLoadedObject != null) {
+                        done = true
+                    }
+                    i++
+                }
             }
             return potentialLoadedObject
         }
@@ -272,8 +304,11 @@ class FileUtil {
         ) {
             val fileNames = getFileNames(fileName)
             synchronized(fileLock) {
-                for (fn in fileNames) {
-                    val file = File(context.filesDir, fn)
+                for (fileName in fileNames) {
+                    val file = File(
+                        context.filesDir,
+                        fileName
+                    )
                     if (file.exists()) {
                         file.delete()
                     }

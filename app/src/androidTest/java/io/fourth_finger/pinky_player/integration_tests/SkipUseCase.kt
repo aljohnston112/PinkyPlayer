@@ -153,7 +153,7 @@ class SkipUseCase {
                 val deviation = abs((expectedProbability - observedProbability))
                 val epsilon = 0.1
                 Assert.assertTrue(
-                    "Deviation for $element should be within $epsilon, but was $deviation",
+                    "Deviation for $element should be within $epsilon, but was $deviation, should have been $expectedProbability",
                     deviation <= epsilon
                 )
             }

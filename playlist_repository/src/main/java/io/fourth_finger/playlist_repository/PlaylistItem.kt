@@ -1,23 +1,23 @@
 package io.fourth_finger.playlist_repository
 
 /**
- * A container for playlist file data.
+ * A UI data container for playlist file data.
  *
- * @param id The id the playlist file.
+ * @param hash The hash the playlist file.
  * @param name The name of the playlist.
  */
 class PlaylistItem(
-    val id: Int,
+    val hash: Int,
     val name: String,
 ) {
 
     override fun equals(other: Any?): Boolean {
         return other is PlaylistItem &&
-                id == other.id
+                hash == other.hash
     }
 
     override fun hashCode(): Int {
-        return id.hashCode()
+        return hash.hashCode()
     }
 
 }
