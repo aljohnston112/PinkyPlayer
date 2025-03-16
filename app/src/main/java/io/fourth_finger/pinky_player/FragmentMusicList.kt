@@ -55,7 +55,7 @@ class FragmentMusicList : Fragment() {
                 } else {
                     job = viewLifecycleOwner.lifecycleScope.launch {
                         (binding.recyclerView.adapter as MusicFileAdapter).updateMusicList(
-                            activityMainViewModel.musicItems.value!!
+                            viewModel.musicItems.value!!
                         )
                     }
                 }

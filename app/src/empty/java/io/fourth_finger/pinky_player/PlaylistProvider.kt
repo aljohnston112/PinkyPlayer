@@ -6,8 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import io.fourth_finger.music_repository.MusicFile
-import io.fourth_finger.music_repository.MusicRepository
+import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.probability_map.ProbabilityMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,10 +18,10 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object MusicFileLiveDataModule {
+object MusicItemLiveDataModule {
 
     @Provides
-    fun provideMusicFileLiveData(): LiveData<List<MusicFile>> {
+    fun provideMusicItemLiveData(): LiveData<List<MusicItem>> {
         return MutableLiveData(emptyList())
     }
 
@@ -31,14 +30,14 @@ object MusicFileLiveDataModule {
 @Singleton
 class PlaylistProvider @Inject constructor(
     scope: CoroutineScope,
-    musicFiles: LiveData<List<MusicFile>>
+    MusicItems: LiveData<List<MusicItem>>
 ) {
 
-    private var playlist: ProbabilityMap<MusicFile>? = null
+    private var playlist: ProbabilityMap<MusicItem>? = null
 
     private val musicLoadedLatch = CountDownLatch(1)
 
-    private val musicObserver: (List<MusicFile>?) -> Unit = { newMusic ->
+    private val musicObserver: (List<MusicItem>?) -> Unit = { newMusic ->
         newMusic?.let {
             if(newMusic.isNotEmpty()) {
                 scope.launch(Dispatchers.Default) {
@@ -69,17 +68,17 @@ class PlaylistProvider @Inject constructor(
 
 
     init {
-        musicFiles.observeForever(musicObserver)
+        MusicItems.observeForever(musicObserver)
     }
 
-    suspend fun await(): ProbabilityMap<MusicFile> {
+    suspend fun await(): ProbabilityMap<MusicItem> {
         withContext(Dispatchers.IO) {
             musicLoadedLatch.await()
         }
         return playlist!!
     }
 
-    fun getOrNull(): ProbabilityMap<MusicFile>? {
+    fun getOrNull(): ProbabilityMap<MusicItem>? {
         return playlist
     }
 
