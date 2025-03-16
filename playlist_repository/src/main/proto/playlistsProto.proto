@@ -6,9 +6,9 @@ option java_multiple_files = true;
 message PlaylistProto {
     sint32 hash = 1;
     string name = 2;
-    repeated sint64 songIds = 3;
+    repeated sint64 songId = 3;
 }
 
 message PlaylistsProto {
-    repeated PlaylistProto playlists = 1;
+    repeated PlaylistProto playlist = 1;
 }

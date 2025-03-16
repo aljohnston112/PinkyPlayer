@@ -32,7 +32,7 @@ internal object PlaylistSerializer: Serializer<PlaylistsProto> {
 
 }
 
-val Context.playlistDataStore: DataStore<PlaylistsProto> by dataStore(
+internal val Context.playlistDataStore: DataStore<PlaylistsProto> by dataStore(
     fileName = "playlist.pb",
     serializer = PlaylistSerializer
 )

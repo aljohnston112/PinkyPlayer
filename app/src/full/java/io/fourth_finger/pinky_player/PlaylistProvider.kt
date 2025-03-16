@@ -17,29 +17,27 @@ class PlaylistProvider @Inject constructor(
     musicRepository: MusicRepository
 ) {
 
-    private var mainPlaylist: ProbabilityMap<MusicItem>? = null
+    private lateinit var mainPlaylist: ProbabilityMap<MusicItem>
 
     private val musicLoadedLatch = CountDownLatch(1)
 
     private val musicObserver: (List<MusicItem>) -> Unit = { newMusic ->
         if (newMusic.isNotEmpty()) {
             scope.launch(Dispatchers.Default) {
-                if (mainPlaylist == null) {
+                if (musicLoadedLatch.count > 0) {
                     mainPlaylist = ProbabilityMap(newMusic)
                 } else {
-                    mainPlaylist?.let {
-                        // Add new songs to the playlist
-                        for (newSong in newMusic) {
-                            if (!it.contains(newSong)) {
-                                it.addElement(newSong)
-                            }
+                    // Add new songs to the playlist
+                    for (newSong in newMusic) {
+                        if (!mainPlaylist.contains(newSong)) {
+                            mainPlaylist.addElement(newSong)
                         }
+                    }
 
-                        // Remove missing songs from the playlist
-                        for (oldSong in it.getElements().toList()) {
-                            if (!newMusic.contains(oldSong)) {
-                                it.removeElement(oldSong)
-                            }
+                    // Remove missing songs from the playlist
+                    for (oldSong in mainPlaylist.getElements().toList()) {
+                        if (!newMusic.contains(oldSong)) {
+                            mainPlaylist.removeElement(oldSong)
                         }
                     }
                 }
@@ -47,7 +45,6 @@ class PlaylistProvider @Inject constructor(
             }
         }
     }
-
 
     init {
         musicRepository.musicItems.observeForever(musicObserver)
@@ -57,7 +54,7 @@ class PlaylistProvider @Inject constructor(
         withContext(Dispatchers.IO) {
             musicLoadedLatch.await()
         }
-        return mainPlaylist!!
+        return mainPlaylist
     }
 
     fun getOrNull(): ProbabilityMap<MusicItem>? {

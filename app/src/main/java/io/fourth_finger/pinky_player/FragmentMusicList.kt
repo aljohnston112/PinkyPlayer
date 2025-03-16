@@ -152,9 +152,7 @@ class FragmentMusicList : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         requireActivity().removeMenuProvider(menuProvider)
-        if (_searchView != null) {
-            searchView.setOnQueryTextListener(null)
-        }
+        searchView.setOnQueryTextListener(null)
         _searchView = null
         binding.recyclerView.adapter = null
         _binding = null

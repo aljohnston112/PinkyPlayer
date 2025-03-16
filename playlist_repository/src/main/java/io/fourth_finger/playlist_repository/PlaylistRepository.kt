@@ -9,34 +9,30 @@ import javax.inject.Singleton
 
 @Singleton
 class PlaylistRepository @Inject constructor(
-    @ApplicationContext context: Context,
+    @ApplicationContext private val context: Context,
 ) {
 
-    val playlistItems: Flow<List<PlaylistItem>> = context.playlistDataStore.data.map {
-        val playlists = mutableListOf<PlaylistItem>()
-        for(playlist in it.playlistsList){
-            playlists.add(
-                PlaylistItem(
-                    playlist.hash,
-                    playlist.name
-                )
+    val playlistItems: Flow<List<PlaylistItem>> =
+        mapPlaylistsProto { playlistProto ->
+            PlaylistItem(
+                playlistProto.hash,
+                playlistProto.name
             )
         }
-        playlists
-    }
 
-    val playlists: Flow<List<Playlist>> = context.playlistDataStore.data.map {
-        val playlists = mutableListOf<Playlist>()
-        for (playlist in it.playlistsList) {
-            playlists.add(
-                Playlist(
-                    playlist.hash,
-                    playlist.name,
-                    playlist.songIdsList
-                )
+    val playlists: Flow<List<Playlist>> =
+        mapPlaylistsProto { playlistProto ->
+            Playlist(
+                playlistProto.hash,
+                playlistProto.name,
+                playlistProto.songIdList
             )
         }
-        playlists
+
+    private fun <T> mapPlaylistsProto(transform: (PlaylistProto) -> T): Flow<List<T>> {
+        return context.playlistDataStore.data.map { playlistsProto ->
+            playlistsProto.playlistList.map(transform)
+        }
     }
 
 }
