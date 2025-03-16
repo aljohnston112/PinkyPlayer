@@ -2,12 +2,10 @@ package io.fourth_finger.pinky_player.integration_tests
 
 import android.Manifest
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.LiveData
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.Player.DISCONTINUITY_REASON_AUTO_TRANSITION
 import androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_AUTO
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.contrib.RecyclerViewActions
@@ -17,18 +15,12 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
-import dagger.hilt.components.SingletonComponent
 import io.fourth_finger.music_repository.MusicDataSource
 import io.fourth_finger.music_repository.MusicDataSourceModule
-import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.ActivityMain
 import io.fourth_finger.pinky_player.MediaBrowserProvider
@@ -36,8 +28,6 @@ import io.fourth_finger.pinky_player.MusicFileAdapter
 import io.fourth_finger.pinky_player.R
 import io.fourth_finger.pinky_player.getOrAwaitValue
 import io.fourth_finger.pinky_player.hilt.provideFakeMusicDataSourceWithTwoShortestSongs
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
