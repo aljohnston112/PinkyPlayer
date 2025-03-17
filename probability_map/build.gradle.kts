@@ -1,6 +1,6 @@
 plugins {
-    id("java-library")
-    id("org.jetbrains.kotlin.jvm")
+    alias(libs.plugins.javaLibrary)
+    alias(libs.plugins.kotlin.jvm)
 }
 
 java {
@@ -10,5 +10,5 @@ java {
 
 
 dependencies {
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit)
 }

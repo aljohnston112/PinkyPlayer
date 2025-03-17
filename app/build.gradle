@@ -1,9 +1,9 @@
 plugins {
-    id 'com.android.application'
-    id 'androidx.navigation.safeargs'
-    id 'org.jetbrains.kotlin.android'
-    id 'com.google.devtools.ksp'
-    id 'com.google.dagger.hilt.android'
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.androidx.navigation.safe.args.plugin)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -75,50 +75,51 @@ dependencies {
     implementation project(':settings_repository')
     implementation project(":shared_resources")
 
-    implementation "androidx.activity:activity-ktx:1.10.1"
-    implementation 'androidx.appcompat:appcompat:1.7.0'
-    implementation 'androidx.concurrent:concurrent-futures-ktx:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
-    implementation 'androidx.core:core-ktx:1.15.0'
+    implementation libs.androidx.activity.ktx
+    implementation libs.androidx.appcompat
+    implementation libs.androidx.concurrent.futures.ktx
+    implementation libs.androidx.constraintlayout
+    implementation libs.androidx.core.ktx
 
     // https://github.com/androidx/media/issues/1352
     // Do not upgrade until commit 1a5cf67 is in the release
     // It will be in 1.4.0-alpha02
-    implementation "androidx.media3:media3-common:1.5.1"
-    implementation "androidx.media3:media3-exoplayer:1.5.1"
-    implementation 'androidx.media3:media3-session:1.5.1'
+    implementation libs.androidx.media3.common
+    implementation libs.androidx.media3.exoplayer
+    implementation libs.media3.session
 
-    implementation "androidx.navigation:navigation-fragment-ktx:2.8.9"
-    implementation "androidx.navigation:navigation-ui-ktx:2.8.9"
+    implementation libs.androidx.navigation.fragment.ktx
+    implementation libs.androidx.navigation.ui.ktx
 
-    implementation "androidx.preference:preference-ktx:1.2.1"
+    implementation libs.androidx.preference.ktx
 
-    implementation "com.google.dagger:hilt-android:2.51.1"
-    ksp "com.google.dagger:hilt-compiler:2.55"
+    implementation libs.hilt.android
+    ksp libs.hilt.compiler
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC'
+    implementation libs.kotlinx.coroutines.core
 
-    debugImplementation "androidx.test:monitor:1.7.2"
+    debugImplementation libs.androidx.monitor
 
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation libs.junit
 
-    androidTestUtil 'androidx.test:orchestrator:1.5.1'
-    androidTestUtil 'androidx.test.services:test-services:1.5.0'
+    androidTestUtil libs.androidx.orchestrator
+    androidTestUtil libs.androidx.test.services
 
-    androidTestImplementation "androidx.arch.core:core-testing:2.2.0"
-    androidTestImplementation "androidx.media3:media3-test-utils:1.5.1"
-    androidTestImplementation "androidx.navigation:navigation-testing:2.8.9"
-    androidTestImplementation 'androidx.test:core-ktx:1.6.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.6.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
-    androidTestImplementation 'androidx.test.ext:junit-ktx:1.2.1'
-    androidTestImplementation 'androidx.test:rules:1.6.1'
-    androidTestImplementation 'androidx.test:runner:1.6.2'
-    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0'
+    androidTestImplementation libs.androidx.core.testing
+    androidTestImplementation libs.androidx.media3.test.utils
+    androidTestImplementation libs.androidx.navigation.testing
+    androidTestImplementation libs.androidx.espresso.contrib
+    androidTestImplementation libs.androidx.espresso.core
+    androidTestImplementation libs.androidx.junit.ktx
+    androidTestImplementation libs.androidx.rules
+    androidTestImplementation libs.androidx.runner
+    androidTestImplementation libs.androidx.uiautomator
 
-    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.51.1'
-    kspAndroidTest 'com.google.dagger:hilt-android-compiler:2.51.1'
+    androidTestImplementation libs.core.ktx
 
-    androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1'
+    androidTestImplementation libs.hilt.android.testing
+    kspAndroidTest libs.hilt.android.compiler
+
+    androidTestImplementation libs.kotlinx.coroutines.test
 
 }

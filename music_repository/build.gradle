@@ -1,8 +1,8 @@
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
-    id 'com.google.devtools.ksp'
-    id 'com.google.dagger.hilt.android'
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -45,27 +45,26 @@ dependencies {
 
     implementation(project(":shared_resources"))
 
-    implementation 'androidx.lifecycle:lifecycle-livedata-core-ktx:2.8.7'
+    implementation libs.lifecycle.livedata.core.ktx
+    implementation libs.kotlinx.coroutines.core
 
-    implementation 'androidx.lifecycle:lifecycle-livedata-core-ktx:2.8.7'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC'
+    implementation libs.hilt.android
+    ksp libs.hilt.compiler
 
-    implementation "com.google.dagger:hilt-android:2.51.1"
-    ksp "com.google.dagger:hilt-compiler:2.55"
 
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation libs.junit
+    testImplementation libs.kotlinx.coroutines.test
 
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1'
 
-    androidTestImplementation "androidx.arch.core:core-testing:2.2.0"
-    androidTestImplementation "androidx.test:rules:1.6.1"
+    androidTestImplementation libs.androidx.core.testing
+    androidTestImplementation libs.androidx.rules
 
-    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.51.1'
-    kspAndroidTest 'com.google.dagger:hilt-android-compiler:2.51.1'
+    androidTestImplementation libs.hilt.android.testing
+    kspAndroidTest libs.hilt.android.compiler
 
-    androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1'
+    androidTestImplementation libs.kotlinx.coroutines.test
 
-    androidTestUtil 'androidx.test:orchestrator:1.5.1'
+    androidTestUtil libs.androidx.orchestrator
 
 }
 
