@@ -45,26 +45,23 @@ dependencies {
 
     implementation(project(":shared_resources"))
 
-    implementation libs.lifecycle.livedata.core.ktx
-    implementation libs.kotlinx.coroutines.core
+    implementation(libs.lifecycle.livedata.core.ktx)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
-    implementation libs.hilt.android
-    ksp libs.hilt.compiler
+    debugImplementation(libs.androidx.monitor)
+
+    testImplementation (libs.junit)
+    testImplementation (libs.kotlinx.coroutines.test)
 
 
-    testImplementation libs.junit
-    testImplementation libs.kotlinx.coroutines.test
-
-
-    androidTestImplementation libs.androidx.core.testing
-    androidTestImplementation libs.androidx.rules
-
-    androidTestImplementation libs.hilt.android.testing
-    kspAndroidTest libs.hilt.android.compiler
-
-    androidTestImplementation libs.kotlinx.coroutines.test
-
-    androidTestUtil libs.androidx.orchestrator
+    androidTestImplementation (libs.androidx.core.testing)
+    androidTestUtil (libs.androidx.orchestrator)
+    androidTestImplementation (libs.androidx.rules)
+    androidTestImplementation (libs.hilt.android.testing)
+    kspAndroidTest (libs.hilt.android.compiler)
+    androidTestImplementation (libs.kotlinx.coroutines.test)
 
 }
 

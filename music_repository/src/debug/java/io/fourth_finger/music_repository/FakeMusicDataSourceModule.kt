@@ -1,12 +1,7 @@
-package io.fourth_finger.pinky_player.hilt
+package io.fourth_finger.music_repository
 
 import android.content.ContentResolver
 import android.net.Uri
-import io.fourth_finger.music_repository.MusicDataSource
-import io.fourth_finger.music_repository.MusicDataSourceImpl
-import io.fourth_finger.music_repository.MusicItem
-import io.fourth_finger.music_repository.MusicRepository
-import io.fourth_finger.pinky_player.MediaFileUtil.Companion.getMusicIdOfTwoShortDurationSongs
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -35,9 +30,10 @@ fun provideFakeMusicDataSourceWithTwoShortestSongs(): MusicDataSource {
                 shortestMusic.clear()
                 shortestMusic.addAll(
                     withContext(Dispatchers.Default) {
-                        getMusicIdOfTwoShortDurationSongs(musicRepository).map {
-                            musicRepository.getMusicItem(it)!!
-                        }
+                        MediaFileUtil.Companion.getMusicIdOfTwoShortDurationSongs(musicRepository)
+                            .map {
+                                musicRepository.getMusicItem(it)!!
+                            }
                     }
                 )
                 shortestMusic.toList()

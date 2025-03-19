@@ -19,7 +19,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".HiltTestActivity"
+            android:name="io.fourth_finger.shared_resources.test.HiltTestActivity"
             android:exported="false" />
 
         <service

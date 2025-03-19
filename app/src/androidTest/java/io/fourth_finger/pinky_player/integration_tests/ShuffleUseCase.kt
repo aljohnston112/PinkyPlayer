@@ -9,7 +9,6 @@ import androidx.media3.common.Player.MEDIA_ITEM_TRANSITION_REASON_AUTO
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import dagger.Module
 import dagger.Provides
@@ -25,7 +24,7 @@ import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.MediaBrowserProvider
 import io.fourth_finger.pinky_player.MediaItemCreator
 import io.fourth_finger.pinky_player.getOrAwaitValue
-import io.fourth_finger.pinky_player.hilt.provideFakeMusicDataSourceWithTwoShortestSongs
+import io.fourth_finger.music_repository.provideFakeMusicDataSourceWithTwoShortestSongs
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before

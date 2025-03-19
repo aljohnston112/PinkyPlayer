@@ -1,8 +1,7 @@
-package io.fourth_finger.pinky_player
+package io.fourth_finger.music_repository
 
 import android.media.MediaMetadataRetriever
 import androidx.test.platform.app.InstrumentationRegistry
-import io.fourth_finger.music_repository.MusicRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope

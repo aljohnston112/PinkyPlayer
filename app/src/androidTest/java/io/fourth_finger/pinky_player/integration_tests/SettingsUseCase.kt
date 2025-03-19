@@ -5,7 +5,6 @@ import android.media.AudioFocusRequest
 import android.media.AudioManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.content.ContextCompat.getSystemService
-import androidx.lifecycle.LiveData
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.Player.PLAY_WHEN_READY_CHANGE_REASON_AUDIO_FOCUS_LOSS
@@ -31,20 +30,18 @@ import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import io.fourth_finger.music_repository.MusicDataSource
 import io.fourth_finger.music_repository.MusicDataSourceModule
-import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.ActivityMain
 import io.fourth_finger.pinky_player.FragmentSettings
 import io.fourth_finger.pinky_player.MediaItemCreator
 import io.fourth_finger.pinky_player.R
 import io.fourth_finger.pinky_player.getOrAwaitValue
-import io.fourth_finger.pinky_player.hilt.provideFakeMusicDataSourceWithTwoShortestSongs
+import io.fourth_finger.music_repository.provideFakeMusicDataSourceWithTwoShortestSongs
 import io.fourth_finger.settings_repository.SettingsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -125,6 +122,7 @@ class SettingsUseCase {
 
         }
 
+    // TODO the play button may not be in the correct state due to using very short audio files
     @Test
     fun userGoesToSettings_ChangingProbabilityDown_ChangesPlaylistDistribution() =
         runTest(timeout = Duration.parse("10m")) {
@@ -135,7 +133,7 @@ class SettingsUseCase {
                 firstSongId to 1.0 / 4.0,
                 secondSongId to 3.0 / 4.0,
             )
-            val numberOfSamples = 100
+            val numberOfSamples = 1000
             val observedCounts = mutableMapOf<Long, Long>()
             observedCounts[firstSongId] = 0
             observedCounts[secondSongId] = 0

@@ -27,7 +27,7 @@ import io.fourth_finger.pinky_player.MediaBrowserProvider
 import io.fourth_finger.pinky_player.MusicFileAdapter
 import io.fourth_finger.pinky_player.R
 import io.fourth_finger.pinky_player.getOrAwaitValue
-import io.fourth_finger.pinky_player.hilt.provideFakeMusicDataSourceWithTwoShortestSongs
+import io.fourth_finger.music_repository.provideFakeMusicDataSourceWithTwoShortestSongs
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before

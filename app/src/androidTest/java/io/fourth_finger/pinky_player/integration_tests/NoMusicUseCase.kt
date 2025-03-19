@@ -21,13 +21,12 @@ import io.fourth_finger.music_repository.MusicDataSourceModule
 import io.fourth_finger.pinky_player.ActivityMain
 import io.fourth_finger.pinky_player.MusicFileAdapter
 import io.fourth_finger.pinky_player.R
-import io.fourth_finger.pinky_player.hilt.provideFakeMusicDataSourceWithNoSongs
+import io.fourth_finger.music_repository.provideFakeMusicDataSourceWithNoSongs
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.Duration
 
 @UninstallModules(MusicDataSourceModule::class)
 @HiltAndroidTest

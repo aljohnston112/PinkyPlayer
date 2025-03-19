@@ -16,7 +16,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
-import io.fourth_finger.pinky_player.hilt.launchFragmentInHiltContainer
+import io.fourth_finger.shared_resources.test.launchFragmentInHiltContainer
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

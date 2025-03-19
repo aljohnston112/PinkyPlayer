@@ -12,8 +12,7 @@ import androidx.test.rule.GrantPermissionRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
-import io.fourth_finger.pinky_player.hilt.launchFragmentInHiltContainer
-import kotlinx.coroutines.test.advanceUntilIdle
+import io.fourth_finger.shared_resources.test.launchFragmentInHiltContainer
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule

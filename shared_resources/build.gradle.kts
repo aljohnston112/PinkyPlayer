@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "io.fourth_finger.settings_repository"
+    namespace = "io.fourth_finger.shared_resources"
     compileSdk = 35
 
     defaultConfig {
@@ -51,23 +51,24 @@ android {
         jvmTarget = "21"
     }
 
+    sourceSets {
+        named("debug") {
+            res.srcDirs("src/main/res") // Ensure debug sees main resources
+        }
+    }
+
 }
 
 dependencies {
+    debugImplementation(libs.material)
 
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.core.ktx)
-
-    implementation(libs.material)
+    debugImplementation(libs.androidx.appcompat)
+    debugImplementation(libs.androidx.espresso.core)
+    debugImplementation (libs.hilt.android)
+    debugImplementation (libs.hilt.android.testing)
+    kspDebug (libs.hilt.android.compiler)
 
     testImplementation(libs.junit)
-
     testImplementation(libs.kotlinx.coroutines.test)
 
-    implementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.junit)
-
-    implementation (libs.hilt.android)
-    implementation (libs.hilt.android.testing)
-    ksp (libs.hilt.android.compiler)
 }
