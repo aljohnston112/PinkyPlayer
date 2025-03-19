@@ -1,4 +1,4 @@
-package io.fourth_finger.pinky_player.hilt
+package io.fourth_finger.shared_resources.test
 
 import android.app.Application
 import android.content.Context

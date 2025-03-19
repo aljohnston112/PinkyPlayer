@@ -1,6 +1,10 @@
+import org.gradle.kotlin.dsl.androidTestImplementation
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -60,6 +64,10 @@ dependencies {
 
     testImplementation(libs.kotlinx.coroutines.test)
 
-    androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+
+    implementation (libs.hilt.android)
+    implementation (libs.hilt.android.testing)
+    ksp (libs.hilt.android.compiler)
 }

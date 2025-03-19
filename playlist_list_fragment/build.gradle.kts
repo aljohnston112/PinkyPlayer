@@ -16,7 +16,7 @@ android {
     defaultConfig {
         minSdk = 21
 
-        testInstrumentationRunner = "io.fourth_finger.pinky_player.hilt.PinkyRunner"
+        testInstrumentationRunner = "io.fourth_finger.shared_resources.test.PinkyRunner"
         testInstrumentationRunnerArguments += (
                 mapOf(
                     "clearPackageData" to "true",

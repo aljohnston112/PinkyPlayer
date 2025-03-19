@@ -22,7 +22,7 @@ android {
         versionCode 3
         versionName "0.3.3"
 
-        testInstrumentationRunner "io.fourth_finger.pinky_player.hilt.PinkyRunner"
+        testInstrumentationRunner "io.fourth_finger.shared_resources.test.PinkyRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         testInstrumentationRunnerArguments useTestStorageService: 'true'
 
