@@ -11,6 +11,6 @@ plugins {
     alias(libs.plugins.protobuf) apply(false)
 }
 
-tasks.register('clean', Delete) {
-    delete rootProject.getLayout().buildDirectory
+tasks.register<Delete>("clean") {
+    delete(rootProject.layout.buildDirectory)
 }

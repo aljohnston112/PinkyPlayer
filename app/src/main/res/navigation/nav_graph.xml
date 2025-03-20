@@ -9,7 +9,7 @@
 
     <fragment
         android:id="@+id/fragmentMusicList"
-        android:name="io.fourth_finger.pinky_player.FragmentMusicList"
+        android:name="io.fourth_finger.music_list_fragment.FragmentMusicList"
         android:label="fragment_music_list"
         tools:layout="@layout/fragment_music_list" />
     <fragment

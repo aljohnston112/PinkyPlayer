@@ -6,37 +6,51 @@ plugins {
 }
 
 android {
-    namespace 'io.fourth_finger.music_repository'
-    compileSdk 35
+    namespace = "io.fourth_finger.music_repository"
+    compileSdk = 35
 
     defaultConfig {
-        minSdk 21
-        targetSdk 35
+        minSdk = 21
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments clearPackageData: 'true'
-        testInstrumentationRunnerArguments useTestStorageService: 'true'
+        testInstrumentationRunnerArguments += (
+                mapOf(
+                        "clearPackageData" to "true",
+                        "useTestStorageService" to "true"
+                )
+        )
+    }
+
+    testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+        installation {
+            timeOutInMs = 600000
+        }
     }
 
     buildTypes {
 
         debug {
-            testCoverageEnabled true
-            minifyEnabled false
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
+            isMinifyEnabled = false
         }
 
         release {
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
 
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = '21'
+        jvmTarget = "21"
     }
 
 }
@@ -54,7 +68,6 @@ dependencies {
 
     testImplementation (libs.junit)
     testImplementation (libs.kotlinx.coroutines.test)
-
 
     androidTestImplementation (libs.androidx.core.testing)
     androidTestUtil (libs.androidx.orchestrator)
