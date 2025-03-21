@@ -20,6 +20,9 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.fourth_finger.music_repository.MusicDataSourceImpl
 import io.fourth_finger.music_repository.MusicRepository
+import io.fourth_finger.playlist_repository.PlaylistProvider
+import io.fourth_finger.shared_resources.MediaBrowserProvider
+import io.fourth_finger.shared_resources.MediaItemCreator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

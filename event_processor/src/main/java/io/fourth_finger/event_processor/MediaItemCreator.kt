@@ -1,4 +1,4 @@
-package io.fourth_finger.pinky_player
+package io.fourth_finger.event_processor
 
 import android.content.Context
 import android.provider.MediaStore
@@ -15,12 +15,12 @@ class MediaItemCreator @Inject constructor(
     private val metaDataCreator = MetaDataCreator(musicRepository)
 
     /**
-     * Creates and returns a [MediaItem] for the music with the given id.
-     * Metadata is included in the [MediaItem].
+     * Creates and returns a [androidx.media3.common.MediaItem] for the music with the given id.
+     * Metadata is included in the [androidx.media3.common.MediaItem].
      *
      * @param context
      * @param id The music file's [MediaStore.Audio.Media] id.
-     * @return The constructed [MediaItem].
+     * @return The constructed [androidx.media3.common.MediaItem].
      */
     fun getMediaItem(
         context: Context,

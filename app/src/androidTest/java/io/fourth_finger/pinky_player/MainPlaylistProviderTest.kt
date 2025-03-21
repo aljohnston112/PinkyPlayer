@@ -9,6 +9,7 @@ import dagger.hilt.android.testing.HiltTestApplication
 import io.fourth_finger.music_repository.MusicDataSourceImpl
 import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.music_repository.MusicRepository
+import io.fourth_finger.playlist_repository.PlaylistProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob

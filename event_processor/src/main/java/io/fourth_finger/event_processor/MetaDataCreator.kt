@@ -1,14 +1,15 @@
-package io.fourth_finger.pinky_player
+package io.fourth_finger.event_processor
 
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import androidx.media3.common.MediaMetadata
 import io.fourth_finger.music_repository.MusicRepository
+import io.fourth_finger.music_repository.R
 import javax.inject.Inject
 
 /**
- * Wrapper for a [MediaMetadata.Builder].
+ * Wrapper for a [androidx.media3.common.MediaMetadata.Builder].
  *
  * @param musicRepository
  */

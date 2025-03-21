@@ -1,4 +1,4 @@
-package io.fourth_finger.pinky_player
+package io.fourth_finger.music_list_fragment
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.music_repository.MusicRepository
 import javax.inject.Inject
+import kotlin.collections.orEmpty
 
 @HiltViewModel
 class FragmentMusicListViewModel @Inject constructor(

@@ -1,5 +1,3 @@
-import org.gradle.kotlin.dsl.androidTestImplementation
-
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -51,22 +49,17 @@ android {
         jvmTarget = "21"
     }
 
-    sourceSets {
-        named("debug") {
-            res.srcDirs("src/main/res") // Ensure debug sees main resources
-        }
-    }
-
 }
 
 dependencies {
-    debugImplementation(libs.material)
+
+    implementation (libs.hilt.android)
+    ksp (libs.hilt.android.compiler)
 
     debugImplementation(libs.androidx.appcompat)
     debugImplementation(libs.androidx.espresso.core)
-    debugImplementation (libs.hilt.android)
     debugImplementation (libs.hilt.android.testing)
-    kspDebug (libs.hilt.android.compiler)
+    debugImplementation(libs.material)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

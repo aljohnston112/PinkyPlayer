@@ -1,4 +1,4 @@
-package io.fourth_finger.pinky_player
+package io.fourth_finger.music_list_fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,22 +10,27 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import io.fourth_finger.music_repository.MusicItem
-import io.fourth_finger.pinky_player.databinding.FragmentMusicListBinding
+import io.fourth_finger.event_processor.EventProcessor
+import io.fourth_finger.music_list_fragment.databinding.FragmentMusicListBinding
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.collections.toList
+import kotlin.getValue
 
 /**
- * A [Fragment] that displays a list of [MusicItem]s.
+ * A [androidx.fragment.app.Fragment] that displays a list of [io.fourth_finger.music_repository.MusicItem]s.
  */
 @AndroidEntryPoint
 class FragmentMusicList : Fragment() {
+
+    @Inject
+    lateinit var eventProcessor: EventProcessor
 
     private var _binding: FragmentMusicListBinding? = null
     private val binding get() = _binding!!
@@ -33,7 +38,6 @@ class FragmentMusicList : Fragment() {
     private var _searchView: SearchView? = null
     private val searchView get() = _searchView!!
 
-    private val activityMainViewModel: ActivityMainViewModel by activityViewModels()
     private val viewModel: FragmentMusicListViewModel by viewModels()
 
     private val menuProvider = object : MenuProvider {
@@ -116,7 +120,7 @@ class FragmentMusicList : Fragment() {
     private fun setUpRecyclerView() {
         val adapter = MusicFileAdapter(emptyList()) { songID ->
             // Callback for when a song item is tapped
-            activityMainViewModel.songClicked(
+            eventProcessor.songClicked(
                 requireContext(),
                 songID
             )
@@ -136,7 +140,7 @@ class FragmentMusicList : Fragment() {
         binding.recyclerView.layoutManager = linearLayoutManager
 
         // Set up music list updates
-        activityMainViewModel.musicItems.observe(viewLifecycleOwner) { musicFiles ->
+        viewModel.musicItems.observe(viewLifecycleOwner) { musicFiles ->
             musicFiles?.let {
                 binding.recyclerView.post {
                     adapter.updateMusicList(musicFiles.toList())
@@ -146,7 +150,8 @@ class FragmentMusicList : Fragment() {
         // [FragmentTitle] must guarantee permissions are granted
         // before launching this Fragment
         // Permission must be granted before [loadMusic] is run
-        activityMainViewModel.loadMusic(requireActivity().contentResolver)
+        // activityMainViewModel.loadMusic(requireActivity().contentResolver)
+        // TODO should not be needed
     }
 
     override fun onDestroyView() {

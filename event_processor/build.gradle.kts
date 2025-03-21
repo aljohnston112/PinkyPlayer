@@ -6,12 +6,8 @@ plugins {
 }
 
 android {
-    namespace = "io.fourth_finger.music_list_fragment"
+    namespace = "io.fourth_finger.event_processor"
     compileSdk = 35
-
-    buildFeatures {
-        viewBinding = true
-    }
 
     defaultConfig {
         minSdk = 24
@@ -39,14 +35,17 @@ android {
 }
 
 dependencies {
-    implementation(project(":event_processor"))
-    implementation(project(":music_repository"))
-    implementation(project(":shared_resources"))
 
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.fragment.ktx)
-    implementation(libs.androidx.recycler.view)
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+    implementation(project(":music_repository"))
+    implementation(project(":playlist_repository"))
+    implementation(project(":probability_map"))
+    implementation(project(":settings_repository"))
+
+    implementation(libs.androidx.concurrent.futures.ktx)
+    implementation(libs.androidx.media3.common)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.session)
+    implementation (libs.hilt.android)
+    ksp (libs.hilt.android.compiler)
+
 }

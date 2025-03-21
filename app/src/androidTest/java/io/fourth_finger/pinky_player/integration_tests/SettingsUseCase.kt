@@ -33,7 +33,7 @@ import io.fourth_finger.music_repository.MusicDataSourceModule
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.ActivityMain
 import io.fourth_finger.pinky_player.FragmentSettings
-import io.fourth_finger.pinky_player.MediaItemCreator
+import io.fourth_finger.shared_resources.MediaItemCreator
 import io.fourth_finger.pinky_player.R
 import io.fourth_finger.pinky_player.getOrAwaitValue
 import io.fourth_finger.music_repository.provideFakeMusicDataSourceWithTwoShortestSongs

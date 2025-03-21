@@ -21,8 +21,8 @@ import dagger.hilt.components.SingletonComponent
 import io.fourth_finger.music_repository.MusicDataSource
 import io.fourth_finger.music_repository.MusicDataSourceModule
 import io.fourth_finger.music_repository.MusicRepository
-import io.fourth_finger.pinky_player.MediaBrowserProvider
-import io.fourth_finger.pinky_player.MediaItemCreator
+import io.fourth_finger.shared_resources.MediaBrowserProvider
+import io.fourth_finger.shared_resources.MediaItemCreator
 import io.fourth_finger.pinky_player.getOrAwaitValue
 import io.fourth_finger.music_repository.provideFakeMusicDataSourceWithTwoShortestSongs
 import kotlinx.coroutines.test.runTest

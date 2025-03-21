@@ -32,6 +32,7 @@ import io.fourth_finger.music_repository.MusicDataSourceImpl
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.UIAutomatorUtil.Companion.getPermissionUIAllowButton
 import io.fourth_finger.pinky_player.UIAutomatorUtil.Companion.getPermissionUIDenyButton
+import io.fourth_finger.shared_resources.ServiceMediaLibrary
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.core.AllOf.allOf
 import org.junit.Assert.assertTrue

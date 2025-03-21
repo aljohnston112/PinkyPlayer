@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import io.fourth_finger.pinky_player.FragmentTitleDirections
 import io.fourth_finger.pinky_player.databinding.FragmentTitleBinding
+import io.fourth_finger.pinky_player.ActivityMainViewModel
 
 
 /**

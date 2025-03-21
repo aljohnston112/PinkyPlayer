@@ -16,7 +16,7 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.ActivityMain
-import io.fourth_finger.pinky_player.MediaBrowserProvider
+import io.fourth_finger.shared_resources.MediaBrowserProvider
 import io.fourth_finger.music_repository.MediaFileUtil
 import io.fourth_finger.pinky_player.MusicFileAdapter
 import io.fourth_finger.pinky_player.R

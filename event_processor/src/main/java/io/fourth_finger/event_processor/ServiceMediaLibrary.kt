@@ -1,4 +1,4 @@
-package io.fourth_finger.pinky_player
+package io.fourth_finger.event_processor
 
 import android.content.Intent
 import androidx.annotation.OptIn
@@ -9,6 +9,7 @@ import androidx.media3.session.MediaSession
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
+import io.fourth_finger.playlist_repository.PlaylistProvider
 import io.fourth_finger.settings_repository.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * The [MediaLibraryService] used to play music in the background.
+ * The [androidx.media3.session.MediaLibraryService] used to play music in the background.
  */
 @AndroidEntryPoint
 class ServiceMediaLibrary : MediaLibraryService() {
@@ -99,7 +100,7 @@ class ServiceMediaLibrary : MediaLibraryService() {
 
 
     /**
-     * Sets up the [MediaSession].
+     * Sets up the [androidx.media3.session.MediaSession].
      */
     @OptIn(UnstableApi::class)
     private fun setUpMediaSession() {

@@ -8,6 +8,7 @@ import androidx.test.rule.GrantPermissionRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
+import io.fourth_finger.event_processor.MetaDataCreator
 import io.fourth_finger.music_repository.MusicRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert

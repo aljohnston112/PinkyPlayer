@@ -1,4 +1,4 @@
-package io.fourth_finger.pinky_player
+package io.fourth_finger.playlist_repository
 
 import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.music_repository.MusicRepository

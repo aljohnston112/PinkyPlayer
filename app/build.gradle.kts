@@ -75,6 +75,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":event_processor"))
+    implementation(project(":music_list_fragment"))
     implementation(project(":music_repository"))
     implementation(project(":playlist_repository"))
     implementation(project(":playlist_list_fragment"))
@@ -92,7 +94,7 @@ dependencies {
     // It will be in 1.4.0-alpha02
     implementation(libs.androidx.media3.common)
     implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.media3.session)
+    implementation(libs.androidx.media3.session)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.preference.ktx)

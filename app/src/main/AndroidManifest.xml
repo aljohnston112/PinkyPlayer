@@ -29,7 +29,7 @@
         </activity>
 
         <service
-            android:name=".ServiceMediaLibrary"
+            android:name="io.fourth_finger.event_processor.ServiceMediaLibrary"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback"
             android:permission="android.permission.FOREGROUND_SERVICE">

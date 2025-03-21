@@ -19,6 +19,7 @@ import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import io.fourth_finger.pinky_player.databinding.ActivityMainBinding
+import io.fourth_finger.event_processor.EventProcessor
 import javax.inject.Inject
 
 /**
@@ -28,7 +29,7 @@ import javax.inject.Inject
 class ActivityMain : AppCompatActivity() {
 
     @Inject
-    lateinit var mediaBrowserProvider: MediaBrowserProvider
+    lateinit var eventProcessor: EventProcessor
 
     private lateinit var binding: ActivityMainBinding
 
@@ -125,27 +126,26 @@ class ActivityMain : AppCompatActivity() {
      */
     private fun setUpOnClickListeners() {
         binding.buttonPlayPause.setOnClickListener {
-            viewModel.onPlayPauseClicked(this@ActivityMain)
+            eventProcessor.onPlayPauseClicked(this@ActivityMain)
         }
         binding.buttonNext.setOnClickListener {
-            viewModel.onNextClicked()
+            eventProcessor.onNextClicked()
         }
     }
 
     override fun onStart() {
         super.onStart()
-        viewModel.start()
         viewModel.havePermission.observe(this) { havePermission ->
             if (havePermission) {
                 binding.controls.visibility = VISIBLE
             }
         }
-        viewModel.playbackStarted.observe(this){ playbackStarted ->
+        eventProcessor.playbackStarted.observe(this){ playbackStarted ->
             if (playbackStarted){
                 binding.buttonNext.visibility = VISIBLE
             }
         }
-        viewModel.playing.observe(this) { isPlaying ->
+        eventProcessor.playing.observe(this) { isPlaying ->
             if (isPlaying) {
                 setPlayPauseButton(R.drawable.ic_baseline_pause_24)
             } else {
@@ -158,7 +158,6 @@ class ActivityMain : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        viewModel.stop()
     }
 
     override fun onDestroy() {

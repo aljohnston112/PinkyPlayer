@@ -59,6 +59,9 @@ dependencies {
 
     implementation(project(":shared_resources"))
 
+    implementation(libs.androidx.concurrent.futures.ktx)
+    implementation(libs.androidx.media3.common)
+    implementation(libs.androidx.media3.session)
     implementation(libs.lifecycle.livedata.core.ktx)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.hilt.android)

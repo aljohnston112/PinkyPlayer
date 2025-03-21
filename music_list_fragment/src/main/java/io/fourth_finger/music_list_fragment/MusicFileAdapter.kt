@@ -1,4 +1,4 @@
-package io.fourth_finger.pinky_player
+package io.fourth_finger.music_list_fragment
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -10,9 +10,9 @@ import io.fourth_finger.music_repository.MusicItem
 import kotlin.properties.Delegates
 
 /**
- * A [RecyclerView.Adapter] for [MusicItem]s.
+ * A [androidx.recyclerview.widget.RecyclerView.Adapter] for [io.fourth_finger.music_repository.MusicItem]s.
  *
- * @param music The list of [MusicItem]s to display.
+ * @param music The list of [io.fourth_finger.music_repository.MusicItem]s to display.
  * @param onSongClickListener The callback to be invoked when a song is clicked.
  */
 class MusicFileAdapter(
@@ -21,9 +21,9 @@ class MusicFileAdapter(
 ) : RecyclerView.Adapter<MusicFileAdapter.ViewHolder>() {
 
     /**
-     * Updates the adapter with a new list of [MusicItem]s.
+     * Updates the adapter with a new list of [io.fourth_finger.music_repository.MusicItem]s.
      *
-     * @param music The new list of [MusicItem]s.
+     * @param music The new list of [io.fourth_finger.music_repository.MusicItem]s.
      */
     @SuppressLint("NotifyDataSetChanged")
     fun updateMusicList(music: List<MusicItem>) {
@@ -57,9 +57,9 @@ class MusicFileAdapter(
     override fun getItemCount() = music.size
 
     /**
-     * A [RecyclerView.ViewHolder] for [MusicItem]s.
+     * A [androidx.recyclerview.widget.RecyclerView.ViewHolder] for [io.fourth_finger.music_repository.MusicItem]s.
      *
-     * @param view The item holder [View].
+     * @param view The item holder [android.view.View].
      */
     class ViewHolder(
         view: View

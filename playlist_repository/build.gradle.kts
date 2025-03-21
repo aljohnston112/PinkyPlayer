@@ -39,9 +39,9 @@ android {
 
 dependencies {
 
-    implementation(
-        project(":shared_resources"),
-    )
+    implementation(project(":music_repository"))
+    implementation(project(":probability_map"))
+    implementation(project(":shared_resources"))
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)

@@ -1,7 +1,6 @@
-package io.fourth_finger.pinky_player
+package io.fourth_finger.event_processor
 
 import android.content.Context
-import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.ForwardingPlayer
@@ -11,13 +10,15 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.SeekParameters
 import io.fourth_finger.music_repository.MusicItem
+import io.fourth_finger.playlist_repository.PlaylistProvider
 import io.fourth_finger.probability_map.ProbabilityMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@OptIn(UnstableApi::class)
-class PinkyPlayer(
+@androidx.annotation.OptIn(UnstableApi::class)
+class PinkyPlayer
+    (
     private var scope: CoroutineScope,
     private var context: Context,
     private val mediaItemCreator: MediaItemCreator,

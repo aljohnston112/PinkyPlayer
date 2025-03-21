@@ -2,6 +2,7 @@ package io.fourth_finger.pinky_player
 
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import io.fourth_finger.shared_resources.MediaBrowserProvider
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
