@@ -10,21 +10,18 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import androidx.test.rule.GrantPermissionRule
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
+import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
-import dagger.hilt.components.SingletonComponent
+import io.fourth_finger.event_processor.MediaBrowserProvider
+import io.fourth_finger.event_processor.MediaItemCreator
 import io.fourth_finger.music_repository.MusicDataSource
 import io.fourth_finger.music_repository.MusicDataSourceModule
 import io.fourth_finger.music_repository.MusicRepository
-import io.fourth_finger.shared_resources.MediaBrowserProvider
-import io.fourth_finger.shared_resources.MediaItemCreator
-import io.fourth_finger.pinky_player.getOrAwaitValue
 import io.fourth_finger.music_repository.provideFakeMusicDataSourceWithTwoShortestSongs
+import io.fourth_finger.pinky_player.getOrAwaitValue
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -39,16 +36,10 @@ import kotlin.time.Duration
 @HiltAndroidTest
 class ShuffleUseCase {
 
-    @Module
-    @InstallIn(SingletonComponent::class)
-    class FakeMusicDataSourceModule {
-
-        @Provides
-        fun provideFakeMusicDataSource(): MusicDataSource {
-            return provideFakeMusicDataSourceWithTwoShortestSongs()
-        }
-
-    }
+    @BindValue
+    @JvmField
+    val musicDataSource: MusicDataSource =
+        provideFakeMusicDataSourceWithTwoShortestSongs()
 
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
@@ -75,7 +66,7 @@ class ShuffleUseCase {
     @Test
     @LargeTest
     fun playlist_onCompletion_hasDefaultDistribution() =
-        runTest(timeout = Duration.parse("2m")) {
+        runTest(timeout = Duration.parse("200m")) {
             val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
             musicRepository.loadMusicFiles(
                 application.contentResolver
@@ -87,7 +78,7 @@ class ShuffleUseCase {
                 firstSongId to 1.0 / 2.0,
                 secondSongId to 1.0 / 2.0,
             )
-            val numberOfSamples = 100
+            val numberOfSamples = 1000
 
             val observedCounts = mutableMapOf<Long, Long>()
             observedCounts[firstSongId] = 0
@@ -128,7 +119,9 @@ class ShuffleUseCase {
             UiThreadStatement.runOnUiThread {
                 val mediaItemCreator = MediaItemCreator(musicRepository)
                 mediaBrowser.setMediaItem(mediaItemCreator.getMediaItem(application, firstSongId))
+                mediaBrowser.addMediaItem(mediaItemCreator.getMediaItem(application, firstSongId))
                 mediaBrowser.play()
+                mediaBrowser.seekToNextMediaItem()
             }
 
             countDownLatch.await()

@@ -7,18 +7,13 @@ plugins {
 
 android {
     namespace = "io.fourth_finger.music_repository"
-    compileSdk = 35
 
     defaultConfig {
         minSdk = 21
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments += (
-                mapOf(
-                        "clearPackageData" to "true",
-                        "useTestStorageService" to "true"
-                )
-        )
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
+        testInstrumentationRunnerArguments["useTestStorageService"] = "true"
     }
 
     testOptions {
@@ -49,10 +44,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
-    }
-
 }
 
 dependencies {
@@ -66,6 +57,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    ksp(libs.kotlin.metadata.jvm)
 
     debugImplementation(libs.androidx.monitor)
 

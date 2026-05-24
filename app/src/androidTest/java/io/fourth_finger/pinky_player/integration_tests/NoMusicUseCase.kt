@@ -19,7 +19,7 @@ import dagger.hilt.components.SingletonComponent
 import io.fourth_finger.music_repository.MusicDataSource
 import io.fourth_finger.music_repository.MusicDataSourceModule
 import io.fourth_finger.pinky_player.ActivityMain
-import io.fourth_finger.pinky_player.MusicFileAdapter
+import io.fourth_finger.music_list_fragment.MusicFileAdapter
 import io.fourth_finger.pinky_player.R
 import io.fourth_finger.music_repository.provideFakeMusicDataSourceWithNoSongs
 import kotlinx.coroutines.test.runTest
@@ -70,7 +70,7 @@ class NoMusicUseCase {
                 .perform(click())
 
             assertThrows(PerformException::class.java) {
-                onView(ViewMatchers.withId((R.id.recycler_view)))
+                onView(ViewMatchers.withId((io.fourth_finger.music_list_fragment.R.id.recycler_view)))
                     .perform(
                         RecyclerViewActions.actionOnItemAtPosition<MusicFileAdapter.ViewHolder>(
                             0,

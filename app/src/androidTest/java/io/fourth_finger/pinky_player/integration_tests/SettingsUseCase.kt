@@ -28,12 +28,13 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
+import io.fourth_finger.event_processor.MediaBrowserProvider
+import io.fourth_finger.event_processor.MediaItemCreator
 import io.fourth_finger.music_repository.MusicDataSource
 import io.fourth_finger.music_repository.MusicDataSourceModule
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.ActivityMain
 import io.fourth_finger.pinky_player.FragmentSettings
-import io.fourth_finger.shared_resources.MediaItemCreator
 import io.fourth_finger.pinky_player.R
 import io.fourth_finger.pinky_player.getOrAwaitValue
 import io.fourth_finger.music_repository.provideFakeMusicDataSourceWithTwoShortestSongs
@@ -87,6 +88,8 @@ class SettingsUseCase {
     @Inject
     lateinit var settingsRepository: SettingsRepository
 
+    @Inject
+    lateinit var mediaBrowserProvider: MediaBrowserProvider
 
     @Before
     fun init() {
@@ -159,7 +162,7 @@ class SettingsUseCase {
                 assertTrue(preference.value != 50)
                 preference.value = 50
                 runBlocking {
-                    mediaBrowser = it.mediaBrowserProvider.await()
+                    mediaBrowser = mediaBrowserProvider.await()
                 }
                 countDownLatchSeekBar.countDown()
             }
@@ -203,6 +206,7 @@ class SettingsUseCase {
                 val mediaItemCreator = MediaItemCreator(musicRepository)
                 val application = ApplicationProvider.getApplicationContext<HiltTestApplication>()
                 mediaBrowser?.setMediaItem(mediaItemCreator.getMediaItem(application, firstSongId))
+                mediaBrowser?.prepare()
                 countDownLatchPlayStarted.countDown()
             }
             countDownLatchPlayStarted.await()
@@ -254,7 +258,6 @@ class SettingsUseCase {
             }
 
             countDownLatch.await()
-
         }
 
     @Test
@@ -348,7 +351,7 @@ class SettingsUseCase {
 
                 // Start music playback
                 runBlocking {
-                    mediaBrowser = it.mediaBrowserProvider.await()
+                    mediaBrowser = mediaBrowserProvider.await()
 
                     mediaBrowser.addListener(
                         object : Player.Listener {

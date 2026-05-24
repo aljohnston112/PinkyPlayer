@@ -14,11 +14,11 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import io.fourth_finger.event_processor.MediaBrowserProvider
+import io.fourth_finger.music_list_fragment.MusicFileAdapter
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.ActivityMain
-import io.fourth_finger.shared_resources.MediaBrowserProvider
 import io.fourth_finger.music_repository.MediaFileUtil
-import io.fourth_finger.pinky_player.MusicFileAdapter
 import io.fourth_finger.pinky_player.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
@@ -197,7 +197,7 @@ class PlayMusicUseCase {
 
             // Click the song and wait for it to load
             val shortestMusic = musicRepository.getMusicItem(shortestMusicId)!!
-            onView(withId(R.id.recycler_view))
+            onView(withId(io.fourth_finger.music_list_fragment.R.id.recycler_view))
                 .perform(
                     RecyclerViewActions.actionOnItem<MusicFileAdapter.ViewHolder>(
                         ViewMatchers.hasDescendant(
@@ -255,7 +255,7 @@ class PlayMusicUseCase {
 
             // Click the song and wait for it to load
             val song = musicRepository.getMusicItem(musicId)!!
-            onView(withId(R.id.recycler_view))
+            onView(withId(io.fourth_finger.music_list_fragment.R.id.recycler_view))
                 .perform(
                     RecyclerViewActions.actionOnItem<MusicFileAdapter.ViewHolder>(
                         ViewMatchers.hasDescendant(

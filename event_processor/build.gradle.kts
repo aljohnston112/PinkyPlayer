@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -7,11 +10,8 @@ plugins {
 
 android {
     namespace = "io.fourth_finger.event_processor"
-    compileSdk = 35
 
     defaultConfig {
-        minSdk = 24
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -29,10 +29,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
-    }
 }
+
 
 dependencies {
 
@@ -40,12 +38,15 @@ dependencies {
     implementation(project(":playlist_repository"))
     implementation(project(":probability_map"))
     implementation(project(":settings_repository"))
+    implementation(project(":shared_resources"))
 
     implementation(libs.androidx.concurrent.futures.ktx)
     implementation(libs.androidx.media3.common)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.session)
-    implementation (libs.hilt.android)
-    ksp (libs.hilt.android.compiler)
+
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    ksp(libs.kotlin.metadata.jvm)
 
 }

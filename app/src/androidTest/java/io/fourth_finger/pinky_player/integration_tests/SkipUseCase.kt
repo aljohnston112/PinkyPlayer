@@ -19,12 +19,12 @@ import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import io.fourth_finger.event_processor.MediaBrowserProvider
+import io.fourth_finger.music_list_fragment.MusicFileAdapter
 import io.fourth_finger.music_repository.MusicDataSource
 import io.fourth_finger.music_repository.MusicDataSourceModule
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.ActivityMain
-import io.fourth_finger.shared_resources.MediaBrowserProvider
-import io.fourth_finger.pinky_player.MusicFileAdapter
 import io.fourth_finger.pinky_player.R
 import io.fourth_finger.pinky_player.getOrAwaitValue
 import io.fourth_finger.music_repository.provideFakeMusicDataSourceWithTwoShortestSongs
@@ -44,7 +44,8 @@ class SkipUseCase {
 
     @BindValue
     @JvmField
-    val musicDataSource: MusicDataSource = provideFakeMusicDataSourceWithTwoShortestSongs()
+    val musicDataSource: MusicDataSource =
+        provideFakeMusicDataSourceWithTwoShortestSongs()
 
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
@@ -82,7 +83,7 @@ class SkipUseCase {
                 firstSongId to 2.0 / 3.0,
                 secondSongId to 1.0 / 3.0,
             )
-            val numberOfSamples = 100
+            val numberOfSamples = 1000
 
             val observedCounts = mutableMapOf<Long, Long>()
             observedCounts[firstSongId] = 0
@@ -123,7 +124,7 @@ class SkipUseCase {
             onView(withId(R.id.button_songs))
                 .perform(click())
 
-            onView(withId(R.id.recycler_view))
+            onView(withId(io.fourth_finger.music_list_fragment.R.id.recycler_view))
                 .perform(
                     RecyclerViewActions.actionOnItem<MusicFileAdapter.ViewHolder>(
                         hasDescendant(withText(music[1].fullPath)),
@@ -143,7 +144,7 @@ class SkipUseCase {
                 val deviation = abs((expectedProbability - observedProbability))
                 val epsilon = 0.1
                 Assert.assertTrue(
-                    "Deviation for $element should be within $epsilon, but was $deviation, should have been $expectedProbability",
+                    "Deviation for $element should be within $epsilon, but was $deviation, should have been $expectedProbability, but got $observedProbability",
                     deviation <= epsilon
                 )
             }

@@ -4,10 +4,13 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_24
+    targetCompatibility = JavaVersion.VERSION_24
 }
 
+kotlin {
+    jvmToolchain(24)
+}
 
 dependencies {
     testImplementation(libs.junit)

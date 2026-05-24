@@ -57,7 +57,7 @@ class PlaylistProvider @Inject constructor(
         return mainPlaylist
     }
 
-    fun getOrNull(): ProbabilityMap<MusicItem>? {
+    fun getOrThrow(): ProbabilityMap<MusicItem> {
         return mainPlaylist
     }
 

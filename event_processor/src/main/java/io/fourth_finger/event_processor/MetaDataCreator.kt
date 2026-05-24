@@ -44,7 +44,7 @@ class MetaDataCreator @Inject constructor(
             uri
         } ?: {
             val resources = context.resources
-            val resourceId = R.drawable.ic_baseline_music_note_24
+            val resourceId = io.fourth_finger.shared_resources.R.drawable.ic_baseline_music_note_24
             val drawableUri = Uri.Builder()
                 .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
                 .authority(resources.getResourcePackageName(resourceId))

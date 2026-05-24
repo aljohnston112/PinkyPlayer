@@ -17,7 +17,6 @@ import kotlinx.coroutines.job
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -56,13 +55,9 @@ class MainPlaylistProviderTest {
         }
     }
 
-    @Test
-    fun getOrNull_whenNoMusicLoaded_returnsNull() {
-        assertNull(playlistProvider.getOrNull())
-    }
 
     @Test
-    fun getOrNull_whenMusicLoaded_returnsPlaylist() = runTest {
+    fun await_whenMusicLoaded_returnsPlaylist() = runTest {
         val music = musicRepository.loadMusicFiles(application.contentResolver)
         val countDownLatch = CountDownLatch(1)
         val observer = { newMusic: List<MusicItem> ->
@@ -76,7 +71,7 @@ class MainPlaylistProviderTest {
         scope.coroutineContext.job.children.forEach {
             it.join()
         }
-        val playlist = playlistProvider.getOrNull()!!
+        val playlist = playlistProvider.await()
         for (song in music) {
             assertTrue(playlist.contains(song))
         }

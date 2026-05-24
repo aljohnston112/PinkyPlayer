@@ -1,4 +1,4 @@
-package io.fourth_finger.pinky_player
+package io.fourth_finger.music_list_fragment
 
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -33,7 +33,7 @@ class MusicItemAdapterTest {
      */
     @Test
     fun updateMusicList_newList_updatesViewHolders() {
-        val adapter = MusicFileAdapter(emptyList){ /** onClick **/ }
+        val adapter = MusicFileAdapter(emptyList) { /** onClick **/ }
         assert(adapter.itemCount == 0)
         adapter.updateMusicList(singletonList)
         assert(adapter.itemCount == 1)
@@ -62,8 +62,8 @@ class MusicItemAdapterTest {
     fun onBindViewHolder_validPositions_bindsCorrectly() {
         val adapter = MusicFileAdapter(
             listOf(
-                MusicItem(0, "B/","A"),
-                MusicItem(1, "B/","B")
+                MusicItem(0, "B/", "A"),
+                MusicItem(1, "B/", "B")
             )
         ){ /** onClick **/ }
         val viewHolder = MusicFileAdapter.ViewHolder(viewStub)

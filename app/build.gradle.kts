@@ -4,11 +4,11 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+    id("io.fourth_finger.convention.orchestrator")
 }
 
 android {
     namespace = "io.fourth_finger.pinky_player"
-    compileSdk = 35
 
     buildFeatures {
         viewBinding = true
@@ -16,27 +16,10 @@ android {
 
     defaultConfig {
         applicationId = "io.fourth_finger.pinky_player"
-        // May be as high as 28, if needed
-        minSdk = 28
-        targetSdk = 35
         versionCode = 3
         versionName = "0.3.3"
-
-        testInstrumentationRunner = "io.fourth_finger.shared_resources.test.PinkyRunner"
-        testInstrumentationRunnerArguments += (
-                mapOf(
-                        "clearPackageData" to "true",
-                        "useTestStorageService" to "true"
-                )
-        )
     }
 
-    testOptions {
-        execution = "ANDROIDX_TEST_ORCHESTRATOR"
-        installation {
-            timeOutInMs = 600000
-        }
-    }
 
     buildTypes {
 
@@ -48,8 +31,8 @@ android {
 
         release {
             proguardFiles(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
             )
         }
     }
@@ -68,8 +51,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
 
-    kotlinOptions {
-        jvmTarget = "21"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        }
     }
 
 }
@@ -89,9 +74,6 @@ dependencies {
     implementation(libs.androidx.concurrent.futures.ktx)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
-    // https://github.com/androidx/media/issues/1352
-    // Do not upgrade until commit 1a5cf67 is in the release
-    // It will be in 1.4.0-alpha02
     implementation(libs.androidx.media3.common)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.session)
@@ -100,6 +82,7 @@ dependencies {
     implementation(libs.androidx.preference.ktx)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    ksp(libs.kotlin.metadata.jvm)
     implementation(libs.kotlinx.coroutines.core)
 
     debugImplementation(libs.androidx.monitor)
@@ -118,7 +101,9 @@ dependencies {
     androidTestUtil(libs.androidx.test.services)
     androidTestImplementation(libs.androidx.uiautomator)
     androidTestImplementation(libs.core.ktx)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+
     androidTestImplementation(libs.hilt.android.testing)
     kspAndroidTest(libs.hilt.android.compiler)
-    androidTestImplementation(libs.kotlinx.coroutines.test)
+    kspAndroidTest(libs.kotlin.metadata.jvm)
 }

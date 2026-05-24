@@ -44,7 +44,8 @@ class ServiceMediaLibrary : MediaLibraryService() {
         @OptIn(UnstableApi::class)
         override fun onPlaybackResumption(
             mediaSession: MediaSession,
-            controller: MediaSession.ControllerInfo
+            controller: MediaSession.ControllerInfo,
+            isForPlayback: Boolean
         ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
             // TODO once there is queue functionality
             return Futures.immediateFuture(

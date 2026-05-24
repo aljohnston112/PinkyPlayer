@@ -7,7 +7,6 @@ plugins {
 
 android {
     namespace = "io.fourth_finger.playlist_repository"
-    compileSdk = 35
 
     defaultConfig {
         minSdk = 21
@@ -31,10 +30,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
 
-    kotlinOptions {
-        jvmTarget = "21"
-    }
-
 }
 
 dependencies {
@@ -51,6 +46,7 @@ dependencies {
 
     implementation(libs.hilt.android)
     ksp (libs.hilt.compiler)
+    ksp(libs.kotlin.metadata.jvm)
 
     implementation(libs.protobuf.kotlin)
 
@@ -61,6 +57,7 @@ dependencies {
 
     androidTestImplementation(libs.hilt.android.testing)
     kspAndroidTest(libs.hilt.android.compiler)
+    kspAndroidTest(libs.kotlin.metadata.jvm)
 
     androidTestImplementation(libs.kotlinx.coroutines.test)
 }

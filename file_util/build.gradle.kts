@@ -5,23 +5,15 @@ plugins {
 
 android {
     namespace = "io.fourth_finger.file_util"
-    compileSdk = 35
 
     defaultConfig {
         applicationId = "io.fourth_finger.file_util"
-        minSdk = 26
-        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments += (
-                mapOf(
-                    "clearPackageData" to "true",
-                    "useTestStorageService" to "true"
-                )
-                )
-
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
+        testInstrumentationRunnerArguments["useTestStorageService"] = "true"
     }
 
     buildTypes {
@@ -42,9 +34,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
-    }
-    kotlinOptions {
-        jvmTarget = "21"
     }
 
 }

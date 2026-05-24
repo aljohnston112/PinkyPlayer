@@ -7,7 +7,6 @@ plugins {
 
 android {
     namespace = "io.fourth_finger.playlists"
-    compileSdk = 35
 
     buildFeatures {
         viewBinding = true
@@ -17,12 +16,8 @@ android {
         minSdk = 21
 
         testInstrumentationRunner = "io.fourth_finger.shared_resources.test.PinkyRunner"
-        testInstrumentationRunnerArguments += (
-                mapOf(
-                    "clearPackageData" to "true",
-                    "useTestStorageService" to "true"
-                )
-                )
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
+        testInstrumentationRunnerArguments["useTestStorageService"] = "true"
     }
 
     buildTypes {
@@ -45,8 +40,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
 
-    kotlinOptions {
-        jvmTarget = "21"
+    kotlin {
+        jvmToolchain(21)
     }
 
 }
@@ -71,6 +66,7 @@ dependencies {
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    ksp(libs.kotlin.metadata.jvm)
 
     testImplementation(libs.junit)
 

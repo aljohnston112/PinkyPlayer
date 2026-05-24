@@ -1,4 +1,4 @@
-package io.fourth_finger.pinky_player
+package io.fourth_finger.music_list_fragment
 
 import android.Manifest
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule

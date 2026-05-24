@@ -16,10 +16,10 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.rule.GrantPermissionRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import io.fourth_finger.music_list_fragment.MusicFileAdapter
 import io.fourth_finger.music_repository.MusicItem
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.ActivityMain
-import io.fourth_finger.pinky_player.MusicFileAdapter
 import io.fourth_finger.pinky_player.R
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -64,7 +64,7 @@ class MusicSearchUseCase {
                 .perform(click())
 
             // Type text into the search view
-            onView(withId(R.id.action_search))
+            onView(withId(io.fourth_finger.music_list_fragment.R.id.action_search))
                 .perform(click())
             val searchText = "floaroma"
 
@@ -88,7 +88,7 @@ class MusicSearchUseCase {
             // matches the number of items on the recycler view
             val countDownLatch = CountDownLatch(1)
             activityScenarioRule.scenario.onActivity {
-                val recyclerView = it.findViewById<RecyclerView>(R.id.recycler_view)
+                val recyclerView = it.findViewById<RecyclerView>(io.fourth_finger.music_list_fragment.R.id.recycler_view)
                 recyclerView.post {
                     Assert.assertTrue(recyclerView.adapter!!.itemCount == siftedMusic.size)
                     countDownLatch.countDown()
@@ -98,7 +98,7 @@ class MusicSearchUseCase {
 
             // Make sure all songs are in the recycler view
             for (song in siftedMusic) {
-                onView(withId(R.id.recycler_view))
+                onView(withId(io.fourth_finger.music_list_fragment.R.id.recycler_view))
                     .perform(
                         scrollTo<MusicFileAdapter.ViewHolder>(
                             hasDescendant(
@@ -119,7 +119,7 @@ class MusicSearchUseCase {
                 .perform(click())
 
             // Type text into the search view
-            onView(withId(R.id.action_search))
+            onView(withId(io.fourth_finger.music_list_fragment.R.id.action_search))
                 .perform(click())
             val searchText = "floaroma"
 

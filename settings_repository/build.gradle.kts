@@ -7,21 +7,14 @@ plugins {
 
 android {
     namespace = "io.fourth_finger.settings_repository"
-    compileSdk = 35
 
     defaultConfig {
-        minSdk = 26
 
         consumerProguardFiles("consumer-rules.pro")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments += (
-                mapOf(
-                    "clearPackageData" to "true",
-                    "useTestStorageService" to "true"
-                )
-                )
-
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
+        testInstrumentationRunnerArguments["useTestStorageService"] = "true"
     }
 
     buildTypes {
@@ -45,8 +38,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
 
-    kotlinOptions {
-        jvmTarget = "21"
+    kotlin {
+        jvmToolchain(21)
     }
 
     testOptions {
@@ -65,6 +58,7 @@ dependencies {
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    ksp(libs.kotlin.metadata.jvm)
 
     implementation(libs.kotlinx.coroutines.core)
 
@@ -77,6 +71,7 @@ dependencies {
 
     androidTestImplementation(libs.hilt.android.testing)
     kspAndroidTest(libs.hilt.android.compiler)
+    kspAndroidTest(libs.kotlin.metadata.jvm)
 
     androidTestUtil(libs.androidx.orchestrator)
 

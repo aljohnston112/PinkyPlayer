@@ -142,7 +142,9 @@ class ActivityMain : AppCompatActivity() {
         }
         eventProcessor.playbackStarted.observe(this){ playbackStarted ->
             if (playbackStarted){
-                binding.buttonNext.visibility = VISIBLE
+                runOnUiThread {
+                    binding.buttonNext.visibility = VISIBLE
+                }
             }
         }
         eventProcessor.playing.observe(this) { isPlaying ->

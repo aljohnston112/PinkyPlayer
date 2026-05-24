@@ -47,7 +47,7 @@ class MetaDataCreatorTest {
             val metadata = metaDataCreator.getMetaData(application, testMusic.id)
 
             val resources = application.resources
-            val resourceId = R.drawable.ic_baseline_music_note_24
+            val resourceId = io.fourth_finger.shared_resources.R.drawable.ic_baseline_music_note_24
             val uri = musicRepository.getUri(testMusic.id) ?: Uri.Builder()
                 .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
                 .authority(resources.getResourcePackageName(resourceId))

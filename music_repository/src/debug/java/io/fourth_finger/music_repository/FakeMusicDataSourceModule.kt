@@ -30,7 +30,7 @@ fun provideFakeMusicDataSourceWithTwoShortestSongs(): MusicDataSource {
                 shortestMusic.clear()
                 shortestMusic.addAll(
                     withContext(Dispatchers.Default) {
-                        MediaFileUtil.Companion.getMusicIdOfTwoShortDurationSongs(musicRepository)
+                        MediaFileUtil.getMusicIdOfTwoShortDurationSongs(musicRepository)
                             .map {
                                 musicRepository.getMusicItem(it)!!
                             }

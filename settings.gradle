@@ -1,10 +1,16 @@
 pluginManagement {
+    includeBuild("build_logic")
     repositories {
         gradlePluginPortal()
         google()
         mavenCentral()
     }
 }
+
+plugins {
+    id("com.android.settings") version '8.13.2'
+}
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -23,3 +29,9 @@ include ':shared_resources'
 include ':playlist_repository'
 include ':music_list_fragment'
 include ':event_processor'
+
+android{
+    compileSdk = 36
+    minSdk = 28
+    targetSdk = 36
+}

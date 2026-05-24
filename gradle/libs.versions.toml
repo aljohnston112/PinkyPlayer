@@ -1,54 +1,61 @@
 [versions]
 # The plugin versions
-androidApplicationPlugin = "8.9.0"
-androidLibraryPlugin = "8.9.0"
-hiltPlugin = "2.55"
-kotlinAndroidPlugin = "2.1.10"
-kotlinJvmPlugin = "2.1.10"
-kspPlugin = "2.1.10-1.0.31"
-navigationSafeArgsPlugin = "2.8.9"
-protobufPlugin = "0.9.4"
+androidApplicationPlugin = "8.13.2"
+androidLibraryPlugin = "8.13.2"
+hiltPlugin = "2.58"
+kotlinAndroidPlugin = "2.3.0"
+kotlinJvmPlugin = "2.3.0"
+kspPlugin = "2.3.4"
+navigationSafeArgsPlugin = "2.9.6"
+protobufPlugin = "0.9.6"
+
+androidGradlePlugin = "8.13.0"
+kotlin = "2.3.0"
 
 # The library version
-activityKtx = "1.10.1"
-appcompat = "1.7.0"
-concurrentFuturesKtx = "1.2.0"
+activityKtx = "1.12.2"
+appcompat = "1.7.1"
+concurrentFuturesKtx = "1.3.0"
 constraintlayout = "2.2.1"
-coreKtx = "1.15.0"
+coreKtx = "1.17.0"
 coreTesting = "2.2.0"
-datastore = "1.1.3"
-datastorePreferences = "1.1.3"
-espressoCore = "3.6.1"
-espressoContrib = "3.6.1"
-fragmentKtx = "1.8.6"
-hiltAndroid = "2.51.1"
-hiltAndroidCompiler = "2.51.1"
-hiltCompiler = "2.55"
-hiltAndroidTesting = "2.51.1"
+datastore = "1.2.0"
+datastorePreferences = "1.2.0"
+espressoCore = "3.7.0"
+espressoContrib = "3.7.0"
+fragmentKtx = "1.8.9"
+hiltAndroid = "2.57.2"
+hiltAndroidCompiler = "2.57.2"
+hiltCompiler = "2.57.2"
+hiltAndroidTesting = "2.57.2"
 junit = "4.13.2"
-androidxJunit = "1.2.1"
-junitKtx = "1.2.1"
-kotlinxCoroutinesCore = "1.9.0-RC"
-kotlinxCoroutinesTest = "1.8.1"
-lifecycleLivedataCoreKtx = "2.8.7"
-lifecycleViewModel = "2.8.7"
-material = "1.12.0"
-media3Common = "1.5.1"
-media3Exoplayer = "1.5.1"
-media3TestUtils = "1.5.1"
-media3Session = "1.5.1"
-monitor = "1.7.2"
-navigationFragmentKtx = "2.8.9"
-navigationTesting = "2.8.9"
-navigationUiKtk = "2.8.9"
-orchestrator = "1.5.1"
+androidxJunit = "1.3.0"
+junitKtx = "1.3.0"
+kotlinxCoroutinesCore = "1.10.2"
+kotlinxCoroutinesTest = "1.10.2"
+kotlinMetadataJvm = "2.3.20-Beta1"
+lifecycleLivedataCoreKtx = "2.10.0"
+lifecycleViewModel = "2.10.0"
+material = "1.13.0"
+# https://github.com/androidx/media/issues/1352
+# Do not upgrade until commit 1a5cf67 is in the release
+# It will be in 1.4.0-alpha02
+media3Common = "1.9.0"
+media3Exoplayer = "1.9.0"
+media3TestUtils = "1.9.0"
+media3Session = "1.9.0"
+monitor = "1.8.0"
+navigationFragmentKtx = "2.9.6"
+navigationTesting = "2.9.6"
+navigationUiKtk = "2.9.6"
+orchestrator = "1.6.1"
 preferenceKtx = "1.2.1"
-protobufKotlin = "4.27.2"
+protobufKotlin = "4.33.4"
 recyclerView = "1.4.0"
-rules = "1.6.1"
-runner = "1.6.1"
-testCoreKtx = "1.6.1"
-testServices = "1.5.0"
+rules = "1.7.0"
+runner = "1.7.0"
+testCoreKtx = "1.7.0"
+testServices = "1.6.0"
 uiautomator = "2.3.0"
 
 [libraries]
@@ -93,10 +100,14 @@ junit = { module = "junit:junit", version.ref = "junit" }
 
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+kotlin-metadata-jvm = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlinMetadataJvm" }
 
 lifecycle-livedata-core-ktx = { module = "androidx.lifecycle:lifecycle-livedata-core-ktx", version.ref = "lifecycleLivedataCoreKtx" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 protobuf-kotlin = { module = "com.google.protobuf:protobuf-kotlin", version.ref = "protobufKotlin" }
+
+android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
+kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidApplicationPlugin" }

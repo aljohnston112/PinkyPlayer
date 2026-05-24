@@ -28,11 +28,11 @@ import androidx.test.uiautomator.UiDevice
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
+import io.fourth_finger.event_processor.ServiceMediaLibrary
 import io.fourth_finger.music_repository.MusicDataSourceImpl
 import io.fourth_finger.music_repository.MusicRepository
 import io.fourth_finger.pinky_player.UIAutomatorUtil.Companion.getPermissionUIAllowButton
 import io.fourth_finger.pinky_player.UIAutomatorUtil.Companion.getPermissionUIDenyButton
-import io.fourth_finger.shared_resources.ServiceMediaLibrary
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.core.AllOf.allOf
 import org.junit.Assert.assertTrue
@@ -54,7 +54,8 @@ class ActivityMainTest {
     @get:Rule(order = 2)
     var activityScenarioRule = activityScenarioRule<ActivityMain>()
 
-    private val context: HiltTestApplication = ApplicationProvider.getApplicationContext()
+    private val context: HiltTestApplication =
+        ApplicationProvider.getApplicationContext()
 
     private lateinit var mediaBrowser: MediaBrowser
 
@@ -220,7 +221,8 @@ class ActivityMainTest {
         onView(withText((R.string.settings)))
             .perform(click())
 
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val device =
+            UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val appInfoView = device.findObject(
             By.text("App info")
         )
@@ -234,6 +236,5 @@ class ActivityMainTest {
             .setUri(musicRepository.getUri(music[0].id))
             .build()
     }
-
 
 }

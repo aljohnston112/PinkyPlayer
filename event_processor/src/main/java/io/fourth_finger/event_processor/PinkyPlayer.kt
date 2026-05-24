@@ -17,8 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @androidx.annotation.OptIn(UnstableApi::class)
-class PinkyPlayer
-    (
+class PinkyPlayer(
     private var scope: CoroutineScope,
     private var context: Context,
     private val mediaItemCreator: MediaItemCreator,
@@ -44,13 +43,16 @@ class PinkyPlayer
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             super.onMediaItemTransition(mediaItem, reason)
-            scope.launch(Dispatchers.Main.immediate) {
                 if (reason == MEDIA_ITEM_TRANSITION_REASON_AUTO) {
-                    val song = getNextSong(playlistProvider.await())
+                    val song = getNextSong(playlistProvider.getOrThrow())
                     addMediaItem(song)
+                    if(playbackState == STATE_ENDED){
+                        seekToDefaultPosition(mediaItemCount - 1);
+                        prepare()
+                        play()
+                    }
                 }
             }
-        }
 
     }
 
@@ -103,16 +105,14 @@ class PinkyPlayer
         mediaItems: MutableList<MediaItem>,
         resetPosition: Boolean
     ) {
-        scope.launch(Dispatchers.Main.immediate) {
             val songs = mediaItems.toMutableList()
             if (mediaItems.size == 1) {
                 addSong(
-                    playlistProvider.await(),
+                    playlistProvider.getOrThrow(),
                     songs
                 )
             }
             super.setMediaItems(songs, resetPosition)
-        }
     }
 
     private fun addSong(
@@ -136,7 +136,6 @@ class PinkyPlayer
     }
 
     override fun seekToNextMediaItem() {
-        scope.launch(Dispatchers.Main.immediate) {
 
             val mediaId = currentMediaItem?.mediaId?.toLong()!!
             scope.launch(Dispatchers.IO) {
@@ -147,13 +146,10 @@ class PinkyPlayer
                 currentMediaItemIndex + 1,
                 C.TIME_UNSET
             )
-            val playlist = playlistProvider.await()
+            val playlist = playlistProvider.getOrThrow()
 
             val next = getNextSong(playlist)
             addMediaItem(next)
-            val afterNext = getNextSong(playlist)
-            addMediaItem(afterNext)
-        }
     }
 
     override fun release() {
